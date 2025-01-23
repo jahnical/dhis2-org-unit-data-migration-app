@@ -1,0 +1,59 @@
+:root {
+    --headerbarHeight: 48px;
+    --toolbarHeight: 38px;
+    --expandButtonHeight: 16px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+}
+
+.container.hidden {
+    display: none;
+}
+
+.overflowContainer {
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 78px;
+    max-height: 20vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.expanded {
+    max-height: calc(
+        100vh - var(--headerbarHeight) - var(--toolbarHeight) -
+            var(--expandButtonHeight)
+    );
+    overflow-y: auto;
+}
+
+.button {
+    cursor: pointer;
+    padding: 0;
+    width: 100%;
+    height: var(--expandButtonHeight);
+    background-color: var(--colors-grey050);
+    border: none;
+    border-top: 1px solid var(--colors-grey300);
+    border-bottom: 1px solid var(--colors-grey400);
+}
+.button:hover {
+    background-color: var(--colors-grey100);
+}
+
+.button svg {
+    margin-top: -1px;
+}
+
+.button:hover svg {
+    color: var(--colors-grey900);
+}
+
+.button:focus {
+    outline: none;
+}

@@ -1,0 +1,23 @@
+.rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacers-dp4);
+}
+.columns {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacers-dp4);
+}
+.stretch {
+    flex-grow: 1;
+}
+.stage {
+    margin-left: var(--spacers-dp4);
+}
+
+.label {
+    color: var(--colors-grey700);
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 2px;
+}

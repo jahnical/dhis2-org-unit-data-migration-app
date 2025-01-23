@@ -1,0 +1,76 @@
+{
+    "name": "data-migration-app",
+    "version": "1",
+    "description": "DHIS2 Data Migration",
+    "license": "BSD-3-Clause",
+    "private": true,
+    "scripts": {
+        "deduplicate": "d2-app-scripts deduplicate",
+        "build": "d2-app-scripts build",
+        "start": "d2-app-scripts start",
+        "test": "d2-app-scripts test",
+        "deploy": "d2-app-scripts deploy",
+        "lint": "d2-style check",
+        "format": "d2-style apply",
+        "validate-commit": "d2-style check --staged",
+        "validate-push": "yarn test",
+        "cy:open": "start-server-and-test 'yarn start' http://localhost:3000 'yarn cypress open --e2e --env networkMode=live'",
+        "cy:run": "start-server-and-test 'yarn start' http://localhost:3000 'yarn cypress run --env networkMode=live'"
+    },
+    "devDependencies": {
+        "@dhis2/cli-app-scripts": "^11.4.2",
+        "@dhis2/cli-style": "^10.4.3",
+        "@dhis2/cypress-commands": "^10.0.3",
+        "@dhis2/cypress-plugins": "^10.0.2",
+        "@semantic-release/changelog": "^6",
+        "@semantic-release/exec": "^6",
+        "@semantic-release/git": "^10",
+        "@testing-library/jest-dom": "^5.16.4",
+        "@testing-library/react": "^12.1.4",
+        "cypress": "^13.10.0",
+        "cypress-tags": "^1.2.2",
+        "depcheck": "^1.4.7",
+        "enzyme": "^3.11.0",
+        "enzyme-adapter-react-16": "^1.15.8",
+        "eslint-plugin-cypress": "^2.12.1",
+        "identity-obj-proxy": "^3.0.0",
+        "jest-enzyme": "^7.1.2",
+        "redux-mock-store": "^1.5.4",
+        "semantic-release": "^20",
+        "start-server-and-test": "^1.14.0",
+        "typescript": "^4.8.4",
+        "unimported": "^1.31.1"
+    },
+    "unimported": {
+        "entry": [
+            "src/AppWrapper.js"
+        ]
+    },
+    "dependencies": {
+        "@dhis2/analytics": "^26.9.3",
+        "@dhis2/app-runtime": "^3.4.4",
+        "@dhis2/ui": "^9.4.2",
+        "@dnd-kit/core": "^5.0.3",
+        "@dnd-kit/sortable": "^6.0.1",
+        "@dnd-kit/utilities": "^3.2.2",
+        "@krakenjs/post-robot": "^11.0.0",
+        "@testing-library/jest-dom": "^5.16.4",
+        "@testing-library/react": "^12.1.4",
+        "history": "^5.3.0",
+        "lodash-es": "^4.17.21",
+        "prop-types": "^15.7.2",
+        "query-string": "^7.1.1",
+        "react": "^16.14",
+        "react-beautiful-dnd": "^13.1.0",
+        "react-redux": "^7.2.6",
+        "redux-logger": "^3.0.6",
+        "redux-mock-store": "^1.5.4",
+        "redux-thunk": "^2.3.0",
+        "reselect": "^4.1.5",
+        "styled-jsx": "^4.0.1"
+    },
+    "resolutions": {
+        "@dhis2/ui": "^9.4.2",
+        "i18next": "^20.5.0"
+    }
+}

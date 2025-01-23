@@ -1,0 +1,9 @@
+.overlay {
+    border: 2px solid #4c9ffe;
+    border-radius: 2px;
+    width: fit-content;
+}
+
+.dimensionItem {
+    width: 228px;
+}

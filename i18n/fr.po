@@ -1,0 +1,831 @@
+# 
+# Translators:
+# Bram Piot <bram.piot@gmail.com>, 2022
+# Austin McGee <austin@dhis2.org>, 2022
+# Karoline Tufte Lien <karoline@dhis2.org>, 2022
+# Djibril Dione <dione.djibril@gmail.com>, 2022
+# Edem Kossi <ekossi@hispwca.org>, 2023
+# Yao Selom SAKA (HISP WCA) <ysaka@hispwca.org>, 2023
+# Yayra Gomado <ygomado@hispwca.org>, 2023
+# Gabriela Rodriguez <grodriguezcoronado@gmail.com>, 2024
+# Viktor Varland <viktor@dhis2.org>, 2024
+# Philip Larsen Donnelly, 2024
+# Elise Desailly, 2024
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"POT-Creation-Date: 2024-06-04T11:01:31.012Z\n"
+"PO-Revision-Date: 2022-08-23 11:50+0000\n"
+"Last-Translator: Elise Desailly, 2024\n"
+"Language-Team: French (https://app.transifex.com/hisp-uio/teams/100509/fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid "Add to {{axisName}}"
+msgstr "Ajouter à {{axisName}} "
+
+msgid "Choose a condition type"
+msgstr "Choisir un type de condition"
+
+msgid "Case sensitive"
+msgstr "Respecter les majuscules et les minuscules"
+
+msgid "Remove"
+msgstr "Supprimer"
+
+msgid "and"
+msgstr "et"
+
+msgid "Show items that meet the following conditions for this data item:"
+msgstr ""
+"Afficher les éléments qui répondent aux conditions suivantes pour cet "
+"élément de données :"
+
+msgid "This dimension can't be filtered. All values will be shown."
+msgstr ""
+"Cette dimension ne peut pas être filtrée. Toutes les valeurs seront "
+"affichées."
+
+msgid ""
+"No conditions yet, so all values will be included. Add a condition to filter"
+" results."
+msgstr ""
+"Pas encore de conditions, donc toutes les valeurs seront incluses. Ajoutez "
+"une condition pour filtrer les résultats."
+
+msgid "Preset options can't be combined with other conditions"
+msgstr ""
+"Les options prédéfinies ne peuvent pas être combinées avec d'autres "
+"conditions."
+
+msgid "Add another condition"
+msgstr "Ajouter une autre condition"
+
+msgid "Add a condition"
+msgstr "Ajouter une condition"
+
+msgid "Repeated events"
+msgstr "Événements répétés"
+
+msgid "Conditions"
+msgstr "Conditions"
+
+msgid "Only available for repeatable stages"
+msgstr "Disponible uniquement pour les étapes répétables"
+
+msgid "is one of preset options"
+msgstr "est l'une des options prédéfinies"
+
+msgid "Loading..."
+msgstr "Chargement…"
+
+msgid "Choose a set of options"
+msgstr "Choisir un ensemble d'options"
+
+msgid "No preset option sets for this data item"
+msgstr "Aucun ensemble d'options prédéfinies pour cet élément de données"
+
+msgid "Choose options"
+msgstr "Choisir des options"
+
+msgid ""
+"From stages with repeatable events, show values for this data element from:"
+msgstr ""
+"Pour les es étapes avec des événements répétables, afficher les valeurs pour"
+" cet élément de données à partir :"
+
+msgid "Most recent events:"
+msgstr "Des événements les plus récents :"
+
+msgid "Oldest events:"
+msgstr "Des événements les plus anciens :"
+
+msgid "Hide"
+msgstr "Masquer"
+
+msgid "Show items where the status is:"
+msgstr "Afficher les items dont le statut est :"
+
+msgid "Choose from presets"
+msgstr "Choisir parmi les prédéfinis"
+
+msgid "Define start - end dates"
+msgstr "Définir les dates de début et de fin"
+
+msgid "Start and end dates are inclusive and will be included in the outputs."
+msgstr ""
+"Les dates de début et de fin sont inclusives et seront incluses dans les "
+"résultats."
+
+msgid "Start date"
+msgstr "Date de début"
+
+msgid "End date"
+msgstr "Date de fin"
+
+msgid "No items selected"
+msgstr "Aucun élément sélectionné"
+
+msgid "Available options"
+msgstr "Options disponibles"
+
+msgid "Filter options"
+msgstr "Options de filtre"
+
+msgid "Selected options"
+msgstr "Options sélectionnées"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Rien retrouvé pour \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "Aucune option"
+
+msgid "Move to {{axisName}}"
+msgstr "Déménager à {{axisName}}"
+
+msgid "HTML"
+msgstr "HTML"
+
+msgid "HTML+CSS (.html+css)"
+msgstr "HTML+CSS (.html+css)"
+
+msgid "Plain data source"
+msgstr "Source de données brutes"
+
+msgid "JSON"
+msgstr "JSON"
+
+msgid "XML"
+msgstr "XML"
+
+msgid "Microsoft Excel"
+msgstr "Microsoft Excel"
+
+msgid "CSV"
+msgstr "CSV"
+
+msgid "Download data from this date"
+msgstr "Télécharger les données à partir de cette date"
+
+msgid "Metadata ID scheme"
+msgstr "Schéma ID des métadata"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Download"
+msgstr "Télécharger"
+
+msgid "all"
+msgstr "Tout"
+
+msgid "Levels"
+msgstr "Niveaux"
+
+msgid "Groups"
+msgstr "Groupes"
+
+msgid "And {{count}} other..."
+msgid_plural "And {{count}} other..."
+msgstr[0] "Et {{nombre}} autre..."
+msgstr[1] "And {{count}} other..."
+msgstr[2] "Et {{count}} autres..."
+
+msgid "None selected"
+msgstr "Aucune sélection"
+
+msgid "Program stage: {{- stageName}}"
+msgstr "Étape du programme : {{- stageName}}"
+
+msgid "Program: {{- programName}}"
+msgstr "Programme : {{- programName}}"
+
+msgid "Showing all values for this dimension"
+msgstr "Affichage de toutes les valeurs pour cette dimension"
+
+msgid "No dimensions found for '{{- searchTerm}}'"
+msgstr "Aucune dimension trouvée pour '{{- searchTerm}}'"
+
+msgid "No dimensions found in the {{- programName}} program"
+msgstr "Aucune dimension trouvée dans le programme {{- programName}}"
+
+msgid " {{- trackedEntityType}} has no dimensions"
+msgstr ""
+
+msgid "No dimensions found"
+msgstr "Aucune dimension trouvée"
+
+msgid "Couldn't load dimensions"
+msgstr "Impossible de charger les dimensions"
+
+msgid ""
+"There was a problem loading the dimensions. Try again, or contact your "
+"system administrator."
+msgstr ""
+"Un problème est survenu lors du chargement des dimensions. Essayez à "
+"nouveau, ou contactez votre administrateur système."
+
+msgid "Event"
+msgstr "Évènement"
+
+msgid "Enrollment"
+msgstr "Enrôlement"
+
+msgid "Tracked entity"
+msgstr "Entité suivie"
+
+msgid ""
+"See individual event data from a Tracker program stage or event program."
+msgstr ""
+"Voir les données des événements individuels d'une étape du programme Tracker"
+" ou d'un programme d'événement."
+
+msgid "See data from multiple program stages in a Tracker program."
+msgstr ""
+"Voir les données de plusieurs étapes du programme dans un programme Tracker."
+
+msgid "See individual tracked entities from one or more Tracker programs."
+msgstr ""
+
+msgid "Global dimensions"
+msgstr "Dimensions globales"
+
+msgid "Program dimensions"
+msgstr "Dimensions du programme"
+
+msgid "Input: {{type}}"
+msgstr "Entrée : {{type}}"
+
+msgid "Choose an input first"
+msgstr ""
+
+msgid "Program data dimensions"
+msgstr "Dimensions des données du programme"
+
+msgid "Search data dimensions"
+msgstr "Rechercher les dimensions des données"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "All types"
+msgstr "Tous les types"
+
+msgid "Data element"
+msgstr "Élément de donnée"
+
+msgid "Program attribute"
+msgstr "Attribut de Programme"
+
+msgid "Program indicator"
+msgstr "Indicateur de programme"
+
+msgid "Category"
+msgstr "Catégorie"
+
+msgid "Category option group set"
+msgstr "Ensemble de groupes d'option de catégorie"
+
+msgid "Choose an input to get started adding program dimensions."
+msgstr ""
+
+msgid "Program"
+msgstr "Programme"
+
+msgid "Could not load programs"
+msgstr "Impossible de charger les programmes"
+
+msgid ""
+"The programs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"Les programmes n'ont pas pu être récupérés. Réessayez ou contactez votre "
+"administrateur système."
+
+msgid "Choose a program"
+msgstr "Choisir un programme"
+
+msgid "No programs found"
+msgstr "Aucun programme trouvé"
+
+msgid "Stage"
+msgstr "Etape"
+
+msgid "All"
+msgstr "Tout"
+
+msgid "No stages found"
+msgstr "Aucune étape trouvée"
+
+msgid "Could not load types"
+msgstr ""
+
+msgid ""
+"The types couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+
+msgid "Choose a type"
+msgstr ""
+
+msgid "No types found"
+msgstr ""
+
+msgid "{{- itemName}} dimensions"
+msgstr ""
+
+msgid "Filter by program usage"
+msgstr "Filtrer par utilisation du programme"
+
+msgid "Clear"
+msgstr "Effacer"
+
+msgid "Search dimensions"
+msgstr "Rechercher les dimensions"
+
+msgid "Your dimensions"
+msgstr "Votre dimensions"
+
+msgid "Search your dimensions"
+msgstr "Rechercher vos dimensions"
+
+msgid "Show panels"
+msgstr ""
+
+msgid "Expand visualization and hide panels"
+msgstr ""
+
+msgid "Unsaved visualization"
+msgstr "Visualisation non enregistrée"
+
+msgid "Edited"
+msgstr "Modifié"
+
+msgid "Line list"
+msgstr "Liste des lignes"
+
+msgid "\"{{- deletedObject}}\" successfully deleted."
+msgstr "\"{{- deletedObject}}\" supprimé avec succès."
+
+msgid "Rename successful"
+msgstr "Renommer avec succès"
+
+msgid "Untitled {{visualizationType}} visualization, {{date}}"
+msgstr "Visualisation {{visualizationType}} sans titre, {{date}}"
+
+msgid ""
+"This visualization can't be deleted because it is used on one or more "
+"dashboards"
+msgstr ""
+"Cette visualisation ne peut pas être supprimée car elle est utilisée pour un"
+" ou plusieurs tableaux de bord"
+
+msgid "Show layout"
+msgstr "Afficher la mise en page"
+
+msgid "Hide layout"
+msgstr "Masquer la mise en page"
+
+msgid "Show dimensions sidebar"
+msgstr ""
+
+msgid "Hide dimensions sidebar"
+msgstr ""
+
+msgid "Hide interpretations and details"
+msgstr "Masquer les interprétations et les détails"
+
+msgid "Show interpretations and details"
+msgstr "Afficher les interprétations et les détails"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "Reset sidebar width"
+msgstr ""
+
+msgid "Update"
+msgstr "Mettre à jour"
+
+msgid "Getting started"
+msgstr "Commencer"
+
+msgid ""
+"All dimensions that you can use to build visualizations are shown in the "
+"sections in the left sidebar."
+msgstr ""
+"Toutes les dimensions que vous pouvez utiliser pour créer des visualisations"
+" sont affichées dans la barre latérale gauche"
+
+msgid "Add dimensions to the layout above."
+msgstr "Ajouter des dimensions à la disposition ci-dessus"
+
+msgid "Click a dimension to add or remove conditions."
+msgstr "Cliquez sur une dimension pour ajouter ou supprimer des conditions."
+
+msgid "Your most viewed line lists"
+msgstr "Vos listes de lignes les plus consultées"
+
+msgid "Not available offline"
+msgstr "Non disponible hors ligne"
+
+msgid ""
+"This line list may show data that was not available when the interpretation "
+"was written."
+msgstr ""
+
+msgid "Sort by \"{{column}}\" and update"
+msgstr "Classer par \"1{{column}}\" et mettre à jour"
+
+msgid "No event"
+msgstr "Aucun événement"
+
+msgid "Rows per page"
+msgstr "Lignes par page"
+
+msgid "Page {{page}}, row {{firstItem}}-{{lastItem}}"
+msgstr "Page {{page}}, ligne {{firstItem}}-{{lastItem}}"
+
+msgid "Column sub-totals"
+msgstr "Sous-totaux de colonne"
+
+msgid "Columns totals"
+msgstr "Totaux des colonnes"
+
+msgid "Digit group separator"
+msgstr "Séparateur des groupe de chiffres"
+
+msgid "None"
+msgstr "Aucun"
+
+msgid "Space"
+msgstr "Espace"
+
+msgid "Comma"
+msgstr "Virgule"
+
+msgid "Display density"
+msgstr "Afficher densité"
+
+msgid "Comfortable"
+msgstr "Confortable"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Compact"
+msgstr "Compact"
+
+msgid "Font size"
+msgstr "Taille de la police"
+
+msgid "Large"
+msgstr "Grand"
+
+msgid "Small"
+msgstr "Petit"
+
+msgid "Hide empty rows"
+msgstr "Cacher lignes vides"
+
+msgid "Use a legend for table cell colors"
+msgstr "Utiliser une légende pour les couleurs des cellules du tableau"
+
+msgid "Legend style"
+msgstr "Style de légende"
+
+msgid "Legend type"
+msgstr "Type de légende"
+
+msgid "Use pre-defined legend per data item"
+msgstr "Utiliser une légende prédéfinie par élément de données"
+
+msgid "Choose a single legend for the entire visualization"
+msgstr "Choisir une seule légende pour l'ensemble de la visualisation"
+
+msgid "Legend changes background color"
+msgstr "La légende change la couleur d'arrière-plan"
+
+msgid "Legend changes text color"
+msgstr "La légende change la couleur du texte"
+
+msgid "Legend"
+msgstr "Légende"
+
+msgid "Select from legends"
+msgstr "Choisissez parmi les légendes"
+
+msgid "Loading legends"
+msgstr "Chargement des légendes"
+
+msgid ""
+"You can set a minimum or maximum value. This will apply to the entire "
+"visualization, all values outside of the minimum/maximum range will not be "
+"displayed"
+msgstr ""
+"Vous pouvez définir une valeur minimale ou maximale. Cela s'appliquera à "
+"l'ensemble de la visualisation, toutes les valeurs en dehors de la plage "
+"minimum / maximum ne seront pas affichées"
+
+msgid "Minimum data value"
+msgstr "Valeur minimale des données"
+
+msgid "Maximum data value"
+msgstr "Valeur maximale des données"
+
+msgid "Clear min/max limits"
+msgstr "Limites min/max claires"
+
+msgid "Row sub-totals"
+msgstr "Sous-totaux de ligne"
+
+msgid "Row totals"
+msgstr "Totaux de ligne"
+
+msgid "Dimension labels"
+msgstr "Étiquettes de dimension"
+
+msgid "Display organisation unit hierarchy"
+msgstr "Afficher la hiérarchie des unités d'organisation"
+
+msgid "Show legend key"
+msgstr "Afficher la légende"
+
+msgid "Skip rounding"
+msgstr "Ne pas arondir"
+
+msgid "Add a title"
+msgstr "Ajouter un titre"
+
+msgid "Options"
+msgstr "Options"
+
+msgid "Columns"
+msgstr "Colonnes"
+
+msgid "Rows"
+msgstr "Lignes"
+
+msgid "Filter"
+msgstr "Filtre"
+
+msgid "equal to (=)"
+msgstr "égal à (=)"
+
+msgid "greater than (>)"
+msgstr "supérieur à (>)"
+
+msgid "greater than or equal to (≥)"
+msgstr "supérieur ou égal à (≥)"
+
+msgid "less than (<)"
+msgstr "inférieur à (<)"
+
+msgid "less than or equal to (≤)"
+msgstr "inférieur ou égal à (≤)"
+
+msgid "not equal to (≠)"
+msgstr "n'est pas égal à (≠)"
+
+msgid "is empty / null"
+msgstr "est vide / nul"
+
+msgid "is not empty / not null"
+msgstr "n'est pas vide / nul"
+
+msgid "exactly"
+msgstr "exactement"
+
+msgid "is not"
+msgstr "n'est pas"
+
+msgid "contains"
+msgstr "contient"
+
+msgid "does not contain"
+msgstr "ne contient pas"
+
+msgid "after"
+msgstr "après"
+
+msgid "after or including"
+msgstr "après ou comprenant"
+
+msgid "before"
+msgstr "avant"
+
+msgid "before or including"
+msgstr "avant ou comprenant"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Not answered"
+msgstr "Pas de réponse"
+
+msgid "There is a problem with this visualization."
+msgstr "Il y a un problème avec cette visualisation."
+
+msgid "There was a problem getting the data from the server."
+msgstr "Un problème est survenu lors de l'obtention des données du serveur."
+
+msgid "No data available"
+msgstr "Pas de données disponibles"
+
+msgid ""
+"The selected dimensions didn’t return any data. There may be no data, or you"
+" may not have access to it."
+msgstr ""
+"The selected dimensions didn’t return any data. Il peut ne pas y avoir de "
+"données, ou vous pourriez ne pas y avoir accès."
+
+msgid "Visualization not found"
+msgstr "Visualisation introuvable"
+
+msgid ""
+"The visualization you are trying to view could not be found, the ID could be"
+" incorrect or it could have been deleted."
+msgstr ""
+"La visualisation que vous essayez de consulter est introuvable, "
+"l'identifiant est peut-être incorrect ou a pu être supprimé"
+
+msgid "No tracked entity type selected"
+msgstr ""
+
+msgid "Choose a type from the Input sidebar."
+msgstr ""
+
+msgid "No program selected"
+msgstr "Aucun programme sélectionné"
+
+msgid "Choose a program from the Input sidebar."
+msgstr ""
+
+msgid "Columns is empty"
+msgstr "'Colonnes' est vide"
+
+msgid "Add at least one item to Columns."
+msgstr "Ajouter au moins un élément à Colonnes"
+
+msgid "No organisation unit selected"
+msgstr "Aucune unité d'organisation sélectionnée"
+
+msgid ""
+"Make sure to add the organisation unit dimension with at least one selection"
+" to the layout."
+msgstr ""
+"Assurez-vous d'ajouter la dimension d'unité d'organisation avec au moins une"
+" sélection à la disposition."
+
+msgid "There's a problem with at least one selected indicator"
+msgstr "Il y a un problème avec au moins un indicateur sélectionné"
+
+msgid "Restricted access"
+msgstr "Accès restreint"
+
+msgid ""
+"You don’t have access to the data in this visualization. Contact a system "
+"administrator."
+msgstr ""
+"Vous n'avez pas accès aux données de cette visualisation. Veuillez contacter"
+" un administrateur système."
+
+msgid "You don’t have access to one or more of the chosen organisation units."
+msgstr ""
+"Vous n'avez pas accès à une ou plusieurs des unités d'organisation "
+"sélectionnées."
+
+msgid ""
+"You don’t have access to event analytics. Contact a system administrator."
+msgstr ""
+"Vous n'avez pas accès aux analyses d'événements. Veuillez contacter un "
+"administrateur système."
+
+msgid "Something went wrong"
+msgstr "Quelque chose a mal tourné"
+
+msgid ""
+"There's a problem with the generated analytics. Contact a system "
+"administrator."
+msgstr ""
+
+msgid "There's a syntax problem with the analytics request."
+msgstr "Il y a un problème de syntaxe dans la demande d'analyse."
+
+msgid "Registration date"
+msgstr "Données d'enregistrement"
+
+msgid "Last updated on"
+msgstr "Dernière mise à jour le"
+
+msgid "Created by"
+msgstr "Créé par"
+
+msgid "Last updated by"
+msgstr "Dernière mise à jour par"
+
+msgid "User organisation unit"
+msgstr "Unités d'organisation de l'utilisateur"
+
+msgid "User sub-units"
+msgstr "Sous-unités de l'utilisateur"
+
+msgid "User sub-x2-units"
+msgstr "Sous-unités utilisateur x2"
+
+msgid "Registration org. unit"
+msgstr ""
+
+msgid "Organisation unit"
+msgstr "Unité d'organisation"
+
+msgid "Table title"
+msgstr "Titre du tableau"
+
+msgid "Display"
+msgstr "Afficher"
+
+msgid "Empty data"
+msgstr "Données vides"
+
+msgid "Totals"
+msgstr "Totaux"
+
+msgid "Data"
+msgstr "Données"
+
+msgid "Limit values"
+msgstr "Valeurs seuils"
+
+msgid "Limit number of values"
+msgstr "Nombre limite de valeurs"
+
+msgid "Limit minimum/maximum values"
+msgstr "Valeurs seuils minimales/maximales"
+
+msgid "Style"
+msgstr "Style"
+
+msgid "Event status"
+msgstr "Statut de l'événement"
+
+msgid "Program status"
+msgstr "Statut du programme"
+
+msgid "most recent"
+msgstr "plus récent"
+
+msgid "oldest"
+msgstr "plus ancien"
+
+msgid "oldest {{repeatEventIndex}}"
+msgstr "plus ancien {{repeatEventIndex}}"
+
+msgid "most recent {{repeatEventIndex}}"
+msgstr "plus récent {{repeatEventIndex}}"
+
+msgid "Event date"
+msgstr "Date d'événement"
+
+msgid "Enrollment date"
+msgstr "Date d'enrôlement"
+
+msgid "Incident date"
+msgstr "Date de l´incident"
+
+msgid "Scheduled date"
+msgstr "Date programmée"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Cancelled"
+msgstr "Annulé"
+
+msgid "Completed"
+msgstr "Terminé"
+
+msgid "Scheduled"
+msgstr "Planifié"
+
+msgid "List data from tracked entities and events."
+msgstr "Lister les données des entités suivies et des événements."
+
+msgid "Explore data with manipulatable columns, rows, and aggregations."
+msgstr ""
+"Explorez les données avec des colonnes, des lignes et des agrégations "
+"faciles à manipuler."

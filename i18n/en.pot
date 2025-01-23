@@ -1,0 +1,474 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2025-01-10T15:05:07.307Z\n"
+"PO-Revision-Date: 2025-01-10T15:05:07.307Z\n"
+
+msgid "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
+msgid_plural "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
+msgstr[0] "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
+msgstr[1] "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
+
+msgid "Could not migrate TEIs"
+msgstr "Could not migrate TEIs"
+
+msgid ""
+"The TEIs couldn't be migrated. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be migrated. Try again or contact your system "
+"administrator."
+
+msgid "Migration successful"
+msgstr "Migration successful"
+
+msgid "All TEIs have been successfully migrated to the selected org unit."
+msgstr "All TEIs have been successfully migrated to the selected org unit."
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Migrate"
+msgstr "Migrate"
+
+msgid "Could not load TEIs"
+msgstr "Could not load TEIs"
+
+msgid ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Instance ID"
+msgstr "Instance ID"
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
+
+msgid "Filter by \"{{name}}\""
+msgstr "Filter by \"{{name}}\""
+
+msgid "Add Column"
+msgstr "Add Column"
+
+msgid "Remove Column"
+msgstr "Remove Column"
+
+msgid "Select number range"
+msgstr "Select number range"
+
+msgid "Min value"
+msgstr "Min value"
+
+msgid "Max value"
+msgstr "Max value"
+
+msgid "Select date range"
+msgstr "Select date range"
+
+msgid "Start date"
+msgstr "Start date"
+
+msgid "End date"
+msgstr "End date"
+
+msgid "Select username"
+msgstr "Select username"
+
+msgid "Enter keyword"
+msgstr "Enter keyword"
+
+msgid "Remove Filter"
+msgstr "Remove Filter"
+
+msgid "Apply Filter"
+msgstr "Apply Filter"
+
+msgid "Add to {{axisName}}"
+msgstr "Add to {{axisName}}"
+
+msgid "Choose a condition type"
+msgstr "Choose a condition type"
+
+msgid "Case sensitive"
+msgstr "Case sensitive"
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "and"
+msgstr "and"
+
+msgid "Show items that meet the following conditions for this data item:"
+msgstr "Show items that meet the following conditions for this data item:"
+
+msgid "This dimension can't be filtered. All values will be shown."
+msgstr "This dimension can't be filtered. All values will be shown."
+
+msgid ""
+"No conditions yet, so all values will be included. Add a condition to "
+"filter results."
+msgstr ""
+"No conditions yet, so all values will be included. Add a condition to "
+"filter results."
+
+msgid "Preset options can't be combined with other conditions"
+msgstr "Preset options can't be combined with other conditions"
+
+msgid "Add another condition"
+msgstr "Add another condition"
+
+msgid "Add a condition"
+msgstr "Add a condition"
+
+msgid "Repeated events"
+msgstr "Repeated events"
+
+msgid "Conditions"
+msgstr "Conditions"
+
+msgid "Only available for repeatable stages"
+msgstr "Only available for repeatable stages"
+
+msgid "is one of preset options"
+msgstr "is one of preset options"
+
+msgid "Loading..."
+msgstr "Loading..."
+
+msgid "Choose a set of options"
+msgstr "Choose a set of options"
+
+msgid "No preset option sets for this data item"
+msgstr "No preset option sets for this data item"
+
+msgid "Choose options"
+msgstr "Choose options"
+
+msgid "From stages with repeatable events, show values for this data element from:"
+msgstr "From stages with repeatable events, show values for this data element from:"
+
+msgid "Most recent events:"
+msgstr "Most recent events:"
+
+msgid "Oldest events:"
+msgstr "Oldest events:"
+
+msgid "Hide"
+msgstr "Hide"
+
+msgid "Show items where the status is:"
+msgstr "Show items where the status is:"
+
+msgid "Choose from presets"
+msgstr "Choose from presets"
+
+msgid "Define start - end dates"
+msgstr "Define start - end dates"
+
+msgid "Start and end dates are inclusive and will be included in the outputs."
+msgstr "Start and end dates are inclusive and will be included in the outputs."
+
+msgid "No items selected"
+msgstr "No items selected"
+
+msgid "Available options"
+msgstr "Available options"
+
+msgid "Filter options"
+msgstr "Filter options"
+
+msgid "Selected options"
+msgstr "Selected options"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Nothing found for \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "No options"
+
+msgid "all"
+msgstr "all"
+
+msgid "Event"
+msgstr "Event"
+
+msgid "Enrollment"
+msgstr "Enrollment"
+
+msgid "Tracked entity"
+msgstr "Tracked entity"
+
+msgid "Select program to migrate data."
+msgstr "Select program to migrate data."
+
+msgid "Could not load programs"
+msgstr "Could not load programs"
+
+msgid ""
+"The programs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The programs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Choose a program"
+msgstr "Choose a program"
+
+msgid "No programs found"
+msgstr "No programs found"
+
+msgid "Stage"
+msgstr "Stage"
+
+msgid "No stages found"
+msgstr "No stages found"
+
+msgid "Org Unit Data Migration"
+msgstr "Org Unit Data Migration"
+
+msgid "Update"
+msgstr "Update"
+
+msgid "Getting started"
+msgstr "Getting started"
+
+msgid ""
+"Select program and organisation unit in the left sidebar to retrive and "
+"TEIs and migrate them."
+msgstr ""
+"Select program and organisation unit in the left sidebar to retrive and "
+"TEIs and migrate them."
+
+msgid "Apply necessary filters to remain with the only data you want to migrate."
+msgstr "Apply necessary filters to remain with the only data you want to migrate."
+
+msgid "Click an attribute to add or remove a filter."
+msgstr "Click an attribute to add or remove a filter."
+
+msgid "Your most viewed line lists"
+msgstr "Your most viewed line lists"
+
+msgid "equal to (=)"
+msgstr "equal to (=)"
+
+msgid "greater than (>)"
+msgstr "greater than (>)"
+
+msgid "greater than or equal to (≥)"
+msgstr "greater than or equal to (≥)"
+
+msgid "less than (<)"
+msgstr "less than (<)"
+
+msgid "less than or equal to (≤)"
+msgstr "less than or equal to (≤)"
+
+msgid "not equal to (≠)"
+msgstr "not equal to (≠)"
+
+msgid "is empty / null"
+msgstr "is empty / null"
+
+msgid "is not empty / not null"
+msgstr "is not empty / not null"
+
+msgid "exactly"
+msgstr "exactly"
+
+msgid "is not"
+msgstr "is not"
+
+msgid "contains"
+msgstr "contains"
+
+msgid "does not contain"
+msgstr "does not contain"
+
+msgid "after"
+msgstr "after"
+
+msgid "after or including"
+msgstr "after or including"
+
+msgid "before"
+msgstr "before"
+
+msgid "before or including"
+msgstr "before or including"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Not answered"
+msgstr "Not answered"
+
+msgid "There is a problem with this visualization."
+msgstr "There is a problem with this visualization."
+
+msgid "There was a problem getting the data from the server."
+msgstr "There was a problem getting the data from the server."
+
+msgid "No data available"
+msgstr "No data available"
+
+msgid ""
+"The selected dimensions didn’t return any data. There may be no data, or "
+"you may not have access to it."
+msgstr ""
+"The selected dimensions didn’t return any data. There may be no data, or "
+"you may not have access to it."
+
+msgid "Visualization not found"
+msgstr "Visualization not found"
+
+msgid ""
+"The visualization you are trying to view could not be found, the ID could "
+"be incorrect or it could have been deleted."
+msgstr ""
+"The visualization you are trying to view could not be found, the ID could "
+"be incorrect or it could have been deleted."
+
+msgid "No tracked entity type selected"
+msgstr "No tracked entity type selected"
+
+msgid "Choose a type from the Input sidebar."
+msgstr "Choose a type from the Input sidebar."
+
+msgid "No program selected"
+msgstr "No program selected"
+
+msgid "Choose a program from the Input sidebar."
+msgstr "Choose a program from the Input sidebar."
+
+msgid "Columns is empty"
+msgstr "Columns is empty"
+
+msgid "Add at least one item to Columns."
+msgstr "Add at least one item to Columns."
+
+msgid "No organisation unit selected"
+msgstr "No organisation unit selected"
+
+msgid ""
+"Make sure to add the organisation unit dimension with at least one "
+"selection to the layout."
+msgstr ""
+"Make sure to add the organisation unit dimension with at least one "
+"selection to the layout."
+
+msgid "There's a problem with at least one selected indicator"
+msgstr "There's a problem with at least one selected indicator"
+
+msgid "Restricted access"
+msgstr "Restricted access"
+
+msgid ""
+"You don’t have access to the data in this visualization. Contact a system "
+"administrator."
+msgstr ""
+"You don’t have access to the data in this visualization. Contact a system "
+"administrator."
+
+msgid "You don’t have access to one or more of the chosen organisation units."
+msgstr "You don’t have access to one or more of the chosen organisation units."
+
+msgid "You don’t have access to event analytics. Contact a system administrator."
+msgstr "You don’t have access to event analytics. Contact a system administrator."
+
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+msgid ""
+"There's a problem with the generated analytics. Contact a system "
+"administrator."
+msgstr ""
+"There's a problem with the generated analytics. Contact a system "
+"administrator."
+
+msgid "There's a syntax problem with the analytics request."
+msgstr "There's a syntax problem with the analytics request."
+
+msgid "Registration date"
+msgstr "Registration date"
+
+msgid "Last updated on"
+msgstr "Last updated on"
+
+msgid "Created by"
+msgstr "Created by"
+
+msgid "Last updated by"
+msgstr "Last updated by"
+
+msgid "User organisation unit"
+msgstr "User organisation unit"
+
+msgid "User sub-units"
+msgstr "User sub-units"
+
+msgid "User sub-x2-units"
+msgstr "User sub-x2-units"
+
+msgid "Registration org. unit"
+msgstr "Registration org. unit"
+
+msgid "Organisation unit"
+msgstr "Organisation unit"
+
+msgid "Event status"
+msgstr "Event status"
+
+msgid "Program status"
+msgstr "Program status"
+
+msgid "Event date"
+msgstr "Event date"
+
+msgid "Enrollment date"
+msgstr "Enrollment date"
+
+msgid "Incident date"
+msgstr "Incident date"
+
+msgid "Scheduled date"
+msgstr "Scheduled date"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Cancelled"
+msgstr "Cancelled"
+
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Scheduled"
+msgstr "Scheduled"
+
+msgid "List data from tracked entities and events."
+msgstr "List data from tracked entities and events."
+
+msgid "Explore data with manipulatable columns, rows, and aggregations."
+msgstr "Explore data with manipulatable columns, rows, and aggregations."

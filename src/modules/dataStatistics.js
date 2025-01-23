@@ -1,0 +1,1 @@
+export const EVENT_TYPE = 'EVENT_VISUALIZATION_VIEW'

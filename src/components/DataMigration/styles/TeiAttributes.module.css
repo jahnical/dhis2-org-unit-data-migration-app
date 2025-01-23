@@ -1,0 +1,15 @@
+.container {
+    width: 100%;
+}
+
+.attributesWrapper {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.activeFilter {
+    background-color: #0812688e;
+}

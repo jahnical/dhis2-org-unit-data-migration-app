@@ -1,0 +1,93 @@
+/* .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+} */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #fafafa;
+}
+::-webkit-scrollbar-thumb {
+    background: #d1d1d1;
+    border-radius: 3px;
+}
+
+.eventReportsApp {
+    height: 100%;
+    background-color: var(--colors-grey300);
+    overflow: hidden;
+}
+
+.flexCt {
+    display: flex;
+}
+
+.flexDirCol {
+    flex-direction: column;
+}
+
+.flexGrow1 {
+    flex-grow: 1;
+}
+.minWidth0 {
+    min-width: 0;
+}
+
+.flexBasis0 {
+    flex-basis: 0%;
+}
+
+/* Toolbar */
+
+.sectionToolbar {
+    height: 39px;
+    border-bottom: 1px solid var(--colors-grey400);
+}
+
+/* Main */
+.sectionMain {
+    overflow: hidden;
+}
+
+.mainRight {
+    width: 380px;
+    background-color: #f0f2f4;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transform: scaleX(1);
+    transition: width 200ms ease-out;
+    border-left: 1px solid var(--colors-grey400);
+    box-shadow: 1px 0 2px 0 rgb(0 0 0 / 0.03);
+}
+.mainRight.hidden {
+    width: 0;
+    border: none;
+}
+/* Main canvas */
+
+.mainCenterCanvas {
+    display: flex;
+    gap: var(--spacers-dp4);
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    margin: 0 var(--spacers-dp4) var(--spacers-dp4);
+}
+
+.loadingCover {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    background: #ffffffab;
+}

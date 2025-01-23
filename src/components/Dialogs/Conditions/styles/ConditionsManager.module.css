@@ -1,0 +1,47 @@
+.infoIcon svg {
+    color: var(--colors-grey900);
+    margin-right: 6px;
+    vertical-align: text-bottom;
+}
+
+.separator {
+    display: block;
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: 500;
+    color: var(--colors-grey700);
+    padding: var(--spacers-dp4) 0;
+}
+
+.tooltipReference {
+    display: inline-flex;
+    cursor: not-allowed;
+    margin-top: var(--spacers-dp16);
+}
+
+.tooltipReference > .addConditionButton:disabled {
+    pointer-events: none;
+}
+
+.tabBar {
+    margin-bottom: var(--spacers-dp16);
+}
+
+.repeatableWrapper {
+    display: flex;
+    align-items: center;
+    margin-left: var(--spacers-dp8);
+}
+
+.repeatableWrapper:first-child {
+    margin-top: var(--spacers-dp16);
+}
+
+.repeatableWrapper:not(:last-child) {
+    margin-bottom: var(--spacers-dp12);
+}
+
+.repeatableInput {
+    width: 100px;
+    margin-left: var(--spacers-dp4);
+}
