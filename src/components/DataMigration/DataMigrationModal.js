@@ -44,7 +44,7 @@ const DataMigrationModal = ({ onClose }) => {
                 teis: allTeis,
                 filteredTeis: filteredTeis,
                 targetOrgUnit: targetOrgUnit,
-                targetOrgUnitName: metadata[targetOrgUnit],
+                targetOrgUnitName: metadata[targetOrgUnit].name,
                 credentials: credentials,
                 engine: engine,
             })

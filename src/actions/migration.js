@@ -220,6 +220,36 @@ export const migrationAsyncActions = {
                 // Wait for all ownership transfers to complete
                 await Promise.all(ownershipPromises)
 
+                // Extract and update all events from TEIs
+                const updatedEvents = updatedTeis.flatMap(tei =>
+                    (tei.enrollments || []).flatMap(enrollment =>
+                        (enrollment.events || []).map(event => ({
+                            ...event,
+                            orgUnit: targetOrgUnit,
+                            orgUnitName: targetOrgUnitName,
+                        }))
+                    )
+                ).filter(event => event.event)
+
+                if (updatedEvents.length === 0) {
+                    console.log('No events found for updating.')
+                    return
+                }
+
+                console.log(`Updating ${updatedEvents.length} events...`)
+                console.log(updatedEvents)
+
+                // Update all events in a single API call
+                const eventMutation = {
+                    resource: 'events',
+                    type: 'create',
+                    data: {
+                        events: updatedEvents
+                    }
+                }
+
+                await customEngine.mutate(eventMutation)
+
                 dispatch({
                     type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
                     payload: response,
