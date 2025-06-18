@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { acAddMetadata } from '../../actions/metadata.js'
-import { migrationActionCreators } from '../../actions/migration.js'
+import { dataActionCreators } from '../../actions/migration.js'
 import { acAddParentGraphMap } from '../../actions/ui.js'
 import { removeLastPathSegment } from '../../modules/orgUnit.js'
 import { sGetMetadata } from '../../reducers/metadata.js'
@@ -41,9 +41,9 @@ const OrgUnitSelection = ({
             addParentGraphMap(forParentGraphMap)
             setSelected(item)
             if (isSourceOrgUnit) {
-                dispatch(migrationActionCreators.setSourceOrgUnit(item.id))
+                dispatch(dataActionCreators.setSourceOrgUnit(item.id))
             } else {
-                dispatch(migrationActionCreators.setTargetOrgUnit(item.id))
+                dispatch(dataActionCreators.setTargetOrgUnit(item.id))
             }
         }
     }

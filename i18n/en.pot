@@ -5,13 +5,74 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-03-11T05:58:35.880Z\n"
-"PO-Revision-Date: 2025-03-11T05:58:35.881Z\n"
+"POT-Creation-Date: 2025-06-18T11:56:46.636Z\n"
+"PO-Revision-Date: 2025-06-18T11:56:46.636Z\n"
 
-msgid "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
-msgid_plural "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
-msgstr[0] "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
-msgstr[1] "Migrating {{count}} TEIs to {{targetOrgUnit}}..."
+msgid "Confirm Data Deletion"
+msgstr "Confirm Data Deletion"
+
+msgid "Deleting {{count}} TEIs..."
+msgid_plural "Deleting {{count}} TEIs..."
+msgstr[0] "Deleting {{count}} TEIs..."
+msgstr[1] "Deleting {{count}} TEIs..."
+
+msgid "Could not delete TEIs"
+msgstr "Could not delete TEIs"
+
+msgid ""
+"The TEIs couldn't be deleted. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be deleted. Try again or contact your system "
+"administrator."
+
+msgid "Deletion successful"
+msgstr "Deletion successful"
+
+msgid "All selected TEIs have been successfully deleted."
+msgstr "All selected TEIs have been successfully deleted."
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "You are about to delete {{count}} TEIs. This action cannot be undone."
+msgid_plural "You are about to delete {{count}} TEIs. This action cannot be undone."
+msgstr[0] "You are about to delete {{count}} TEIs. This action cannot be undone."
+msgstr[1] "You are about to delete {{count}} TEIs. This action cannot be undone."
+
+msgid "... and {{count}} more"
+msgid_plural "... and {{count}} more"
+msgstr[0] "... and {{count}} more"
+msgstr[1] "... and {{count}} more"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Migration Preview"
+msgstr "Migration Preview"
+
+msgid "{{count}} TEIs"
+msgid_plural "{{count}} TEIs"
+msgstr[0] "{{count}} TEIs"
+msgstr[1] "{{count}} TEIs"
+
+msgid "To {{orgUnit}}"
+msgstr "To {{orgUnit}}"
+
+msgid "This action cannot be undone. Are you sure you want to continue?"
+msgstr "This action cannot be undone. Are you sure you want to continue?"
+
+msgid "Updating Organisation Units"
+msgstr "Updating Organisation Units"
+
+msgid "Transferring Ownerships {{current}} of {{total}} TEIs..."
+msgstr "Transferring Ownerships {{current}} of {{total}} TEIs..."
 
 msgid "Could not migrate TEIs"
 msgstr "Could not migrate TEIs"
@@ -29,14 +90,11 @@ msgstr "Migration successful"
 msgid "All TEIs have been successfully migrated to the selected org unit."
 msgstr "All TEIs have been successfully migrated to the selected org unit."
 
-msgid "Close"
-msgstr "Close"
+msgid "Next"
+msgstr "Next"
 
-msgid "Cancel"
-msgstr "Cancel"
-
-msgid "Migrate"
-msgstr "Migrate"
+msgid "Confirm Migration"
+msgstr "Confirm Migration"
 
 msgid "Could not load TEIs"
 msgstr "Could not load TEIs"
@@ -242,8 +300,8 @@ msgstr "Stage"
 msgid "No stages found"
 msgstr "No stages found"
 
-msgid "Org Unit Data Migration"
-msgstr "Org Unit Data Migration"
+msgid "Data Management"
+msgstr "Data Management"
 
 msgid "Update"
 msgstr "Update"

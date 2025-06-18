@@ -11,13 +11,15 @@ import {
     CircularLoader,
     NoticeBox,
     TableRowHead,
+    Checkbox,
 } from '@dhis2/ui'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-    migrationActionCreators,
+    dataActionCreators,
     migrationAsyncActions,
 } from '../../actions/migration.js'
+import { filterTeis } from '../../modules/migration.js'
 import { migrationSelectors } from '../../reducers/migration.js'
 import { sGetUiProgramId } from '../../reducers/ui.js'
 import classes from './styles/Common.module.css'
@@ -26,9 +28,12 @@ const TEIs = () => {
     const loading = useSelector(migrationSelectors.getMigrationIsLoading)
     const error = useSelector(migrationSelectors.getMigrationError)
     const dispatch = useDispatch()
-    const programId = useSelector(sGetUiProgramId)
+    const uiProgramId = useSelector(sGetUiProgramId)
+    const programId = useSelector(migrationSelectors.getMigrationProgram)
     const orgUnitId = useSelector(migrationSelectors.getMigrationOrgUnit)
-    const teis = useSelector(migrationSelectors.getMigrationTEIs)
+    const [teis, setTeis] = useState([])
+    const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
+    const allTeis = useSelector(migrationSelectors.getMigrationRawTEIs)
     const filters = useSelector(migrationSelectors.getMigrationFilters)
     const attributesToDisplay = useSelector(
         migrationSelectors.getMigrationAttributesToDisplay
@@ -36,13 +41,40 @@ const TEIs = () => {
     const engine = useDataEngine()
 
     useEffect(() => {
-        dispatch(migrationActionCreators.setProgram(programId))
+        dispatch(dataActionCreators.setProgram(uiProgramId))
+    }, [uiProgramId, dispatch])
+
+    useEffect(() => {
+        setTeis([]) // Reset TEIs when program or org unit changes
+        dispatch(dataActionCreators.setSelectedTEIs([])) // Reset selections when program or org unit changes
         if (programId && orgUnitId) {
             dispatch(
                 migrationAsyncActions.fetchTEIs(orgUnitId, programId, engine)
             )
         }
-    }, [programId, orgUnitId, dispatch, engine, filters])
+    }, [programId, orgUnitId, dispatch, engine])
+
+    useEffect(() => {
+        setTeis(filterTeis(allTeis, filters))
+        dispatch(dataActionCreators.setSelectedTEIs([])) // Reset selections when filters change
+    }, [filters, allTeis, dispatch])
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            dispatch(dataActionCreators.setSelectedTEIs(teis.map(tei => tei.id)))
+        } else {
+            dispatch(dataActionCreators.setSelectedTEIs([]))
+        }
+    }
+
+    const handleSelectTei = (teiId) => {
+        const isSelected = selectedTeis.includes(teiId)
+        if (isSelected) {
+            dispatch(dataActionCreators.setSelectedTEIs(selectedTeis.filter(id => id !== teiId)))
+        } else {
+            dispatch(dataActionCreators.setSelectedTEIs([...selectedTeis, teiId]))
+        }
+    }
 
     if (loading) {
         return <CircularLoader />
@@ -66,16 +98,21 @@ const TEIs = () => {
                             <div style={{ color: 'grey' }}>
                                 <h4 style={{ marginLeft: '16px' }}>
                                     {i18n.t(
-                                        `${teis.length} Tracked Entity Instances`
+                                        `${selectedTeis.length} Selected of ${teis.length} Tracked Entity Instances`
                                     )}
                                 </h4>
                             </div>
 
                             <TableHead>
                                 <TableRowHead>
-                                    <TableCellHead
-                                        className={classes.columnInstanceId}
-                                    >
+                                    <TableCellHead className={classes.checkbox}>
+                                        <Checkbox
+                                            checked={selectedTeis.length === teis.length && teis.length > 0}
+                                            indeterminate={selectedTeis.length > 0 && selectedTeis.length < teis.length}
+                                            onChange={({ checked }) => handleSelectAll(checked)}
+                                        />
+                                    </TableCellHead>
+                                    <TableCellHead className={classes.columnInstanceId}>
                                         {i18n.t('Instance ID')}
                                     </TableCellHead>
                                     <TableCellHead className={classes.column}>
@@ -105,6 +142,12 @@ const TEIs = () => {
                             <TableBody>
                                 {teis.map((instance) => (
                                     <TableRow key={instance.id}>
+                                        <TableCell className={classes.checkbox}>
+                                            <Checkbox
+                                                checked={selectedTeis.includes(instance.id)}
+                                                onChange={() => handleSelectTei(instance.id)}
+                                            />
+                                        </TableCell>
                                         <TableCell
                                             className={classes.columnInstanceId}
                                         >
@@ -124,27 +167,20 @@ const TEIs = () => {
                                             {instance.storedBy || ''}
                                         </TableCell>
                                         <TableCell className={classes.column}>
-                                            {instance.lastUpdatedBy.username ||
-                                                ''}
+                                            {instance.lastUpdatedBy?.username || ''}
                                         </TableCell>
-
                                         {attributesToDisplay.map((attr) => {
-                                            const attribute =
-                                                instance.attributes.find(
-                                                    (a) => a.name === attr
-                                                ) || { value: '' }
+                                            const attribute = instance.attributes?.find(
+                                                (a) => a.name === attr
+                                            ) || { value: '', valueType: '' }
                                             return (
                                                 <TableCell
-                                                    key={attribute.attribute}
+                                                    key={attr}
                                                     className={classes.column}
                                                 >
-                                                    {attribute.valueType ===
-                                                        VALUE_TYPE_DATE ||
-                                                    attribute.valueType ===
-                                                        VALUE_TYPE_DATETIME
-                                                        ? new Date(
-                                                              attribute.value
-                                                          ).toLocaleString()
+                                                    {attribute.valueType === VALUE_TYPE_DATE ||
+                                                    attribute.valueType === VALUE_TYPE_DATETIME
+                                                        ? new Date(attribute.value).toLocaleString()
                                                         : attribute.value}
                                                 </TableCell>
                                             )

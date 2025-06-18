@@ -1,7 +1,7 @@
 const config = {
     type: 'app',
-    name: 'data-migration',
-    title: 'Data Migration',
+    name: 'data-management',
+    title: 'iCHIS Data Management',
 
     minDHIS2Version: '2.39',
 

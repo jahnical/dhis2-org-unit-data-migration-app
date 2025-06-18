@@ -27,7 +27,7 @@ import {
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { migrationActionCreators } from '../../actions/migration.js'
+import { dataActionCreators } from '../../actions/migration.js'
 import { migrationSelectors } from '../../reducers/migration.js'
 import classes from './styles/TeiAttributes.module.css'
 
@@ -105,12 +105,12 @@ const TeiFilterableFields = () => {
     }
 
     const addColumn = (columnName) => {
-        dispatch(migrationActionCreators.addDisplayAttribute(columnName))
+        dispatch(dataActionCreators.addDisplayAttribute(columnName))
         setIsModalOpen(false)
     }
 
     const removeColumn = (columnName) => {
-        dispatch(migrationActionCreators.removeDisplayAttribute(columnName))
+        dispatch(dataActionCreators.removeDisplayAttribute(columnName))
         setIsModalOpen(false)
     }
 
@@ -119,14 +119,14 @@ const TeiFilterableFields = () => {
 
     const handleFilterChange = (value) => {
         if (isActiveFilter(selectedField)) {
-            dispatch(migrationActionCreators.updateFilter(value))
+            dispatch(dataActionCreators.updateFilter(value))
         } else {
-            dispatch(migrationActionCreators.addFilter(value))
+            dispatch(dataActionCreators.addFilter(value))
         }
     }
 
     const removeFilter = () => {
-        dispatch(migrationActionCreators.removeFilter(selectedField))
+        dispatch(dataActionCreators.removeFilter(selectedField))
     }
 
     const [numberRange, setNumberRange] = useState({ min: null, max: null })

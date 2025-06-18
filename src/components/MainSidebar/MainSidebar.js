@@ -10,6 +10,7 @@ import {
     sGetUiSidebarHidden,
     sGetUiAccessoryPanelActiveTab,
 } from '../../reducers/ui.js'
+import DataDeletionModal from '../DataDeletion/DataDeletionModal.js'
 import DataMigrationModal from '../DataMigration/DataMigrationModal.js'
 import OrgUnitSelection from '../DataMigration/OrgUnitSelection.js'
 import { InputPanel } from './InputPanel/index.js'
@@ -22,9 +23,11 @@ const MainSidebar = () => {
     const selectedTabId = useSelector(sGetUiAccessoryPanelActiveTab)
     const programId = useSelector(migrationSelectors.getMigrationProgram)
     const orgUnitId = useSelector(migrationSelectors.getMigrationOrgUnit)
+    const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
     const open = useSelector(sGetUiShowAccessoryPanel) && Boolean(selectedTabId)
     const [isTransitioning, setIsTransitioning] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
+    const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false)
+    const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false)
 
     const {
         isResizing,
@@ -49,13 +52,20 @@ const MainSidebar = () => {
             setSelectedTabId(null)
         }
     }, [open, isTransitioning, setSelectedTabId])
+
     const onMigrateDataCliked = () => {
         console.log('Migrate Data clicked')
-        setIsOpen(true)
+        setIsMigrationModalOpen(true)
+    }
+
+    const onDeleteDataCliked = () => {
+        console.log('Delete Data clicked')
+        setIsDeletionModalOpen(true)
     }
 
     const handleDMmodalClose = () => {
-        setIsOpen(false)
+        setIsMigrationModalOpen(false)
+        setIsDeletionModalOpen(false)
     }
 
     return (
@@ -98,8 +108,12 @@ const MainSidebar = () => {
 
                     <Divider />
 
-                    {isOpen && (
+                    {isMigrationModalOpen && (
                         <DataMigrationModal onClose={handleDMmodalClose} />
+                    )}
+
+                    {isDeletionModalOpen && (
+                        <DataDeletionModal onClose={handleDMmodalClose} />
                     )}
 
                     <Button
@@ -111,9 +125,23 @@ const MainSidebar = () => {
                             height: '48px',
                             marginTop: '16px',
                         }}
-                        disabled={!programId || !orgUnitId}
+                        disabled={!programId || !orgUnitId || selectedTeis.length === 0}
                     >
                         Migrate Data
+                    </Button>
+
+                    <Button
+                        secondary
+                        onClick={onDeleteDataCliked}
+                        style={{
+                            width: '100%',
+                            maxWidth: '512px',
+                            height: '48px',
+                            marginTop: '16px',
+                        }}
+                        disabled={!programId || !orgUnitId || selectedTeis.length === 0}
+                    >
+                        Delete Data
                     </Button>
                 </div>
                 {open && (

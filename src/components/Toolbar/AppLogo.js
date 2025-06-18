@@ -14,7 +14,7 @@ export const AppLogo = () => {
             <span className={classes.container}>
                 <IconMove24 color="#4a5768" />
                 <span className={classes.appName}>
-                    {i18n.t('Org Unit Data Migration')}
+                    {i18n.t('Data Management')}
                 </span>
             </span>
         </ToolbarSidebar>

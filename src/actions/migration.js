@@ -1,6 +1,6 @@
 import { MIGRATION_TYPES } from '../reducers/migration.js'
 
-export const migrationActionCreators = {
+export const dataActionCreators = {
     setSourceOrgUnit: (orgUnitId) => ({
         type: MIGRATION_TYPES.SET_ORG_UNIT,
         payload: orgUnitId,
@@ -19,6 +19,11 @@ export const migrationActionCreators = {
     setCredentials: (credentials) => ({
         type: MIGRATION_TYPES.SET_CREDENTIALS,
         payload: credentials,
+    }),
+
+    setSelectedTEIs: (teis) => ({
+        type: MIGRATION_TYPES.SET_SELECTED_TEIS,
+        payload: teis,
     }),
 
     addFilter: (filter) => ({
@@ -108,19 +113,18 @@ export const migrationAsyncActions = {
     migrateTEIs:
         ({
             teis,
-            filteredTeis,
+            selectedTeis,
             targetOrgUnit,
             targetOrgUnitName,
-            credentials,
             engine,
+            onProgress,
         }) =>
         async (dispatch) => {
             if (
                 !teis?.length ||
                 !targetOrgUnit ||
                 !engine ||
-                !filteredTeis?.length ||
-                !credentials
+                !selectedTeis?.length
             ) {
                 throw new Error('Missing required parameters')
             }
@@ -129,21 +133,24 @@ export const migrationAsyncActions = {
 
             try {
                 // Wrap the engine with new headers
-                const customEngine = {
-                    mutate: (mutation, options) => {
-                        const headers = {
-                            ...options?.headers,
-                            Authorization: `Basic ${btoa(
-                                `${credentials.username}:${credentials.password}`
-                            )}`,
-                        }
-                        return engine.mutate(mutation, { ...options, headers })
-                    },
-                }
+                // const customEngine = {
+                //     mutate: (mutation, options) => {
+                //         const headers = {
+                //             ...options?.headers,
+                //             Authorization: `Basic ${btoa(
+                //                 `${credentials.username}:${credentials.password}`
+                //             )}`,
+                //         }
+                //         return engine.mutate(mutation, { ...options, headers })
+                //     },
+                // }
 
-                teis = filteredTeis.map((tei) =>
-                    teis.find((t) => t.trackedEntityInstance === tei.id)
+                const customEngine = engine
+
+                teis = teis.filter((tei) =>
+                    selectedTeis.includes(tei.trackedEntityInstance)
                 )
+
                 const updatedTeis = teis.map((tei) => {
                     // Update all orgUnit references in the TEI
                     const updatedTei = {
@@ -199,7 +206,26 @@ export const migrationAsyncActions = {
                     },
                 }
 
+                onProgress({step: 0})
+
                 const response = await customEngine.mutate(mutation)
+
+
+
+                const successfulTeis = []
+                const failedTeis = []
+                const totalTeis = updatedTeis.length
+
+                const updateProgress = () => {
+                    onProgress({
+                        step: 1,
+                        total: totalTeis,
+                        failedTeis: [...failedTeis],
+                        successfulTeis: [...successfulTeis]
+                    })
+                }
+
+                updateProgress()
 
                 const ownershipPromises = updatedTeis.map(async (tei) => {
                     const ownershipPayload = {
@@ -214,41 +240,51 @@ export const migrationAsyncActions = {
                         params: ownershipPayload,
                     }
 
-                    return engine.mutate(ownershipMutation)
+                    try {
+                        await engine.mutate(ownershipMutation)
+                        successfulTeis.push(tei.trackedEntityInstance)
+                        // Update progress after each successful transfer
+                        updateProgress()
+                    } catch (error) {
+                        failedTeis.push(tei.trackedEntityInstance)
+
+                        updateProgress()
+                        console.error(`Failed to transfer ownership for TEI ${tei.trackedEntityInstance}:`, error)
+                    }
                 })
 
                 // Wait for all ownership transfers to complete
                 await Promise.all(ownershipPromises)
 
-                // Extract and update all events from TEIs
-                const updatedEvents = updatedTeis.flatMap(tei =>
-                    (tei.enrollments || []).flatMap(enrollment =>
-                        (enrollment.events || []).map(event => ({
-                            ...event,
-                            orgUnit: targetOrgUnit,
-                            orgUnitName: targetOrgUnitName,
-                        }))
-                    )
-                ).filter(event => event.event)
+                // // Extract and update all events from TEIs
+                // const updatedEvents = updatedTeis.flatMap(tei =>
+                //     (tei.enrollments || []).flatMap(enrollment =>
+                //         (enrollment.events || []).map(event => ({
+                //             ...event,
+                //             orgUnit: targetOrgUnit,
+                //             orgUnitName: targetOrgUnitName,
+                //         }))
+                //     )
+                // ).filter(event => event.event)
 
-                if (updatedEvents.length === 0) {
-                    console.log('No events found for updating.')
-                    return
-                }
+                // if (updatedEvents.length === 0) {
+                //     console.log('No events found for updating.')
+                //     return
+                // }
 
-                console.log(`Updating ${updatedEvents.length} events...`)
-                console.log(updatedEvents)
+                // console.log(`Updating ${updatedEvents.length} events...`)
+                // console.log(updatedEvents)
 
-                // Update all events in a single API call
-                const eventMutation = {
-                    resource: 'events',
-                    type: 'create',
-                    data: {
-                        events: updatedEvents
-                    }
-                }
+                // // Update all events in a single API call
+                // const eventMutation = {
+                //     resource: 'events',
+                //     type: 'create',
+                //     data: {
+                //         events: updatedEvents
+                //     }
+                // }
 
-                await customEngine.mutate(eventMutation)
+                // await customEngine.mutate(eventMutation)
 
                 dispatch({
                     type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
@@ -268,6 +304,6 @@ export const migrationAsyncActions = {
 
 // Export all actions
 export const migrationActions = {
-    ...migrationActionCreators,
+    ...dataActionCreators,
     ...migrationAsyncActions,
 }

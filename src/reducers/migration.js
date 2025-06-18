@@ -1,12 +1,11 @@
-import { VALUE_TYPE_DATETIME, VALUE_TYPE_TEXT } from '@dhis2/analytics'
-import { FILTERABLE_TYPES, filterTeis } from '../modules/migration.js'
-
+import { filterTeis } from '../modules/migration.js'
 // Action Types
 export const MIGRATION_TYPES = {
     SET_ORG_UNIT: 'MIGRATION_SET_ORG_UNIT',
     SET_TARGET_ORG_UNIT: 'MIGRATION_SET_TARGET_ORG_UNIT',
     SET_PROGRAM: 'MIGRATION_SET_PROGRAM',
     SET_CREDENTIALS: 'MIGRATION_SET_CREDENTIALS',
+    SET_SELECTED_TEIS: 'MIGRATION_SET_SELECTED_TEIS',
     ADD_FILTER: 'MIGRATION_SET_FILTERS',
     UPDATE_FILTER: 'MIGRATION_UPDATE_FILTER',
     REMOVE_FILTER: 'MIGRATION_REMOVE_FILTER',
@@ -32,6 +31,7 @@ const formInitialState = {
     },
     attributesToDisplay: [],
     filters: [],
+    selectedTeis: [],
 }
 
 const migrationInitialState = {
@@ -45,13 +45,13 @@ const migrationInitialState = {
 export function migrationForm(state = formInitialState, action) {
     switch (action.type) {
         case MIGRATION_TYPES.SET_ORG_UNIT:
-            return { ...state, orgUnitId: action.payload }
+            return { ...state, orgUnitId: action.payload, filters: [] }
 
         case MIGRATION_TYPES.SET_TARGET_ORG_UNIT:
             return { ...state, targetOrgUnitId: action.payload }
 
         case MIGRATION_TYPES.SET_PROGRAM:
-            return { ...state, programId: action.payload }
+            return { ...state, programId: action.payload, filters: [] }
 
         case MIGRATION_TYPES.SET_CREDENTIALS:
             return {
@@ -98,6 +98,12 @@ export function migrationForm(state = formInitialState, action) {
                 filters: state.filters.filter(
                     (filter) => filter.field !== action.payload.name
                 ),
+            }
+
+        case MIGRATION_TYPES.SET_SELECTED_TEIS:
+            return {
+                ...state,
+                selectedTeis: action.payload,
             }
 
         case MIGRATION_TYPES.RESET:
@@ -149,62 +155,14 @@ export const migrationSelectors = {
     getMigrationIsLoading: (state) => state.migration.loading,
     getMigrationError: (state) => state.migration.error,
     getMigrationMigrationStatus: (state) => state.migration.migrationStatus,
+    getSelectedTEIs: (state) => state.migrationForm.selectedTeis,
     getMigrationAttributesToDisplay: (state) =>
         state.migrationForm.attributesToDisplay,
     getMigrationRawTEIs: (state) => state.migration.teis,
     getMigrationTEIs: (state) => {
         const teis = state.migration.teis
         return filterTeis(
-            teis.map((tei) => {
-                const attributes =
-                    tei.attributes?.map((attr) => ({
-                        attribute: attr.attribute,
-                        name: attr.displayName,
-                        valueType: attr.valueType,
-                        value: attr.value,
-                    })) ?? []
-
-                const storedBy = tei.attributes?.find(
-                    (attr) => attr?.storedBy
-                )?.storedBy
-
-                return {
-                    id: tei.trackedEntityInstance,
-                    created: tei.created,
-                    lastUpdated: tei.lastUpdated,
-                    createdBy: tei.createdByUserInfo ?? {},
-                    storedBy: storedBy,
-                    lastUpdatedBy: tei.lastUpdatedByUserInfo ?? {},
-                    attributes,
-                    filterableFields: [
-                        ...[
-                            {
-                                name: 'Created At',
-                                value: tei.created,
-                                valueType: VALUE_TYPE_DATETIME,
-                            },
-                            {
-                                name: 'Last Updated At',
-                                value: tei.lastUpdated,
-                                valueType: VALUE_TYPE_DATETIME,
-                            },
-                            {
-                                name: 'Stored By',
-                                value: storedBy,
-                                valueType: VALUE_TYPE_TEXT,
-                            },
-                            {
-                                name: 'Last Updated By',
-                                value: tei.lastUpdatedByUserInfo?.username,
-                                valueType: VALUE_TYPE_TEXT,
-                            },
-                        ],
-                        ...attributes,
-                    ].filter((field) =>
-                        FILTERABLE_TYPES.includes(field.valueType)
-                    ),
-                }
-            }),
+            teis,
             state.migrationForm.filters
         )
     },

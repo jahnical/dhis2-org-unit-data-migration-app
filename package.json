@@ -7,7 +7,7 @@
     "scripts": {
         "deduplicate": "d2-app-scripts deduplicate",
         "build": "d2-app-scripts build",
-        "start": "d2-app-scripts start",
+        "start": "d2-app-scripts start --proxy https://project.ccdev.org/chisdev --port 3000",
         "test": "d2-app-scripts test",
         "deploy": "d2-app-scripts deploy",
         "lint": "d2-style check",

@@ -11,79 +11,114 @@ import {
     NoticeBox,
 } from '@dhis2/ui'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-    migrationActionCreators,
+    dataActionCreators,
     migrationAsyncActions,
 } from '../../actions/migration.js'
 import { sGetMetadata } from '../../reducers/metadata.js'
 import { migrationSelectors } from '../../reducers/migration.js'
-import HSACredentialsForm from './HSACredentialsForm.js'
 import OrgUnitSelection from './OrgUnitSelection.js'
 
 const DataMigrationModal = ({ onClose }) => {
-    const targetOrgUnit = useSelector(
-        migrationSelectors.getMigrationTargetOrgUnit
-    )
-    const credentials = useSelector(migrationSelectors.getMigrationCredentials)
-    const filteredTeis = useSelector(migrationSelectors.getMigrationTEIs)
+    const [step, setStep] = useState('selection') // selection, preview, migrating
+    const [migrationProgress, setMigrationProgress] = useState({step: 0})
+
+    const targetOrgUnit = useSelector(migrationSelectors.getMigrationTargetOrgUnit)
+    const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
     const allTeis = useSelector(migrationSelectors.getMigrationRawTEIs)
     const loading = useSelector(migrationSelectors.getMigrationIsLoading)
     const error = useSelector(migrationSelectors.getMigrationError)
-    const migrationStatus = useSelector(
-        migrationSelectors.getMigrationMigrationStatus
-    )
+    const migrationStatus = useSelector(migrationSelectors.getMigrationMigrationStatus)
     const metadata = useSelector(sGetMetadata)
     const engine = useDataEngine()
     const dispatch = useDispatch()
 
-    const migrateData = () => {
+    const migrateData = async () => {
+        setStep('migrating')
+        setMigrationProgress({step: 0})
+
+        // Simulating progress updates
+        const updateProgress = (progress) => {
+            setMigrationProgress(progress)
+        }
+
         dispatch(
             migrationAsyncActions.migrateTEIs({
                 teis: allTeis,
-                filteredTeis: filteredTeis,
+                selectedTeis: selectedTeis,
                 targetOrgUnit: targetOrgUnit,
                 targetOrgUnitName: metadata[targetOrgUnit].name,
-                credentials: credentials,
                 engine: engine,
+                onProgress: updateProgress,
             })
         )
     }
 
     const onCloseClicked = () => {
         if (migrationStatus === 'success') {
-            dispatch(migrationActionCreators.reset())
+            dispatch(dataActionCreators.reset())
         }
         onClose()
     }
 
+    const renderPreview = () => (
+        <div style={{ padding: '16px' }}>
+            <NoticeBox title={i18n.t('Migration Preview')} warning>
+                <p>{i18n.t('You are about to migrate:')}</p>
+                <ul>
+                    <li>
+                        {i18n.t('{{count}} TEIs', { count: selectedTeis.length })}
+                    </li>
+                    <li>
+                        {i18n.t('To {{orgUnit}}', {
+                            orgUnit: metadata[targetOrgUnit].displayName,
+                        })}
+                    </li>
+                </ul>
+                <p>{i18n.t('This action cannot be undone. Are you sure you want to continue?')}</p>
+            </NoticeBox>
+        </div>
+    )
+
+    const renderProgress = () => (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+            padding: '16px'
+        }}>
+            <CircularLoader />
+            {
+                migrationProgress.step == 0? <div>
+                    <p>{i18n.t("Updating Organisation Units")}</p>
+                </div> : <>
+                    <div>
+                        {i18n.t('Transferring Ownerships {{success}} successes and {{failure}} failures of {{total}} TEIs...', {
+                            success: migrationProgress.successfulTeis?.length || 0,
+                            failure: migrationProgress.failedTeis?.length || 0,
+                            total: migrationProgress.total,
+                        })}
+                    </div>
+                    <div>
+                        {Math.round((
+                            ((migrationProgress.successfulTeis?.length || 0) + (migrationProgress.failedTeis?.length || 0))
+                            / migrationProgress.total) * 100)
+                            }%
+                    </div>
+                </>
+            }
+        </div>
+    )
+
     return (
         <Modal onClose={onClose} position="middle" large>
             <ModalTitle>Data Migration</ModalTitle>
-            {loading ? (
+            {loading && step === 'migrating' ? (
                 <ModalContent>
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '16px',
-                        }}
-                    >
-                        <CircularLoader />
-                        <span>
-                            {i18n.t(
-                                'Migrating {{count}} TEIs to {{targetOrgUnit}}...',
-                                {
-                                    count: filteredTeis.length,
-                                    targetOrgUnit: metadata[targetOrgUnit]
-                                        ? metadata[targetOrgUnit].displayName
-                                        : undefined,
-                                }
-                            )}
-                        </span>
-                    </div>
+                    {renderProgress()}
                 </ModalContent>
             ) : error ? (
                 <ModalContent>
@@ -96,39 +131,19 @@ const DataMigrationModal = ({ onClose }) => {
                 </ModalContent>
             ) : (
                 <>
-                    <ModalContent
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                        }}
-                    >
+                    <ModalContent>
                         {migrationStatus === 'success' ? (
-                            <NoticeBox
-                                success
-                                title={i18n.t('Migration successful')}
-                            >
-                                {i18n.t(
-                                    'All TEIs have been successfully migrated to the selected org unit.'
-                                )}
+                            <NoticeBox success title={i18n.t('Migration successful')}>
+                                {i18n.t('All TEIs have been successfully migrated to the selected org unit.')}
                             </NoticeBox>
-                        ) : (
-                            <>
-                                <div style={{ marginBottom: '20px' }}>
-                                    <h4>Select Target Organisation Unit</h4>
-                                    <OrgUnitSelection isSourceOrgUnit={false} />
-                                </div>
-                                <div
-                                    style={{
-                                        overflow: 'auto',
-                                        maxHeight: '512px',
-                                        maxWidth: '372pt',
-                                        marginBottom: '16px',
-                                    }}
-                                >
-                                    <HSACredentialsForm />
-                                </div>
-                            </>
-                        )}
+                        ) : step === 'selection' ? (
+                            <div style={{ marginBottom: '20px' }}>
+                                <h4>Select Target Organisation Unit</h4>
+                                <OrgUnitSelection isSourceOrgUnit={false} />
+                            </div>
+                        ) : step === 'preview' ? (
+                            renderPreview()
+                        ) : null}
                     </ModalContent>
                     <ModalActions>
                         {migrationStatus === 'success' ? (
@@ -150,18 +165,25 @@ const DataMigrationModal = ({ onClose }) => {
                                 >
                                     {i18n.t('Cancel')}
                                 </Button>
-                                <Button
-                                    disabled={
-                                        !targetOrgUnit ||
-                                        !credentials.username ||
-                                        !credentials.password
-                                    }
-                                    primary
-                                    onClick={migrateData}
-                                    dataTest="data-migration-modal-confirm"
-                                >
-                                    {i18n.t('Migrate')}
-                                </Button>
+                                {step === 'selection' && (
+                                    <Button
+                                        disabled={!targetOrgUnit}
+                                        primary
+                                        onClick={() => setStep('preview')}
+                                        dataTest="data-migration-modal-next"
+                                    >
+                                        {i18n.t('Next')}
+                                    </Button>
+                                )}
+                                {step === 'preview' && (
+                                    <Button
+                                        primary
+                                        onClick={migrateData}
+                                        dataTest="data-migration-modal-confirm"
+                                    >
+                                        {i18n.t('Confirm Migration')}
+                                    </Button>
+                                )}
                             </ButtonStrip>
                         )}
                     </ModalActions>
