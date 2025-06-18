@@ -77,7 +77,7 @@ const DataMigrationModal = ({ onClose }) => {
                         })}
                     </li>
                 </ul>
-                <p>{i18n.t('This action cannot be undone. Are you sure you want to continue?')}</p>
+                <p>{i18n.t('Are you sure you want to continue?')}</p>
             </NoticeBox>
         </div>
     )

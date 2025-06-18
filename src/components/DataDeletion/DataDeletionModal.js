@@ -1,4 +1,4 @@
-import { useDataEngine } from '@dhis2/app-runtime'
+import { useDataMutation } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import {
     Modal,
@@ -17,21 +17,30 @@ import {
     dataActionCreators,
     migrationAsyncActions,
 } from '../../actions/migration.js'
-import { migrationSelectors } from '../../reducers/migration.js'
+import { deletionSelectors, migrationSelectors } from '../../reducers/migration.js'
 
 const DataDeletionModal = ({ onClose }) => {
-const filteredTeis = useSelector(migrationSelectors.getMigrationTEIs)
-const loading = useSelector(migrationSelectors.getMigrationIsLoading)
-const error = useSelector(migrationSelectors.getMigrationError)
-const deletionStatus = useSelector(migrationSelectors.getMigrationMigrationStatus)
-const engine = useDataEngine()
+
+    const deleteTEIMutation = {
+        resource: 'trackedEntityInstances',
+        type: 'delete',
+        id: ({ id }) => id,
+    }
+
+const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
+// const loading = useSelector(deletionSelectors.getDeletionIsLoading)
+// const error = useSelector(deletionSelectors.getDeletionError)
+const deletionStatus = useSelector(deletionSelectors.getDeletionState)
+const [deleteTEI, { loading, error }] = useDataMutation(deleteTEIMutation)
 const dispatch = useDispatch()
 
 const deleteData = () => {
+
+
     dispatch(
         migrationAsyncActions.deleteTEIs({
-            teis: filteredTeis,
-            engine: engine,
+            teis: selectedTeis,
+            deleteTEI: deleteTEI,
         })
     )
 }
@@ -59,7 +68,7 @@ return (
                     <CircularLoader />
                     <span>
                         {i18n.t('Deleting {{count}} TEIs...', {
-                            count: filteredTeis.length,
+                            count: selectedTeis.length,
                         })}
                     </span>
                 </div>
@@ -89,18 +98,18 @@ return (
                         <div>
                             <NoticeBox warning title={i18n.t('Warning')}>
                                 {i18n.t('You are about to delete {{count}} TEIs. This action cannot be undone.', {
-                                    count: filteredTeis.length,
+                                    count: selectedTeis.length,
                                 })}
                             </NoticeBox>
                             <div style={{ marginTop: '16px' }}>
                                 <h4>{i18n.t('Items to be deleted:')}</h4>
                                 <ul>
-                                    {filteredTeis.slice(0, 5).map((tei) => (
-                                        <li key={tei.id}>{tei.displayName || tei.id}</li>
+                                    {selectedTeis.slice(0, 5).map((tei) => (
+                                        <li key={tei}>{tei}</li>
                                     ))}
-                                    {filteredTeis.length > 5 && (
+                                    {selectedTeis.length > 5 && (
                                         <li>{i18n.t('... and {{count}} more', {
-                                            count: filteredTeis.length - 5
+                                            count: selectedTeis.length - 5
                                         })}</li>
                                     )}
                                 </ul>

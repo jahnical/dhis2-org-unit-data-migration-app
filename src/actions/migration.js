@@ -300,6 +300,31 @@ export const migrationAsyncActions = {
                 throw error
             }
         },
+
+    deleteTEIs: ({teis, deleteTEI}) => async (dispatch) => {
+        console.log('deleteTEIs called with:', teis, deleteTEI)
+        if (!teis?.length || !deleteTEI) {
+            throw new Error('Missing required parameters')
+        }
+
+        dispatch({ type: MIGRATION_TYPES.DELETE_TEIS_START })
+
+        try {
+            const deletionPromises = teis.map((tei) => {
+                deleteTEI({id: tei})
+            })
+
+            await Promise.all(deletionPromises)
+
+            dispatch({ type: MIGRATION_TYPES.DELETE_TEIS_SUCCESS })
+        } catch (error) {
+            dispatch({
+                type: MIGRATION_TYPES.DELETE_TEIS_ERROR,
+                payload: error.message,
+            })
+            throw error
+        }
+    }
 }
 
 // Export all actions

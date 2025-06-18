@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import current from './current.js'
 import loader from './loader.js'
 import metadata from './metadata.js'
-import { migrationForm, migration } from './migration.js'
+import { migrationForm, migration, deleteTeis } from './migration.js'
 import ui from './ui.js'
 import visualization from './visualization.js'
 
@@ -16,4 +16,5 @@ export default combineReducers({
     visualization,
     migrationForm,
     migration,
+    deleteTeis
 })

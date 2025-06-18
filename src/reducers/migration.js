@@ -18,6 +18,9 @@ export const MIGRATION_TYPES = {
     MIGRATE_TEIS_START: 'MIGRATE_TEIS_START',
     MIGRATE_TEIS_SUCCESS: 'MIGRATE_TEIS_SUCCESS',
     MIGRATE_TEIS_ERROR: 'MIGRATE_TEIS_ERROR',
+    DELETE_TEIS_START: 'DELETE_TEIS_START',
+    DELETE_TEIS_SUCCESS: 'DELETE_TEIS_SUCCESS',
+    DELETE_TEIS_ERROR: 'DELETE_TEIS_ERROR',
 }
 
 // Initial States
@@ -38,7 +41,14 @@ const migrationInitialState = {
     teis: [],
     loading: false,
     error: null,
-    migrationStatus: null,
+    migrationStatus: null
+}
+
+const deletionInitialState = {
+    teis: [],
+    loading: false,
+    error: null,
+    deletionStatus: null,
 }
 
 // Form Reducer
@@ -144,6 +154,27 @@ export function migration(state = migrationInitialState, action) {
     }
 }
 
+export function deleteTeis(state = deletionInitialState, action) {
+    switch (action.type) {
+        case MIGRATION_TYPES.DELETE_TEIS_START:
+            return { ...state, loading: true, error: null }
+
+        case MIGRATION_TYPES.DELETE_TEIS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                deletionStatus: 'success',
+                teis: [],
+            }
+
+        case MIGRATION_TYPES.DELETE_TEIS_ERROR:
+            return { ...state, loading: false, error: action.payload }
+
+        default:
+            return state
+    }
+}
+
 // Selectors
 export const migrationSelectors = {
     getMigrationState: (state) => state.migrationForm,
@@ -166,4 +197,11 @@ export const migrationSelectors = {
             state.migrationForm.filters
         )
     },
+}
+
+export const deletionSelectors = {
+    getDeletionState: (state) => state.deleteTeis.deletionStatus,
+    getDeletionIsLoading: (state) => state.deleteTeis.loading,
+    getDeletionError: (state) => state.deleteTeis.error,
+    getDeletedTEIs: (state) => state.deleteTeis.teis,
 }
