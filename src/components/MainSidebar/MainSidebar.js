@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { acSetUiAccessoryPanelActiveTab } from '../../actions/ui.js'
 import { ACCESSORY_PANEL_TAB_INPUT } from '../../modules/accessoryPanelConstants.js'
-import { migrationSelectors } from '../../reducers/migration.js'
+import { dataControlSelectors } from '../../reducers/data_controls.js'
 import {
     sGetUiShowAccessoryPanel,
     sGetUiSidebarHidden,
@@ -21,9 +21,9 @@ import { useResizableAccessorySidebar } from './useResizableAccessorySidebar.js'
 const MainSidebar = () => {
     const dispatch = useDispatch()
     const selectedTabId = useSelector(sGetUiAccessoryPanelActiveTab)
-    const programId = useSelector(migrationSelectors.getMigrationProgram)
-    const orgUnitId = useSelector(migrationSelectors.getMigrationOrgUnit)
-    const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
+    const programId = useSelector(dataControlSelectors.getDataControlProgram)
+    const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
+    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
     const open = useSelector(sGetUiShowAccessoryPanel) && Boolean(selectedTabId)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false)

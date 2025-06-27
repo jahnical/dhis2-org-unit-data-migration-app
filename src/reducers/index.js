@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux'
 import current from './current.js'
+import { dataControl } from './data_controls.js'
+import { deleteTeis } from './deletion.js'
 import loader from './loader.js'
 import metadata from './metadata.js'
-import { migrationForm, migration, deleteTeis } from './migration.js'
+import { migration } from './migration.js'
 import ui from './ui.js'
 import visualization from './visualization.js'
 
@@ -14,7 +16,7 @@ export default combineReducers({
     metadata,
     ui,
     visualization,
-    migrationForm,
     migration,
-    deleteTeis
+    deleteTeis,
+    dataControl
 })

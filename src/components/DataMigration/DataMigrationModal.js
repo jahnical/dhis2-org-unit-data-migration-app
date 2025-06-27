@@ -13,10 +13,11 @@ import {
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { dataActionCreators } from '../../actions/data_controls.js'
 import {
-    dataActionCreators,
-    migrationAsyncActions,
+    migrationActions,
 } from '../../actions/migration.js'
+import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { sGetMetadata } from '../../reducers/metadata.js'
 import { migrationSelectors } from '../../reducers/migration.js'
 import OrgUnitSelection from './OrgUnitSelection.js'
@@ -25,9 +26,9 @@ const DataMigrationModal = ({ onClose }) => {
     const [step, setStep] = useState('selection') // selection, preview, migrating
     const [migrationProgress, setMigrationProgress] = useState({step: 0})
 
-    const targetOrgUnit = useSelector(migrationSelectors.getMigrationTargetOrgUnit)
-    const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
-    const allTeis = useSelector(migrationSelectors.getMigrationRawTEIs)
+    const targetOrgUnit = useSelector(migrationSelectors.getMigrationTargetOrgUnitId)
+    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
+    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
     const loading = useSelector(migrationSelectors.getMigrationIsLoading)
     const error = useSelector(migrationSelectors.getMigrationError)
     const migrationStatus = useSelector(migrationSelectors.getMigrationMigrationStatus)
@@ -45,7 +46,7 @@ const DataMigrationModal = ({ onClose }) => {
         }
 
         dispatch(
-            migrationAsyncActions.migrateTEIs({
+            migrationActions.migrateTEIs({
                 teis: allTeis,
                 selectedTeis: selectedTeis,
                 targetOrgUnit: targetOrgUnit,
@@ -59,6 +60,7 @@ const DataMigrationModal = ({ onClose }) => {
     const onCloseClicked = () => {
         if (migrationStatus === 'success') {
             dispatch(dataActionCreators.reset())
+            dispatch(migrationActions.resetMigration())
         }
         onClose()
     }

@@ -8,11 +8,11 @@ import { tSetInitMetadata } from '../actions/metadata.js'
 import { acSetShowExpandedLayoutPanel } from '../actions/ui.js'
 import history from '../modules/history.js'
 import { SYSTEM_SETTINGS_DIGIT_GROUP_SEPARATOR } from '../modules/systemSettings.js'
+import { dataControlSelectors } from '../reducers/data_controls.js'
 import {
     sGetIsVisualizationLoading,
     sGetLoadError,
 } from '../reducers/loader.js'
-import { migrationSelectors } from '../reducers/migration.js'
 import { sGetUiProgramId } from '../reducers/ui.js'
 import classes from './App.module.css'
 import TEIs from './DataMigration/TEIs.js'
@@ -26,7 +26,7 @@ import StartScreen from './Visualization/StartScreen.js'
 
 const App = () => {
     const programId = useSelector(sGetUiProgramId)
-    const orgUnitId = useSelector(migrationSelectors.getMigrationOrgUnit)
+    const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
     const [initialLoadIsComplete, setInitialLoadIsComplete] = useState(false)
     const dispatch = useDispatch()
     const isLoading = useSelector(sGetIsVisualizationLoading)

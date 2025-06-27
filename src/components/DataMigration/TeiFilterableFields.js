@@ -27,24 +27,24 @@ import {
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { dataActionCreators } from '../../actions/migration.js'
-import { migrationSelectors } from '../../reducers/migration.js'
+import { dataActionCreators } from '../../actions/data_controls.js'
+import { dataControlSelectors } from '../../reducers/data_controls.js'
 import classes from './styles/TeiAttributes.module.css'
 
 const TeiFilterableFields = () => {
-    const teis = useSelector(migrationSelectors.getMigrationTEIs)
-    const allTEIs = useSelector(migrationSelectors.getMigrationRawTEIs)
-    const programId = useSelector(migrationSelectors.getMigrationProgram)
-    const orgUnitId = useSelector(migrationSelectors.getMigrationOrgUnit)
+    const teis = useSelector(dataControlSelectors.getDataControlTEIs)
+    const allTEIs = useSelector(dataControlSelectors.getDataControlRawTEIs)
+    const programId = useSelector(dataControlSelectors.getDataControlProgram)
+    const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
     const [fields, setFields] = useState([])
     const [selectedField, setSelectedField] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [storedByOptions, setStoredByOptions] = useState([])
     const [lastUpdatedByOptions, setLastUpdatedByOptions] = useState([])
     const dispatch = useDispatch()
-    const filters = useSelector(migrationSelectors.getMigrationFilters)
+    const filters = useSelector(dataControlSelectors.getDataControlFilters)
     const attributesToDisplay = useSelector(
-        migrationSelectors.getMigrationAttributesToDisplay
+        dataControlSelectors.getDataControlAttributesToDisplay
     )
 
     useEffect(() => {

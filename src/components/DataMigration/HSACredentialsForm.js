@@ -1,7 +1,7 @@
 import { InputField } from '@dhis2/ui'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { migrationActionCreators } from '../../actions/migration.js'
+import { dataActionCreators } from '../../actions/data_controls.js'
 
 const HSACredentialsForm = () => {
     const dispatch = useDispatch()
@@ -16,12 +16,12 @@ const HSACredentialsForm = () => {
             ...prev,
             [name]: value,
         }))
-        dispatch(migrationActionCreators.setCredentials({ [name]: value }))
+        dispatch(dataActionCreators.setCredentials({ [name]: value }))
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        dispatch(migrationActionCreators.setCredentials(credentials))
+        dispatch(dataActionCreators.setCredentials(credentials))
     }
 
     return (

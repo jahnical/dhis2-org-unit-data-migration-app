@@ -15,29 +15,24 @@ import {
 } from '@dhis2/ui'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-    dataActionCreators,
-    migrationAsyncActions,
-} from '../../actions/migration.js'
-import { filterTeis } from '../../modules/migration.js'
-import { migrationSelectors } from '../../reducers/migration.js'
+import { dataActionCreators } from '../../actions/data_controls.js'
+import { filterTeis } from '../../modules/data_control.js'
+import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { sGetUiProgramId } from '../../reducers/ui.js'
 import classes from './styles/Common.module.css'
 
 const TEIs = () => {
-    const loading = useSelector(migrationSelectors.getMigrationIsLoading)
-    const error = useSelector(migrationSelectors.getMigrationError)
+    const loading = useSelector(dataControlSelectors.getDataControlIsLoading)
+    const error = useSelector(dataControlSelectors.getDataControlError)
     const dispatch = useDispatch()
     const uiProgramId = useSelector(sGetUiProgramId)
-    const programId = useSelector(migrationSelectors.getMigrationProgram)
-    const orgUnitId = useSelector(migrationSelectors.getMigrationOrgUnit)
+    const programId = useSelector(dataControlSelectors.getDataControlProgram)
+    const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
     const [teis, setTeis] = useState([])
-    const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
-    const allTeis = useSelector(migrationSelectors.getMigrationRawTEIs)
-    const filters = useSelector(migrationSelectors.getMigrationFilters)
-    const attributesToDisplay = useSelector(
-        migrationSelectors.getMigrationAttributesToDisplay
-    )
+    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
+    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
+    const filters = useSelector(dataControlSelectors.getDataControlFilters)
+    const attributesToDisplay = useSelector(dataControlSelectors.getDataControlAttributesToDisplay)
     const engine = useDataEngine()
 
     useEffect(() => {
@@ -49,7 +44,7 @@ const TEIs = () => {
         dispatch(dataActionCreators.setSelectedTEIs([])) // Reset selections when program or org unit changes
         if (programId && orgUnitId) {
             dispatch(
-                migrationAsyncActions.fetchTEIs(orgUnitId, programId, engine)
+                dataActionCreators.fetchTEIs(orgUnitId, programId, engine)
             )
         }
     }, [programId, orgUnitId, dispatch, engine])

@@ -1,114 +1,14 @@
 import { MIGRATION_TYPES } from '../reducers/migration.js'
 
-export const dataActionCreators = {
-    setSourceOrgUnit: (orgUnitId) => ({
-        type: MIGRATION_TYPES.SET_ORG_UNIT,
-        payload: orgUnitId,
-    }),
-
+export const migrationActions = {
     setTargetOrgUnit: (orgUnitId) => ({
-        type: MIGRATION_TYPES.SET_TARGET_ORG_UNIT,
-        payload: orgUnitId,
-    }),
+            type: MIGRATION_TYPES.SET_TARGET_ORG_UNIT,
+            payload: orgUnitId,
+        }),
 
-    setProgram: (programId) => ({
-        type: MIGRATION_TYPES.SET_PROGRAM,
-        payload: programId,
-    }),
-
-    setCredentials: (credentials) => ({
-        type: MIGRATION_TYPES.SET_CREDENTIALS,
-        payload: credentials,
-    }),
-
-    setSelectedTEIs: (teis) => ({
-        type: MIGRATION_TYPES.SET_SELECTED_TEIS,
-        payload: teis,
-    }),
-
-    addFilter: (filter) => ({
-        type: MIGRATION_TYPES.ADD_FILTER,
-        payload: filter,
-    }),
-
-    updateFilter: (filter) => ({
-        type: MIGRATION_TYPES.UPDATE_FILTER,
-        payload: filter,
-    }),
-
-    removeFilter: (filter) => ({
-        type: MIGRATION_TYPES.REMOVE_FILTER,
-        payload: filter,
-    }),
-
-    addDisplayAttribute: (attribute) => ({
-        type: MIGRATION_TYPES.ADD_DISPLAY_ATTRIBUTE,
-        payload: attribute,
-    }),
-
-    removeDisplayAttribute: (attribute) => ({
-        type: MIGRATION_TYPES.REMOVE_DISPLAY_ATTRIBUTE,
-        payload: attribute,
-    }),
-
-    reset: () => ({
-        type: MIGRATION_TYPES.RESET,
-    }),
-}
-
-export const migrationAsyncActions = {
-    fetchTEIs: (sourceOrgUnit, program, engine) => async (dispatch) => {
-        if (!sourceOrgUnit || !program || !engine) {
-            throw new Error('Missing required parameters')
-        }
-
-        dispatch({ type: MIGRATION_TYPES.FETCH_TEIS_START })
-
-        try {
-            const allTEIs = []
-            let hasMoreData = true
-            let page = 1
-            const pageSize = 500
-
-            while (hasMoreData) {
-                const query = {
-                    teis: {
-                        resource: 'trackedEntityInstances',
-                        params: {
-                            ou: sourceOrgUnit,
-                            program,
-                            fields: '*',
-                            pageSize,
-                            page,
-                        },
-                    },
-                }
-
-                const { teis } = await engine.query(query)
-
-                allTEIs.push(...teis.trackedEntityInstances)
-
-                if (teis.trackedEntityInstances.length === pageSize) {
-                    page++
-                } else {
-                    hasMoreData = false
-                }
-            }
-
-            dispatch({
-                type: MIGRATION_TYPES.FETCH_TEIS_SUCCESS,
-                payload: allTEIs,
-            })
-
-            return allTEIs
-        } catch (error) {
-            dispatch({
-                type: MIGRATION_TYPES.FETCH_TEIS_ERROR,
-                payload: error.message,
-            })
-            throw error
-        }
-    },
+    resetMigration: () => ({
+            type: MIGRATION_TYPES.RESET,
+        }),
 
     migrateTEIs:
         ({
@@ -132,18 +32,6 @@ export const migrationAsyncActions = {
             dispatch({ type: MIGRATION_TYPES.MIGRATE_TEIS_START })
 
             try {
-                // Wrap the engine with new headers
-                // const customEngine = {
-                //     mutate: (mutation, options) => {
-                //         const headers = {
-                //             ...options?.headers,
-                //             Authorization: `Basic ${btoa(
-                //                 `${credentials.username}:${credentials.password}`
-                //             )}`,
-                //         }
-                //         return engine.mutate(mutation, { ...options, headers })
-                //     },
-                // }
 
                 const customEngine = engine
 
@@ -228,63 +116,36 @@ export const migrationAsyncActions = {
                 updateProgress()
 
                 const ownershipPromises = updatedTeis.map(async (tei) => {
-                    const ownershipPayload = {
-                        trackedEntityInstance: tei.trackedEntityInstance,
-                        program: tei.programOwners[0].program,
-                        ou: targetOrgUnit,
-                    }
+                    const teiOwnershipPromises = tei.programOwners.map(async (ownership) => {
+                        const ownershipPayload = {
+                            trackedEntityInstance: tei.trackedEntityInstance,
+                            program: ownership.program,
+                            ou: targetOrgUnit,
+                        }
 
-                    const ownershipMutation = {
-                        resource: `tracker/ownership/transfer`,
-                        type: 'update',
-                        params: ownershipPayload,
-                    }
+                        const ownershipMutation = {
+                            resource: `tracker/ownership/transfer`,
+                            type: 'update',
+                            params: ownershipPayload,
+                        }
 
-                    try {
-                        await engine.mutate(ownershipMutation)
-                        successfulTeis.push(tei.trackedEntityInstance)
-                        // Update progress after each successful transfer
-                        updateProgress()
-                    } catch (error) {
-                        failedTeis.push(tei.trackedEntityInstance)
+                        try {
+                            await engine.mutate(ownershipMutation)
+                            successfulTeis.push(tei.trackedEntityInstance)
+                            // Update progress after each successful transfer
+                            updateProgress()
+                        } catch (error) {
+                            failedTeis.push(tei.trackedEntityInstance)
 
-                        updateProgress()
-                        console.error(`Failed to transfer ownership for TEI ${tei.trackedEntityInstance}:`, error)
-                    }
+                            updateProgress()
+                            console.error(`Failed to transfer ownership for TEI ${tei.trackedEntityInstance}:`, error)
+                        }
+                    })
+                    return await Promise.all(teiOwnershipPromises)
                 })
 
                 // Wait for all ownership transfers to complete
                 await Promise.all(ownershipPromises)
-
-                // // Extract and update all events from TEIs
-                // const updatedEvents = updatedTeis.flatMap(tei =>
-                //     (tei.enrollments || []).flatMap(enrollment =>
-                //         (enrollment.events || []).map(event => ({
-                //             ...event,
-                //             orgUnit: targetOrgUnit,
-                //             orgUnitName: targetOrgUnitName,
-                //         }))
-                //     )
-                // ).filter(event => event.event)
-
-                // if (updatedEvents.length === 0) {
-                //     console.log('No events found for updating.')
-                //     return
-                // }
-
-                // console.log(`Updating ${updatedEvents.length} events...`)
-                // console.log(updatedEvents)
-
-                // // Update all events in a single API call
-                // const eventMutation = {
-                //     resource: 'events',
-                //     type: 'create',
-                //     data: {
-                //         events: updatedEvents
-                //     }
-                // }
-
-                // await customEngine.mutate(eventMutation)
 
                 dispatch({
                     type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
@@ -300,35 +161,4 @@ export const migrationAsyncActions = {
                 throw error
             }
         },
-
-    deleteTEIs: ({teis, deleteTEI}) => async (dispatch) => {
-        console.log('deleteTEIs called with:', teis, deleteTEI)
-        if (!teis?.length || !deleteTEI) {
-            throw new Error('Missing required parameters')
-        }
-
-        dispatch({ type: MIGRATION_TYPES.DELETE_TEIS_START })
-
-        try {
-            const deletionPromises = teis.map((tei) => {
-                deleteTEI({id: tei})
-            })
-
-            await Promise.all(deletionPromises)
-
-            dispatch({ type: MIGRATION_TYPES.DELETE_TEIS_SUCCESS })
-        } catch (error) {
-            dispatch({
-                type: MIGRATION_TYPES.DELETE_TEIS_ERROR,
-                payload: error.message,
-            })
-            throw error
-        }
-    }
-}
-
-// Export all actions
-export const migrationActions = {
-    ...dataActionCreators,
-    ...migrationAsyncActions,
 }

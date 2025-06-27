@@ -3,8 +3,9 @@ import { OrganisationUnitTree } from '@dhis2/ui'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import { connect, useDispatch } from 'react-redux'
+import { dataActionCreators } from '../../actions/data_controls.js'
 import { acAddMetadata } from '../../actions/metadata.js'
-import { dataActionCreators } from '../../actions/migration.js'
+import { migrationActions } from '../../actions/migration.js'
 import { acAddParentGraphMap } from '../../actions/ui.js'
 import { removeLastPathSegment } from '../../modules/orgUnit.js'
 import { sGetMetadata } from '../../reducers/metadata.js'
@@ -43,7 +44,7 @@ const OrgUnitSelection = ({
             if (isSourceOrgUnit) {
                 dispatch(dataActionCreators.setSourceOrgUnit(item.id))
             } else {
-                dispatch(dataActionCreators.setTargetOrgUnit(item.id))
+                dispatch(migrationActions.setTargetOrgUnit(item.id))
             }
         }
     }

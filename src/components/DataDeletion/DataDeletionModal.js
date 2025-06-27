@@ -13,11 +13,10 @@ import {
 import PropTypes from 'prop-types'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-    dataActionCreators,
-    migrationAsyncActions,
-} from '../../actions/migration.js'
-import { deletionSelectors, migrationSelectors } from '../../reducers/migration.js'
+import { dataActionCreators } from '../../actions/data_controls.js'
+import { deletionAsyncActions } from '../../actions/deletion.js'
+import { dataControlSelectors } from '../../reducers/data_controls.js'
+import { deletionSelectors } from '../../reducers/deletion.js'
 
 const DataDeletionModal = ({ onClose }) => {
 
@@ -27,18 +26,14 @@ const DataDeletionModal = ({ onClose }) => {
         id: ({ id }) => id,
     }
 
-const selectedTeis = useSelector(migrationSelectors.getSelectedTEIs)
-// const loading = useSelector(deletionSelectors.getDeletionIsLoading)
-// const error = useSelector(deletionSelectors.getDeletionError)
+const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
 const deletionStatus = useSelector(deletionSelectors.getDeletionState)
 const [deleteTEI, { loading, error }] = useDataMutation(deleteTEIMutation)
 const dispatch = useDispatch()
 
 const deleteData = () => {
-
-
     dispatch(
-        migrationAsyncActions.deleteTEIs({
+        deletionAsyncActions.deleteTEIs({
             teis: selectedTeis,
             deleteTEI: deleteTEI,
         })
