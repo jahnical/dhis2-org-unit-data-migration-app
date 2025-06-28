@@ -96,19 +96,20 @@ return (
                                     count: selectedTeis.length,
                                 })}
                             </NoticeBox>
-                            <div style={{ marginTop: '16px' }}>
-                                <h4>{i18n.t('Items to be deleted:')}</h4>
-                                <ul>
-                                    {selectedTeis.slice(0, 5).map((tei) => (
-                                        <li key={tei}>{tei}</li>
-                                    ))}
-                                    {selectedTeis.length > 5 && (
-                                        <li>{i18n.t('... and {{count}} more', {
-                                            count: selectedTeis.length - 5
-                                        })}</li>
-                                    )}
-                                </ul>
-                            </div>
+                            {/*Removed Section listing a summary of TEI items to be deleted*/}
+                            {/*<div style={{ marginTop: '16px' }}>*/}
+                            {/*    <h4>{i18n.t('Items to be deleted:')}</h4>*/}
+                            {/*    <ul>*/}
+                            {/*        {selectedTeis.slice(0, 5).map((tei) => (*/}
+                            {/*            <li key={tei}>{tei}</li>*/}
+                            {/*        ))}*/}
+                            {/*        {selectedTeis.length > 5 && (*/}
+                            {/*            <li>{i18n.t('... and {{count}} more', {*/}
+                            {/*                count: selectedTeis.length - 5*/}
+                            {/*            })}</li>*/}
+                            {/*        )}*/}
+                            {/*    </ul>*/}
+                            {/*</div>*/}
                         </div>
                     )}
                 </ModalContent>
