@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-06-28T03:50:46.621Z\n"
-"PO-Revision-Date: 2025-06-28T03:50:46.622Z\n"
+"POT-Creation-Date: 2025-06-28T16:58:22.125Z\n"
+"PO-Revision-Date: 2025-06-28T16:58:22.127Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -41,9 +41,7 @@ msgstr[0] "You are about to delete {{count}} TEIs. This action cannot be undone.
 msgstr[1] "You are about to delete {{count}} TEIs. This action cannot be undone."
 
 msgid "... and {{count}} more"
-msgid_plural "... and {{count}} more"
-msgstr[0] "... and {{count}} more"
-msgstr[1] "... and {{count}} more"
+msgstr "... and {{count}} more"
 
 msgid "Close"
 msgstr "Close"
