@@ -131,7 +131,7 @@ const MainSidebar = () => {
                     </Button>
 
                     <Button
-                        secondary
+                        destructive={true}
                         onClick={onDeleteDataCliked}
                         style={{
                             width: '100%',
