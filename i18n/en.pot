@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-02T10:54:29.422Z\n"
-"PO-Revision-Date: 2025-07-02T10:54:29.423Z\n"
+"POT-Creation-Date: 2025-07-02T17:19:49.820Z\n"
+"PO-Revision-Date: 2025-07-02T17:19:49.821Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -98,6 +98,31 @@ msgstr "Next"
 msgid "Confirm Migration"
 msgstr "Confirm Migration"
 
+msgid "Could not load History TEIs"
+msgstr "Could not load History TEIs"
+
+msgid ""
+"The History TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The History TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Instance ID"
+msgstr "Instance ID"
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
+
 msgid "Filter by \"{{name}}\""
 msgstr "Filter by \"{{name}}\""
 
@@ -143,21 +168,6 @@ msgid ""
 msgstr ""
 "The TEIs couldn't be retrieved. Try again or contact your system "
 "administrator."
-
-msgid "Instance ID"
-msgstr "Instance ID"
-
-msgid "Created At"
-msgstr "Created At"
-
-msgid "Last Updated At"
-msgstr "Last Updated At"
-
-msgid "Stored By"
-msgstr "Stored By"
-
-msgid "Last Updated By"
-msgstr "Last Updated By"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
