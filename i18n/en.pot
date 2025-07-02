@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-06-28T16:58:22.125Z\n"
-"PO-Revision-Date: 2025-06-28T16:58:22.127Z\n"
+"POT-Creation-Date: 2025-07-02T10:54:29.422Z\n"
+"PO-Revision-Date: 2025-07-02T10:54:29.423Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -101,35 +101,32 @@ msgstr "Confirm Migration"
 msgid "Filter by \"{{name}}\""
 msgstr "Filter by \"{{name}}\""
 
-msgid "Add Column"
-msgstr "Add Column"
+msgid "Select Stored By"
+msgstr "Select Stored By"
 
-msgid "Remove Column"
-msgstr "Remove Column"
+msgid "Select Last Updated By"
+msgstr "Select Last Updated By"
 
-msgid "Select number range"
-msgstr "Select number range"
+msgid "Start Date"
+msgstr "Start Date"
+
+msgid "End Date"
+msgstr "End Date"
+
+msgid "Enter Household Code"
+msgstr "Enter Household Code"
+
+msgid "Enter Househould Member Number"
+msgstr "Enter Househould Member Number"
+
+msgid "Enter keyword"
+msgstr "Enter keyword"
 
 msgid "Min value"
 msgstr "Min value"
 
 msgid "Max value"
 msgstr "Max value"
-
-msgid "Select date range"
-msgstr "Select date range"
-
-msgid "Start date"
-msgstr "Start date"
-
-msgid "End date"
-msgstr "End date"
-
-msgid "Select username"
-msgstr "Select username"
-
-msgid "Enter keyword"
-msgstr "Enter keyword"
 
 msgid "Remove Filter"
 msgstr "Remove Filter"
@@ -264,6 +261,12 @@ msgstr "Define start - end dates"
 
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
+
+msgid "Start date"
+msgstr "Start date"
+
+msgid "End date"
+msgstr "End date"
 
 msgid "all"
 msgstr "all"

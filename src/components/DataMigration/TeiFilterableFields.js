@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { dataActionCreators } from '../../actions/data_controls.js'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import classes from './styles/TeiAttributes.module.css'
+import { FIELD_METADATA } from '../../constants/FilterFieldmetadata.js'
 
 const TeiFilterableFields = () => {
     const teis = useSelector(dataControlSelectors.getDataControlTEIs)
@@ -145,10 +146,35 @@ const TeiFilterableFields = () => {
         resetFilterInputs()
     }
 
-    const applyFilters = () => {
+     const applyFilters = () => {
         setIsModalOpen(false)
 
+        const metadata = FIELD_METADATA[selectedField.name] || {}
+
         if (
+            metadata.inputType === 'select' ||
+            metadata.inputType === 'storedByOptions' ||
+            metadata.inputType === 'lastUpdatedByOptions'
+        ) {
+            handleFilterChange({
+                keyword,
+                field: selectedField.name,
+                type: selectedField.valueType,
+            })
+        } else if (metadata.inputType === 'date-range') {
+            handleFilterChange({
+                startDate: dateRange.start,
+                endDate: dateRange.end,
+                field: selectedField.name,
+                type: selectedField.valueType,
+            })
+        } else if (metadata.inputType === 'number-only') {
+            handleFilterChange({
+                keyword: keyword,
+                field: selectedField.name,
+                type: 'NUMBER',
+            })
+        } else if (
             [
                 VALUE_TYPE_NUMBER,
                 VALUE_TYPE_INTEGER,
@@ -163,16 +189,6 @@ const TeiFilterableFields = () => {
                 field: selectedField.name,
                 type: selectedField.valueType,
             })
-        } else if (
-            selectedField.valueType === VALUE_TYPE_DATE ||
-            selectedField.valueType === VALUE_TYPE_DATETIME
-        ) {
-            handleFilterChange({
-                startDate: dateRange.start,
-                endDate: dateRange.end,
-                field: selectedField.name,
-                type: selectedField.valueType,
-            })
         } else if (selectedField.valueType === VALUE_TYPE_TEXT) {
             handleFilterChange({
                 keyword: keyword,
@@ -184,10 +200,10 @@ const TeiFilterableFields = () => {
         resetFilterInputs()
     }
 
-    const renderFilterDialog = () => {
-        if (!selectedField) {
-            return null
-        }
+   const renderFilterDialog = () => {
+        if (!selectedField) return null
+
+        const metadata = FIELD_METADATA[selectedField.name] || {}
 
         return (
             <Modal position="middle" hide={!isModalOpen} open={isModalOpen}>
@@ -196,54 +212,130 @@ const TeiFilterableFields = () => {
                         name: selectedField.name,
                     })}
                 </ModalTitle>
-
                 <ModalContent>
-                    <Box padding="8px 0">
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                            }}
+                    {metadata.inputType === 'select' && (
+                        <SingleSelectField
+                            label={i18n.t(`Select ${selectedField.name}`)}
+                            selected={keyword}
+                            onChange={({ selected }) => setKeyword(selected)}
                         >
-                            {selectedField.attribute &&
-                                !attributesToDisplay.includes(
-                                    selectedField.name
-                                ) && (
-                                    <Button
-                                        onClick={() =>
-                                            addColumn(selectedField.name)
-                                        }
-                                        primary
-                                    >
-                                        <IconAdd24 /> {i18n.t('Add Column')}
-                                    </Button>
-                                )}
+                            {metadata.options.map((opt) => (
+                                <SingleSelectOption
+                                    key={opt}
+                                    value={opt}
+                                    label={opt}
+                                />
+                            ))}
+                        </SingleSelectField>
+                    )}
 
-                            {selectedField.attribute &&
-                                attributesToDisplay.includes(
-                                    selectedField.name
-                                ) && (
-                                    <Button
-                                        onClick={() =>
-                                            removeColumn(selectedField.name)
-                                        }
-                                        destructive
-                                    >
-                                        <IconSubtractCircle24 />{' '}
-                                        {i18n.t('Remove Column')}
-                                    </Button>
-                                )}
-                        </div>
-                    </Box>
-                    {[
-                        VALUE_TYPE_NUMBER,
-                        VALUE_TYPE_INTEGER,
-                        VALUE_TYPE_INTEGER_NEGATIVE,
-                        VALUE_TYPE_INTEGER_POSITIVE,
-                        VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE,
-                    ].includes(selectedField.valueType) && (
-                        <div>
-                            <h5>{i18n.t('Select number range')}</h5>
+                    {metadata.inputType === 'storedByOptions' && (
+                        <SingleSelectField
+                            label={i18n.t('Select Stored By')}
+                            selected={keyword}
+                            onChange={({ selected }) => setKeyword(selected)}
+                        >
+                            {storedByOptions.map((u) => (
+                                <SingleSelectOption
+                                    key={u}
+                                    value={u}
+                                    label={u}
+                                />
+                            ))}
+                        </SingleSelectField>
+                    )}
+
+                    {metadata.inputType === 'lastUpdatedByOptions' && (
+                        <SingleSelectField
+                            label={i18n.t('Select Last Updated By')}
+                            selected={keyword}
+                            onChange={({ selected }) => setKeyword(selected)}
+                        >
+                            {lastUpdatedByOptions.map((u) => (
+                                <SingleSelectOption
+                                    key={u}
+                                    value={u}
+                                    label={u}
+                                />
+                            ))}
+                        </SingleSelectField>
+                    )}
+
+                    {metadata.inputType === 'date-range' && (
+                        <Box margin="8px 0">
+                            <InputField
+                                label={i18n.t('Start Date')}
+                                type="date"
+                                value={dateRange.start}
+                                onChange={({ value }) =>
+                                    setDateRange({ ...dateRange, start: value })
+                                }
+                            />
+                            <InputField
+                                label={i18n.t('End Date')}
+                                type="date"
+                                value={dateRange.end}
+                                onChange={({ value }) =>
+                                    setDateRange({ ...dateRange, end: value })
+                                }
+                            />
+                        </Box>
+                    )}
+
+                    {selectedField.name === 'Household Code' && (
+                        <InputField
+                            label={i18n.t('Enter Household Code')}
+                            type="number"
+                            value={keyword}
+                            onChange={({ value }) => {
+                                if (/^\d*$/.test(value)) {
+                                    setKeyword(value)
+                                }
+                            }}
+                        />
+                    )}
+
+                    {selectedField.name === 'Household Member Number' && (
+                        <InputField
+                            label={i18n.t('Enter Househould Member Number')}
+                            type="number"
+                            value={keyword}
+                            onChange={({ value }) => {
+                                if (/^\d*$/.test(value)) {
+                                    setKeyword(value)
+                                }
+                            }}
+                        />
+                    )}
+
+                    {['Traditional Authority', 'Group Village Head'].includes(
+                        selectedField.name
+                    ) && (
+                        <InputField
+                            label={i18n.t(`Enter ${selectedField.name}`)}
+                            type="text"
+                            value={keyword}
+                            onChange={({ value }) => setKeyword(value)}
+                        />
+                    )}
+
+                    {!metadata.inputType &&
+                        selectedField.valueType === VALUE_TYPE_TEXT && (
+                            <InputField
+                                label={i18n.t('Enter keyword')}
+                                type="text"
+                                value={keyword}
+                                onChange={({ value }) => setKeyword(value)}
+                            />
+                        )}
+                    {!metadata.inputType &&
+                        [
+                            VALUE_TYPE_NUMBER,
+                            VALUE_TYPE_INTEGER,
+                            VALUE_TYPE_INTEGER_NEGATIVE,
+                            VALUE_TYPE_INTEGER_POSITIVE,
+                            VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE,
+                        ].includes(selectedField.valueType) && (
                             <Box margin="8px 0">
                                 <InputField
                                     type="number"
@@ -268,93 +360,39 @@ const TeiFilterableFields = () => {
                                     }
                                 />
                             </Box>
-                        </div>
-                    )}
-                    {(selectedField.valueType === VALUE_TYPE_DATE ||
-                        selectedField.valueType === VALUE_TYPE_DATETIME) && (
-                        <div>
-                            <h5>{i18n.t('Select date range')}</h5>
-                            <Box margin="8px 0">
-                                <InputField
-                                    type={
-                                        selectedField.valueType === 'DATE'
-                                            ? 'date'
-                                            : 'datetime-local'
-                                    }
-                                    label={i18n.t('Start date')}
-                                    value={dateRange.start}
-                                    onChange={({ value }) =>
-                                        setDateRange({
-                                            ...dateRange,
-                                            start: value,
-                                        })
-                                    }
-                                />
-                                <InputField
-                                    type={
-                                        selectedField.valueType === 'DATE'
-                                            ? 'date'
-                                            : 'datetime-local'
-                                    }
-                                    label={i18n.t('End date')}
-                                    value={dateRange.end}
-                                    onChange={({ value }) =>
-                                        setDateRange({
-                                            ...dateRange,
-                                            end: value,
-                                        })
-                                    }
-                                />
-                            </Box>
-                        </div>
-                    )}
-                    {(selectedField.name === 'Stored By' ||
-                        selectedField.name === 'Last Updated By') && (
-                        <SingleSelectField
-                            label={i18n.t('Select username')}
-                            onChange={({ selected }) => setKeyword(selected)}
-                            selected={keyword}
-                        >
-                            {(selectedField.name === 'Stored By'
-                                ? storedByOptions
-                                : lastUpdatedByOptions
-                            ).map((option) => (
-                                <SingleSelectOption
-                                    key={option}
-                                    value={option}
-                                    label={option}
-                                />
-                            ))}
-                        </SingleSelectField>
-                    )}
-                    {selectedField.valueType === VALUE_TYPE_TEXT &&
-                        selectedField.name !== 'Stored By' &&
-                        selectedField.name !== 'Last Updated By' && (
-                            <InputField
-                                label={i18n.t('Enter keyword')}
-                                type="text"
-                                value={keyword}
-                                onChange={({ value }) => setKeyword(value)}
-                            />
                         )}
                 </ModalContent>
                 <ModalActions>
                     <ButtonStrip end>
-                        <Button onClick={() => cancelFilterModal()} secondary>
+                        <Button onClick={cancelFilterModal} secondary>
                             {i18n.t('Cancel')}
                         </Button>
                         {isActiveFilter(selectedField) && (
-                            <Button onClick={() => removeFilter()} destructive>
+                            <Button onClick={removeFilter} destructive>
                                 {i18n.t('Remove Filter')}
                             </Button>
                         )}
                         <Button
-                            onClick={() => applyFilters()}
+                            onClick={applyFilters}
                             primary
                             disabled={
-                                !(numberRange.min && numberRange.max) &&
-                                !(dateRange.start && dateRange.end) &&
-                                !keyword
+                                (metadata.inputType === 'select' && !keyword) ||
+                                (metadata.inputType === 'date-range' &&
+                                    !(dateRange.start && dateRange.end)) ||
+                                ([
+                                    VALUE_TYPE_NUMBER,
+                                    VALUE_TYPE_INTEGER,
+                                    VALUE_TYPE_INTEGER_NEGATIVE,
+                                    VALUE_TYPE_INTEGER_POSITIVE,
+                                    VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE,
+                                ].includes(selectedField.valueType) &&
+                                    !(numberRange.min && numberRange.max)) ||
+                                (metadata.inputType === 'number-only' &&
+                                    !keyword) ||
+                                (!metadata.inputType &&
+                                    selectedField.valueType ===
+                                        VALUE_TYPE_TEXT &&
+                                    !keyword)
                             }
                         >
                             {i18n.t('Apply Filter')}
