@@ -12,6 +12,7 @@ import {
 } from '../../reducers/ui.js'
 import DataDeletionModal from '../DataDeletion/DataDeletionModal.js'
 import DataMigrationModal from '../DataMigration/DataMigrationModal.js'
+import DataDownloadModal from '../DataDownload/DataDownloadModal.js'
 import OrgUnitSelection from '../DataMigration/OrgUnitSelection.js'
 import { InputPanel } from './InputPanel/index.js'
 import styles from './MainSidebar.module.css'
@@ -27,6 +28,7 @@ const MainSidebar = () => {
     const open = useSelector(sGetUiShowAccessoryPanel) && Boolean(selectedTabId)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false)
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
     const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false)
 
     const {
@@ -56,6 +58,11 @@ const MainSidebar = () => {
     const onMigrateDataCliked = () => {
         console.log('Migrate Data clicked')
         setIsMigrationModalOpen(true)
+    }
+
+    const onDownloadDataClocked = () => {
+        console.log('Download Data clicked')
+        setIsDownloadModalOpen(true)
     }
 
     const onDeleteDataCliked = () => {
@@ -112,6 +119,10 @@ const MainSidebar = () => {
                         <DataMigrationModal onClose={handleDMmodalClose} />
                     )}
 
+                    {isDownloadModalOpen && (
+                        <DataDownloadModal onClose={handleDMmodalClose} />
+                    )}
+
                     {isDeletionModalOpen && (
                         <DataDeletionModal onClose={handleDMmodalClose} />
                     )}
@@ -128,6 +139,20 @@ const MainSidebar = () => {
                         disabled={!programId || !orgUnitId || selectedTeis.length === 0}
                     >
                         Migrate Data
+                    </Button>
+
+                    <Button
+                        primary
+                        onClick={onDownloadDataClocked}
+                        style={{
+                            width: '100%',
+                            maxWidth: '512px',
+                            height: '48px',
+                            marginTop: '16px',
+                        }}
+                        disabled={!programId || !orgUnitId || selectedTeis.length === 0}
+                    >
+                        Download Data
                     </Button>
 
                     <Button
