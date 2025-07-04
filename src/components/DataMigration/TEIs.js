@@ -77,9 +77,10 @@ const TEIs = () => {
                 return tei.storedBy
             case 'lastUpdatedBy':
                 return tei.lastUpdatedBy?.username
-            default:
+            default: {
                 const attribute = tei.attributes?.find(a => a.displayName === columnName || a.name === columnName)
                 return attribute ? attribute.value : ''
+            }
         }
     }
 
@@ -101,7 +102,7 @@ const TEIs = () => {
         setSortKey(columnName)
         setSortDirection(newSortDirection)
 
-        let dataToProcess = initialFilteredTeis
+        const dataToProcess = initialFilteredTeis
 
         if (newSortDirection === 'default') {
             setDisplayTeis([...dataToProcess])
@@ -110,8 +111,8 @@ const TEIs = () => {
                 const aValue = getColumnValue(a, columnName)
                 const bValue = getColumnValue(b, columnName)
 
-                if (aValue === undefined || aValue === null) return newSortDirection === 'asc' ? 1 : -1
-                if (bValue === undefined || bValue === null) return newSortDirection === 'asc' ? -1 : 1
+                if (aValue === undefined || aValue === null) {return newSortDirection === 'asc' ? 1 : -1}
+                if (bValue === undefined || bValue === null) {return newSortDirection === 'asc' ? -1 : 1}
 
                 const isDateColumn = ['created', 'lastUpdated'].includes(columnName) ||
                                      (a.attributes?.find(attr => attr.displayName === columnName || attr.name === columnName)?.valueType === VALUE_TYPE_DATE ||
