@@ -146,7 +146,7 @@ const TeiFilterableFields = () => {
         resetFilterInputs()
     }
 
-     const applyFilters = () => {
+    const applyFilters = () => {
         setIsModalOpen(false)
 
         const metadata = FIELD_METADATA[selectedField.name] || {}
@@ -200,7 +200,7 @@ const TeiFilterableFields = () => {
         resetFilterInputs()
     }
 
-   const renderFilterDialog = () => {
+    const renderFilterDialog = () => {
         if (!selectedField) return null
 
         const metadata = FIELD_METADATA[selectedField.name] || {}
@@ -308,7 +308,7 @@ const TeiFilterableFields = () => {
                         />
                     )}
 
-                    {['Traditional Authority', 'Group Village Head'].includes(
+                    {["Traditional Authority", "Group Village Head"].includes(
                         selectedField.name
                     ) && (
                         <InputField
@@ -379,7 +379,7 @@ const TeiFilterableFields = () => {
                                 (metadata.inputType === 'select' && !keyword) ||
                                 (metadata.inputType === 'date-range' &&
                                     !(dateRange.start && dateRange.end)) ||
-                                ([
+                                ( [
                                     VALUE_TYPE_NUMBER,
                                     VALUE_TYPE_INTEGER,
                                     VALUE_TYPE_INTEGER_NEGATIVE,

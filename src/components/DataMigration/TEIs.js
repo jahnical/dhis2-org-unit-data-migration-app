@@ -20,6 +20,8 @@ import { filterTeis } from '../../modules/data_control.js'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { sGetUiProgramId } from '../../reducers/ui.js'
 import classes from './styles/Common.module.css'
+import TeiFilterableFields from './TeiFilterableFields.js'
+import { APP_SOFT_DELETED_ATTR_ID, isAppSoftDeleted } from '../../constants/appSoftDeletedAttrId.js'
 
 const TEIs = () => {
     const loading = useSelector(dataControlSelectors.getDataControlIsLoading)
@@ -50,13 +52,34 @@ const TEIs = () => {
     }, [programId, orgUnitId, dispatch, engine])
 
     useEffect(() => {
-        setTeis(filterTeis(allTeis, filters))
+        setTeis(
+            filterTeis(
+                allTeis.filter(
+                    tei =>
+                        !isAppSoftDeleted(tei) &&
+                        tei.deleted !== true && // Exclude DHIS2-deleted TEIs
+                        (tei.orgUnit === orgUnitId || tei.ou === orgUnitId)
+                ),
+                filters
+            ).map(tei => ({
+                ...tei,
+                id: tei.trackedEntityInstance || tei.id, // Always set both
+                trackedEntityInstance: tei.trackedEntityInstance || tei.id, // Always set both
+                storedBy: tei.storedBy || tei.createdByUserInfo?.username || '',
+                createdBy: tei.createdByUserInfo || {},
+                lastUpdatedBy: tei.lastUpdatedByUserInfo || {},
+                owner: tei.owner || tei.programOwners?.[0]?.ownerOrgUnit || '',
+            }))
+        )
         dispatch(dataActionCreators.setSelectedTEIs([])) // Reset selections when filters change
-    }, [filters, allTeis, dispatch])
+    }, [allTeis, orgUnitId, filters, dispatch])
+
+    // Use filtered TEIs from selector/utility, do not filter in component
+    const filteredTeis = teis
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            dispatch(dataActionCreators.setSelectedTEIs(teis.map(tei => tei.id)))
+            dispatch(dataActionCreators.setSelectedTEIs(teis.map(tei => tei.trackedEntityInstance || tei.id)))
         } else {
             dispatch(dataActionCreators.setSelectedTEIs([]))
         }
@@ -93,11 +116,10 @@ const TEIs = () => {
                             <div style={{ color: 'grey' }}>
                                 <h4 style={{ marginLeft: '16px' }}>
                                     {i18n.t(
-                                        `${selectedTeis.length} Selected of ${teis.length} Tracked Entity Instances`
+                                        `${selectedTeis.length} Selected of ${filteredTeis.length} Tracked Entity Instances`
                                     )}
                                 </h4>
                             </div>
-
                             <TableHead>
                                 <TableRowHead>
                                     <TableCellHead className={classes.checkbox}>
@@ -135,18 +157,16 @@ const TEIs = () => {
                         </div>
                         <div className={classes.bodyTable}>
                             <TableBody>
-                                {teis.map((instance) => (
+                                {filteredTeis.map((instance) => (
                                     <TableRow key={instance.id}>
                                         <TableCell className={classes.checkbox}>
                                             <Checkbox
-                                                checked={selectedTeis.includes(instance.id)}
-                                                onChange={() => handleSelectTei(instance.id)}
+                                                checked={selectedTeis.includes(instance.trackedEntityInstance || instance.id)}
+                                                onChange={() => handleSelectTei(instance.trackedEntityInstance || instance.id)}
                                             />
                                         </TableCell>
-                                        <TableCell
-                                            className={classes.columnInstanceId}
-                                        >
-                                            {instance.id}
+                                        <TableCell className={classes.columnInstanceId}>
+                                            {instance.trackedEntityInstance || instance.id}
                                         </TableCell>
                                         <TableCell className={classes.column}>
                                             {new Date(
