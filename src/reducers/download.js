@@ -9,8 +9,8 @@ export const DOWNLOAD_TYPES = {
 const downloadInitialState = {
     loading: false,
     error: null,
-    targetOrgUnitId: null,
-    migrationStatus: null
+    downloadStatus: null,
+    targetOrgUnitId: null
 }
 
 export function downloadTeis(state = downloadInitialState, action) {

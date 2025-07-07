@@ -2,6 +2,7 @@ import { DOWNLOAD_TYPES } from '../reducers/download.js'
 
 // Helper function to convert TEIs to CSV
 const convertTeisToCsv = (teis) => {
+  try {
   if (!teis?.length) return ''
   
   // Extract all unique attribute keys (for CSV headers)
@@ -34,6 +35,10 @@ const convertTeisToCsv = (teis) => {
   })
   
   return [headers, ...rows].join('\n')
+} catch (error) {
+    console.error('CSV conversion error:', error)
+    throw new Error('Failed to convert TEIs to CSV')
+  }
 }
 
 // Helper to trigger download
@@ -55,7 +60,7 @@ export const downloadActions = {
   // ... keep existing actions like setTargetOrgUnit, resetMigration ...
   
   downloadTEIsAsCsv:
-    ({ teis, selectedTeis, onProgress }) =>
+    ({ teis, selectedTeis, onProgress, filename }) =>
     async (dispatch) => {
       if (!teis?.length || !selectedTeis?.length) {
         throw new Error('Missing required parameters')
@@ -72,7 +77,7 @@ export const downloadActions = {
         const csvData = convertTeisToCsv(filteredTeis)
         
         // Trigger download
-        downloadCsv(csvData)
+        downloadCsv(csvData, filename)
         
         // Update progress (if needed)
         if (onProgress) {

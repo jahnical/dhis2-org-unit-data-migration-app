@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-01T12:53:22.464Z\n"
-"PO-Revision-Date: 2025-07-01T12:53:22.464Z\n"
+"POT-Creation-Date: 2025-07-07T06:08:26.948Z\n"
+"PO-Revision-Date: 2025-07-07T06:08:26.948Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -52,13 +52,38 @@ msgstr "Cancel"
 msgid "Delete"
 msgstr "Delete"
 
-msgid "Migration Preview"
-msgstr "Migration Preview"
+msgid "Download Preview"
+msgstr "Download Preview"
 
 msgid "{{count}} TEIs"
 msgid_plural "{{count}} TEIs"
 msgstr[0] "{{count}} TEIs"
 msgstr[1] "{{count}} TEIs"
+
+msgid "The data will be downloaded in CSV format."
+msgstr "The data will be downloaded in CSV format."
+
+msgid "Preparing download... {{completed}} of {{total}} TEIs processed"
+msgstr "Preparing download... {{completed}} of {{total}} TEIs processed"
+
+msgid "Download TEI Data"
+msgstr "Download TEI Data"
+
+msgid "Could not prepare download"
+msgstr "Could not prepare download"
+
+msgid ""
+"The download couldn't be prepared. Try again or contact your system "
+"administrator."
+msgstr ""
+"The download couldn't be prepared. Try again or contact your system "
+"administrator."
+
+msgid "Download CSV"
+msgstr "Download CSV"
+
+msgid "Migration Preview"
+msgstr "Migration Preview"
 
 msgid "To {{orgUnit}}"
 msgstr "To {{orgUnit}}"

@@ -38,11 +38,14 @@ const DataDownloadModal = ({ onClose }) => {
             setDownloadProgress(progress)
         }
 
-        dispatch(
+    dispatch(
             downloadActions.downloadTEIsAsCsv({
                 teis: allTeis,
                 selectedTeis: selectedTeis,
-                onProgress: updateProgress,
+                filename: filename,
+                onProgress: (progress) => setDownloadProgress({ 
+                    completed: progress.completed 
+                })
             })
         )
     }
