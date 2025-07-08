@@ -23,8 +23,6 @@ const convertTeisToCsv = (teis) => {
 
   // Step 2: Prepare headers
   const headers = [
-    'Stored By',
-    'Last Updated By',
     'Organisation Unit',
     ...attributes.map(attr => attr.name), // Use display names for headers
   ].join(',');
@@ -38,8 +36,6 @@ const convertTeisToCsv = (teis) => {
     });
 
     return [
-      tei.storedBy,
-      tei.lastUpdatedBy,
       tei.orgUnit,
       ...attributes.map(attr => attributeValues[attr.id] || '""'), // Match values to headers
     ].join(',');
