@@ -23,11 +23,10 @@ const convertTeisToCsv = (teis) => {
 
   // Step 2: Prepare headers
   const headers = [
-    'Tracked Entity Instance',
+    'Stored By',
+    'Last Updated By',
     'Organisation Unit',
     ...attributes.map(attr => attr.name), // Use display names for headers
-    'Enrollments Count',
-    'Events Count'
   ].join(',');
 
   // Step 3: Prepare rows
@@ -39,11 +38,10 @@ const convertTeisToCsv = (teis) => {
     });
 
     return [
-      tei.trackedEntityInstance,
+      tei.storedBy,
+      tei.lastUpdatedBy,
       tei.orgUnit,
       ...attributes.map(attr => attributeValues[attr.id] || '""'), // Match values to headers
-      (tei.enrollments || []).length,
-      (tei.enrollments || []).reduce((sum, e) => sum + (e.events || []).length, 0)
     ].join(',');
   });
 
