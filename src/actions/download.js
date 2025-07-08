@@ -2,44 +2,53 @@ import { DOWNLOAD_TYPES } from '../reducers/download.js'
 
 // Helper function to convert TEIs to CSV
 const convertTeisToCsv = (teis) => {
-  try {
-  if (!teis?.length) return ''
+  if (!teis?.length) return '';
+
+  // Step 1: Collect all unique attributes with their names
+  const attributeMap = new Map();
   
-  // Extract all unique attribute keys (for CSV headers)
-  const allAttributes = teis.flatMap(tei => tei.attributes || [])
-  const attributeKeys = [...new Set(allAttributes.map(attr => attr.attribute))]
-  
-  // CSV headers
+  teis.forEach(tei => {
+    tei.attributes?.forEach(attr => {
+      if (!attributeMap.has(attr.attribute)) {
+        attributeMap.set(attr.attribute, {
+          id: attr.attribute,
+          name: attr.displayName || attr.attribute // Fallback to ID if no display name
+        });
+      }
+    });
+  });
+
+  // Convert to array for consistent ordering
+  const attributes = Array.from(attributeMap.values());
+
+  // Step 2: Prepare headers
   const headers = [
-    'trackedEntityInstance',
-    'orgUnit',
-    ...attributeKeys,
-    'enrollmentsCount',
-    'eventsCount'
-  ].join(',')
-  
-  // Process each TEI
+    'Tracked Entity Instance',
+    'Organisation Unit',
+    ...attributes.map(attr => attr.name), // Use display names for headers
+    'Enrollments Count',
+    'Events Count'
+  ].join(',');
+
+  // Step 3: Prepare rows
   const rows = teis.map(tei => {
-    const attributes = {}
-    ;(tei.attributes || []).forEach(attr => {
-      attributes[attr.attribute] = `"${attr.value?.replace(/"/g, '""')}"` // Escape quotes in CSV
-    })
-    
+    // Create a quick lookup for attribute values
+    const attributeValues = {};
+    tei.attributes?.forEach(attr => {
+      attributeValues[attr.attribute] = `"${String(attr.value || '').replace(/"/g, '""')}"`;
+    });
+
     return [
       tei.trackedEntityInstance,
       tei.orgUnit,
-      ...attributeKeys.map(key => attributes[key] || '""'),
+      ...attributes.map(attr => attributeValues[attr.id] || '""'), // Match values to headers
       (tei.enrollments || []).length,
       (tei.enrollments || []).reduce((sum, e) => sum + (e.events || []).length, 0)
-    ].join(',')
-  })
-  
-  return [headers, ...rows].join('\n')
-} catch (error) {
-    console.error('CSV conversion error:', error)
-    throw new Error('Failed to convert TEIs to CSV')
-  }
-}
+    ].join(',');
+  });
+
+  return [headers, ...rows].join('\n');
+};
 
 // Helper to trigger download
 const downloadCsv = (csvData, filename = 'teis-export.csv') => {
@@ -57,8 +66,16 @@ const downloadCsv = (csvData, filename = 'teis-export.csv') => {
 }
 
 export const downloadActions = {
-  // ... keep existing actions like setTargetOrgUnit, resetMigration ...
+  setTargetOrgUnit: (orgUnitId) => ({
+              type: DOWNLOAD_TYPES.SET_TARGET_ORG_UNIT,
+              payload: orgUnitId,
+          }),
   
+      resetDownload: () => ({
+              type: DOWNLOAD_TYPES.RESET,
+          }),
+
+
   downloadTEIsAsCsv:
     ({ teis, selectedTeis, onProgress, filename }) =>
     async (dispatch) => {

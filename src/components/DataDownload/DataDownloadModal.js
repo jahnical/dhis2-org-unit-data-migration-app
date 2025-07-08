@@ -27,6 +27,7 @@ const DataDownloadModal = ({ onClose }) => {
     const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
     const loading = useSelector(downloadSelectors.getDownloadIsLoading)
     const error = useSelector(downloadSelectors.getDownloadError)
+    const downloadStatus = useSelector(downloadSelectors.getDownloadStatus)
     const engine = useDataEngine()
     const dispatch = useDispatch()
 
@@ -50,9 +51,13 @@ const DataDownloadModal = ({ onClose }) => {
         )
     }
 
-    const onCloseClicked = () => {
-        onClose()
-    }
+   const onCloseClicked = () => {
+           if (downloadStatus === 'success') {
+               dispatch(dataActionCreators.reset())
+               dispatch(downloadActions.resetDownload())
+           }
+           onClose()
+       }
 
     const renderPreview = () => (
         <div style={{ padding: '16px' }}>

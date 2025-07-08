@@ -142,7 +142,7 @@ const MainSidebar = () => {
                     </Button>
 
                     <Button
-                        primary
+                        success={true}
                         onClick={onDownloadDataClocked}
                         style={{
                             width: '100%',
