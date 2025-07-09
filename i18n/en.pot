@@ -16,38 +16,77 @@ msgid_plural "Deleting {{count}} TEIs..."
 msgstr[0] "Deleting {{count}} TEIs..."
 msgstr[1] "Deleting {{count}} TEIs..."
 
-msgid "Could not delete TEIs"
-msgstr "Could not delete TEIs"
-
-msgid ""
-"The TEIs couldn't be deleted. Try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be deleted. Try again or contact your system "
-"administrator."
-
-msgid "Deletion successful"
-msgstr "Deletion successful"
-
-msgid "All selected TEIs have been successfully deleted."
-msgstr "All selected TEIs have been successfully deleted."
-
-msgid "Warning"
-msgstr "Warning"
-
-msgid "You are about to delete {{count}} TEIs. This action cannot be undone."
-msgid_plural "You are about to delete {{count}} TEIs. This action cannot be undone."
-msgstr[0] "You are about to delete {{count}} TEIs. This action cannot be undone."
-msgstr[1] "You are about to delete {{count}} TEIs. This action cannot be undone."
-
-msgid "... and {{count}} more"
-msgstr "... and {{count}} more"
+msgid "An error occurred during deletion. Please check the alert for details."
+msgstr "An error occurred during deletion. Please check the alert for details."
 
 msgid "Close"
 msgstr "Close"
 
+msgid "Retry"
+msgstr "Retry"
+
+msgid "Soft delete successful"
+msgstr "Soft delete successful"
+
+msgid ""
+"All selected TEIs have been marked as deleted. You can restore them from "
+"the History tab."
+msgstr ""
+"All selected TEIs have been marked as deleted. You can restore them from "
+"the History tab."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "You are about to mark {{count}} TEIs as deleted."
+msgid_plural "You are about to mark {{count}} TEIs as deleted."
+msgstr[0] "You are about to mark {{count}} TEIs as deleted."
+msgstr[1] "You are about to mark {{count}} TEIs as deleted."
+
+msgid ""
+"This is a large number of TEIs. This action will mark them as deleted and "
+"remove them from the active list. This can be undone from the History tab."
+msgstr ""
+"This is a large number of TEIs. This action will mark them as deleted and "
+"remove them from the active list. This can be undone from the History tab."
+
+msgid ""
+"This action will mark the selected TEIs as deleted and remove them from the "
+"active list. This can be undone from the History tab."
+msgstr ""
+"This action will mark the selected TEIs as deleted and remove them from the "
+"active list. This can be undone from the History tab."
+
+msgid "Are you absolutely sure you want to proceed?"
+msgstr "Are you absolutely sure you want to proceed?"
+
 msgid "Cancel"
 msgstr "Cancel"
+
+msgid "Yes, Delete"
+msgstr "Yes, Delete"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "This is a large number of TEIs. Are you sure you want to proceed?"
+msgstr "This is a large number of TEIs. Are you sure you want to proceed?"
+
+msgid "This action can be undone from the History tab."
+msgstr "This action can be undone from the History tab."
+
+msgid ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
+msgid_plural ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
+msgstr[0] ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
+msgstr[1] ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
 
 msgid "Delete"
 msgstr "Delete"
@@ -128,35 +167,116 @@ msgstr "Last Updated By"
 msgid "Filter by \"{{name}}\""
 msgstr "Filter by \"{{name}}\""
 
-msgid "Add Column"
-msgstr "Add Column"
+msgid "Failed to restore TEIs. Please try again."
+msgstr "Failed to restore TEIs. Please try again."
 
-msgid "Remove Column"
-msgstr "Remove Column"
+msgid "Loading TEI history..."
+msgstr "Loading TEI history..."
 
-msgid "Select number range"
-msgstr "Select number range"
+msgid "Too many deleted TEIs to display!"
+msgstr "Too many deleted TEIs to display!"
+
+msgid ""
+"There are too many deleted Tracked Entity Instances to display in the "
+"History tab. Please filter your org unit or program to reduce the number of "
+"deleted TEIs."
+msgstr ""
+"There are too many deleted Tracked Entity Instances to display in the "
+"History tab. Please filter your org unit or program to reduce the number of "
+"deleted TEIs."
+
+msgid "Successfully restored TEIs."
+msgstr "Successfully restored TEIs."
+
+msgid "Could not load History TEIs"
+msgstr "Could not load History TEIs"
+
+msgid ""
+"The History TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The History TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Instance ID"
+msgstr "Instance ID"
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
+
+msgid "No deleted TEIs found for this org unit and program."
+msgstr "No deleted TEIs found for this org unit and program."
+
+msgid "Restore Tracked Entity Instances"
+msgstr "Restore Tracked Entity Instances"
+
+msgid "Confirm Restore"
+msgstr "Confirm Restore"
+
+msgid ""
+"Are you sure you want to restore the following {{count}} Tracked Entity "
+"Instance(s)?"
+msgid_plural ""
+"Are you sure you want to restore the following {{count}} Tracked Entity "
+"Instance(s)?"
+msgstr[0] ""
+"Are you sure you want to restore the following {{count}} Tracked Entity "
+"Instance(s)?"
+msgstr[1] ""
+"Are you sure you want to restore the following {{count}} Tracked Entity "
+"Instance(s)?"
+
+msgid ""
+"This will change their status from deleted to active, making them visible "
+"in the main tab."
+msgstr ""
+"This will change their status from deleted to active, making them visible "
+"in the main tab."
+
+msgid "Restoring..."
+msgstr "Restoring..."
+
+msgid "Restore"
+msgstr "Restore"
+
+msgid "Filter by \"{{name}}\""
+msgstr "Filter by \"{{name}}\""
+
+msgid "Select Stored By"
+msgstr "Select Stored By"
+
+msgid "Select Last Updated By"
+msgstr "Select Last Updated By"
+
+msgid "Start Date"
+msgstr "Start Date"
+
+msgid "End Date"
+msgstr "End Date"
+
+msgid "Enter Household Code"
+msgstr "Enter Household Code"
+
+msgid "Enter Househould Member Number"
+msgstr "Enter Househould Member Number"
+
+msgid "Enter keyword"
+msgstr "Enter keyword"
 
 msgid "Min value"
 msgstr "Min value"
 
 msgid "Max value"
 msgstr "Max value"
-
-msgid "Select date range"
-msgstr "Select date range"
-
-msgid "Start date"
-msgstr "Start date"
-
-msgid "End date"
-msgstr "End date"
-
-msgid "Select username"
-msgstr "Select username"
-
-msgid "Enter keyword"
-msgstr "Enter keyword"
 
 msgid "Remove Filter"
 msgstr "Remove Filter"
