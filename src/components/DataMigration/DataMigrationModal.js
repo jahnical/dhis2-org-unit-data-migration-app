@@ -61,6 +61,8 @@ const DataMigrationModal = ({ onClose }) => {
         if (migrationStatus === 'success') {
             dispatch(dataActionCreators.reset())
             dispatch(migrationActions.resetMigration())
+        } else {
+            dispatch(migrationActions.resetMigration())
         }
         onClose()
     }
@@ -116,7 +118,7 @@ const DataMigrationModal = ({ onClose }) => {
     )
 
     return (
-        <Modal onClose={onClose} position="middle" large>
+        <Modal onClose={onCloseClicked} position="middle" large>
             <ModalTitle>Data Migration</ModalTitle>
             {loading && step === 'migrating' ? (
                 <ModalContent>
@@ -127,7 +129,8 @@ const DataMigrationModal = ({ onClose }) => {
                     <NoticeBox error title={i18n.t('Could not migrate TEIs')}>
                         {error?.message ||
                             i18n.t(
-                                "The TEIs couldn't be migrated. Try again or contact your system administrator."
+                                "The TEIs couldn't be migrated. {{error}}",
+                                { error: error }
                             )}
                     </NoticeBox>
                 </ModalContent>

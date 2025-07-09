@@ -2,15 +2,14 @@ import { VALUE_TYPE_DATE, VALUE_TYPE_DATETIME } from '@dhis2/analytics'
 import { useDataEngine } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import {
-    Table,
+    DataTable,
     TableBody,
-    TableCell,
+    DataTableCell,
     TableHead,
-    TableRow,
-    TableCellHead,
+    DataTableRow,
+    DataTableColumnHeader,
     CircularLoader,
     NoticeBox,
-    TableRowHead,
     Checkbox,
 } from '@dhis2/ui'
 import React, { useEffect, useState } from 'react'
@@ -30,20 +29,28 @@ const TEIs = () => {
     const uiProgramId = useSelector(sGetUiProgramId)
     const programId = useSelector(dataControlSelectors.getDataControlProgram)
     const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
-    const [teis, setTeis] = useState([])
     const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
-    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
+    const rawTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
     const filters = useSelector(dataControlSelectors.getDataControlFilters)
     const attributesToDisplay = useSelector(dataControlSelectors.getDataControlAttributesToDisplay)
     const engine = useDataEngine()
+
+    const [displayTeis, setDisplayTeis] = useState([])
+    const [initialFilteredTeis, setInitialFilteredTeis] = useState([])
+    const [sortKey, setSortKey] = useState('')
+    const [sortDirection, setSortDirection] = useState('default')
 
     useEffect(() => {
         dispatch(dataActionCreators.setProgram(uiProgramId))
     }, [uiProgramId, dispatch])
 
     useEffect(() => {
-        setTeis([]) // Reset TEIs when program or org unit changes
-        dispatch(dataActionCreators.setSelectedTEIs([])) // Reset selections when program or org unit changes
+        setDisplayTeis([])
+        setInitialFilteredTeis([])
+        dispatch(dataActionCreators.setSelectedTEIs([]))
+        setSortKey('')
+        setSortDirection('default')
+
         if (programId && orgUnitId) {
             dispatch(
                 dataActionCreators.fetchTEIs(orgUnitId, programId, engine)
@@ -100,9 +107,7 @@ const TEIs = () => {
 
     return (
         <div style={{ height: '100%' }}>
-            {loading ? (
-                <CircularLoader />
-            ) : error ? (
+            {error ? (
                 <NoticeBox error title={i18n.t('Could not load TEIs')}>
                     {error?.message ||
                         i18n.t(
@@ -124,9 +129,8 @@ const TEIs = () => {
                                 <TableRowHead>
                                     <TableCellHead className={classes.checkbox}>
                                         <Checkbox
-                                            checked={selectedTeis.length === teis.length && teis.length > 0}
-                                            indeterminate={selectedTeis.length > 0 && selectedTeis.length < teis.length}
-                                            onChange={({ checked }) => handleSelectAll(checked)}
+                                            checked={selectedTeis.includes(instance.id)}
+                                            onChange={() => handleSelectTei(instance.id)}
                                         />
                                     </TableCellHead>
                                     <TableCellHead className={classes.columnInstanceId}>
