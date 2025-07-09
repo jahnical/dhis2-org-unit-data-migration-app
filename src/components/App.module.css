@@ -23,7 +23,7 @@
 .eventReportsApp {
     height: 100%;
     background-color: var(--colors-grey300);
-    overflow: visible;
+    overflow: hidden;
 }
 
 .flexCt {
@@ -54,7 +54,7 @@
 
 /* Main */
 .sectionMain {
-    overflow: visible;
+    overflow: hidden;
 }
 
 .mainRight {
@@ -91,4 +91,3 @@
     z-index: 100;
     background: #ffffffab;
 }
-

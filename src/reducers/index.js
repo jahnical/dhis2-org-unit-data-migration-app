@@ -7,7 +7,6 @@ import metadata from './metadata.js'
 import { migration } from './migration.js'
 import ui from './ui.js'
 import visualization from './visualization.js'
-import historyTeis from './historyTeis.js'
 
 // Reducers
 
@@ -19,6 +18,5 @@ export default combineReducers({
     visualization,
     migration,
     deleteTeis,
-    dataControl,
-    historyTeis,
+    dataControl
 })
