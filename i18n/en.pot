@@ -91,13 +91,38 @@ msgstr[1] ""
 msgid "Delete"
 msgstr "Delete"
 
-msgid "Migration Preview"
-msgstr "Migration Preview"
+msgid "Download Preview"
+msgstr "Download Preview"
 
 msgid "{{count}} TEIs"
 msgid_plural "{{count}} TEIs"
 msgstr[0] "{{count}} TEIs"
 msgstr[1] "{{count}} TEIs"
+
+msgid "The data will be downloaded in CSV format."
+msgstr "The data will be downloaded in CSV format."
+
+msgid "Preparing download... {{completed}} of {{total}} TEIs processed"
+msgstr "Preparing download... {{completed}} of {{total}} TEIs processed"
+
+msgid "Download TEI Data"
+msgstr "Download TEI Data"
+
+msgid "Could not prepare download"
+msgstr "Could not prepare download"
+
+msgid ""
+"The download couldn't be prepared. Try again or contact your system "
+"administrator."
+msgstr ""
+"The download couldn't be prepared. Try again or contact your system "
+"administrator."
+
+msgid "Download CSV"
+msgstr "Download CSV"
+
+msgid "Migration Preview"
+msgstr "Migration Preview"
 
 msgid "To {{orgUnit}}"
 msgstr "To {{orgUnit}}"
@@ -286,7 +311,6 @@ msgstr "Apply Filter"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
-
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
 
