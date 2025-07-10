@@ -5,15 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-05T19:37:53.802Z\n"
-"PO-Revision-Date: 2025-07-05T19:37:53.803Z\n"
-
-msgid ""
-"The TEIs couldn't be deleted. Please try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be deleted. Please try again or contact your system "
-"administrator."
+"POT-Creation-Date: 2025-07-04T07:24:45.899Z\n"
+"PO-Revision-Date: 2025-07-04T07:24:45.900Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -126,11 +119,13 @@ msgid "Could not migrate TEIs"
 msgstr "Could not migrate TEIs"
 
 msgid ""
-"The TEIs couldn't be migrated. Try again or contact your system "
-"administrator."
+"The TEIs couldn't be migrated. \n"
+"{{error}}. \n"
+"Try again or contact your system administrator."
 msgstr ""
-"The TEIs couldn't be migrated. Try again or contact your system "
-"administrator."
+"The TEIs couldn't be migrated. \n"
+"{{error}}. \n"
+"Try again or contact your system administrator."
 
 msgid "Migration successful"
 msgstr "Migration successful"
@@ -144,8 +139,33 @@ msgstr "Next"
 msgid "Confirm Migration"
 msgstr "Confirm Migration"
 
-msgid "Engine not available. Please try again later."
-msgstr "Engine not available. Please try again later."
+msgid "Could not load TEIs"
+msgstr "Could not load TEIs"
+
+msgid ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Instance ID"
+msgstr "Instance ID"
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
+
+msgid "Filter by \"{{name}}\""
+msgstr "Filter by \"{{name}}\""
 
 msgid "Failed to restore TEIs. Please try again."
 msgstr "Failed to restore TEIs. Please try again."
@@ -264,36 +284,8 @@ msgstr "Remove Filter"
 msgid "Apply Filter"
 msgstr "Apply Filter"
 
-msgid "Could not load TEIs"
-msgstr "Could not load TEIs"
-
-msgid ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
-
-msgid "No items selected"
-msgstr "No items selected"
-
-msgid "Available options"
-msgstr "Available options"
-
-msgid "Filter options"
-msgstr "Filter options"
-
-msgid "Selected options"
-msgstr "Selected options"
-
-msgid "Nothing found for \"{{- searchTerm}}\""
-msgstr "Nothing found for \"{{- searchTerm}}\""
-
-msgid "No options"
-msgstr "No options"
 
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
@@ -377,11 +369,23 @@ msgstr "Define start - end dates"
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
 
-msgid "Start date"
-msgstr "Start date"
+msgid "No items selected"
+msgstr "No items selected"
 
-msgid "End date"
-msgstr "End date"
+msgid "Available options"
+msgstr "Available options"
+
+msgid "Filter options"
+msgstr "Filter options"
+
+msgid "Selected options"
+msgstr "Selected options"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Nothing found for \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "No options"
 
 msgid "all"
 msgstr "all"
