@@ -11,8 +11,8 @@ import {
     sGetUiAccessoryPanelActiveTab,
 } from '../../reducers/ui.js'
 import DataDeletionModal from '../DataDeletion/DataDeletionModal.js'
-import DataMigrationModal from '../DataMigration/DataMigrationModal.js'
 import DataDownloadModal from '../DataDownload/DataDownloadModal.js'
+import DataMigrationModal from '../DataMigration/DataMigrationModal.js'
 import OrgUnitSelection from '../DataMigration/OrgUnitSelection.js'
 import { InputPanel } from './InputPanel/index.js'
 import styles from './MainSidebar.module.css'
@@ -73,6 +73,7 @@ const MainSidebar = () => {
     const handleDMmodalClose = () => {
         setIsMigrationModalOpen(false)
         setIsDeletionModalOpen(false)
+        setIsDownloadModalOpen(false)
     }
 
     return (
@@ -115,31 +116,17 @@ const MainSidebar = () => {
 
                     <Divider />
 
-                    {isMigrationModalOpen && (
-                        <DataMigrationModal onClose={handleDMmodalClose} />
-                    )}
-
                     {isDownloadModalOpen && (
                         <DataDownloadModal onClose={handleDMmodalClose} />
+                    )}
+
+                    {isMigrationModalOpen && (
+                        <DataMigrationModal onClose={handleDMmodalClose} />
                     )}
 
                     {isDeletionModalOpen && (
                         <DataDeletionModal onClose={handleDMmodalClose} />
                     )}
-
-                    <Button
-                        primary
-                        onClick={onMigrateDataCliked}
-                        style={{
-                            width: '100%',
-                            maxWidth: '512px',
-                            height: '48px',
-                            marginTop: '16px',
-                        }}
-                        disabled={!programId || !orgUnitId || selectedTeis.length === 0}
-                    >
-                        Migrate Data
-                    </Button>
 
                     <Button
                         success={true}
@@ -153,6 +140,20 @@ const MainSidebar = () => {
                         disabled={!programId || !orgUnitId || selectedTeis.length === 0}
                     >
                         Download Data
+                    </Button>
+
+                    <Button
+                        primary
+                        onClick={onMigrateDataCliked}
+                        style={{
+                            width: '100%',
+                            maxWidth: '512px',
+                            height: '48px',
+                            marginTop: '16px',
+                        }}
+                        disabled={!programId || !orgUnitId || selectedTeis.length === 0}
+                    >
+                        Migrate Data
                     </Button>
 
                     <Button

@@ -1,12 +1,12 @@
 import { DOWNLOAD_TYPES } from '../reducers/download.js'
 
 // Helper function to convert TEIs to CSV
-const convertTeisToCsv = (teis) => {
-  if (!teis?.length) return '';
+const convertTeisToCsv = (teis, metadata) => {
+  if (!teis?.length) {return '';}
 
   // Step 1: Collect all unique attributes with their names
   const attributeMap = new Map();
-  
+
   teis.forEach(tei => {
     tei.attributes?.forEach(attr => {
       if (!attributeMap.has(attr.attribute)) {
@@ -36,7 +36,7 @@ const convertTeisToCsv = (teis) => {
     });
 
     return [
-      tei.orgUnit,
+      metadata[tei.orgUnit].name || '', // Use org unit name or empty string
       ...attributes.map(attr => attributeValues[attr.id] || '""'), // Match values to headers
     ].join(',');
   });
@@ -49,11 +49,11 @@ const downloadCsv = (csvData, filename = 'teis-export.csv') => {
   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
-  
+
   link.setAttribute('href', url)
   link.setAttribute('download', filename)
   link.style.visibility = 'hidden'
-  
+
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -64,14 +64,14 @@ export const downloadActions = {
               type: DOWNLOAD_TYPES.SET_TARGET_ORG_UNIT,
               payload: orgUnitId,
           }),
-  
+
       resetDownload: () => ({
               type: DOWNLOAD_TYPES.RESET,
           }),
 
 
   downloadTEIsAsCsv:
-    ({ teis, selectedTeis, onProgress, filename }) =>
+    ({ teis, selectedTeis, metadata, onProgress, filename }) =>
     async (dispatch) => {
       if (!teis?.length || !selectedTeis?.length) {
         throw new Error('Missing required parameters')
@@ -83,13 +83,13 @@ export const downloadActions = {
         // Filter selected TEIs
         const filteredTeis = teis.filter(tei =>
           selectedTeis.includes(tei.trackedEntityInstance))
-        
+
         // Convert to CSV
-        const csvData = convertTeisToCsv(filteredTeis)
-        
+        const csvData = convertTeisToCsv(filteredTeis, metadata)
+
         // Trigger download
         downloadCsv(csvData, filename)
-        
+
         // Update progress (if needed)
         if (onProgress) {
           onProgress({

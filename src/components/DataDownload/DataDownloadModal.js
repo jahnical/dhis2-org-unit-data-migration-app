@@ -1,4 +1,3 @@
-import { useDataEngine } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import {
     Modal,
@@ -17,35 +16,32 @@ import { dataActionCreators } from '../../actions/data_controls.js'
 import { downloadActions } from '../../actions/download.js'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { downloadSelectors } from '../../reducers/download.js'
+import { sGetMetadata } from '../../reducers/metadata.js'
 
 const DataDownloadModal = ({ onClose }) => {
     const [step, setStep] = useState('preview') // preview, downloading
     const [downloadProgress, setDownloadProgress] = useState({ completed: 0 })
     const [filename, setFilename] = useState('teis-export.csv')
-
+    const metadata = useSelector(sGetMetadata)
     const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
     const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
     const loading = useSelector(downloadSelectors.getDownloadIsLoading)
     const error = useSelector(downloadSelectors.getDownloadError)
     const downloadStatus = useSelector(downloadSelectors.getDownloadStatus)
-    const engine = useDataEngine()
     const dispatch = useDispatch()
 
     const downloadData = async () => {
         setStep('downloading')
         setDownloadProgress({ completed: 0 })
 
-        const updateProgress = (progress) => {
-            setDownloadProgress(progress)
-        }
-
     dispatch(
             downloadActions.downloadTEIsAsCsv({
                 teis: allTeis,
                 selectedTeis: selectedTeis,
                 filename: filename,
-                onProgress: (progress) => setDownloadProgress({ 
-                    completed: progress.completed 
+                metadata: metadata,
+                onProgress: (progress) => setDownloadProgress({
+                    completed: progress.completed
                 })
             })
         )
