@@ -23,6 +23,7 @@ import LoadingMask from './LoadingMask/LoadingMask.js'
 import MainSidebar from './MainSidebar/MainSidebar.js'
 import { Toolbar } from './Toolbar/Toolbar.js'
 import StartScreen from './Visualization/StartScreen.js'
+import HistoryTei from './DataMigration/HistoryTei'
 
 const App = () => {
     const programId = useSelector(sGetUiProgramId)
@@ -59,6 +60,12 @@ const App = () => {
         loadVisualization(history.location)
     }, [])
 
+    const [tabIndex, setTabIndex] = useState(0)
+
+    const handleTabChange = (index) => {
+        setTabIndex(index)
+    }
+
     return (
         <div
             className={cx(
@@ -87,32 +94,93 @@ const App = () => {
                             classes.flexDirCol
                         )}
                     >
+                        {/* Tabs */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                borderBottom: '1px solid #ccc',
+                                marginBottom: 16,
+                            }}
+                        >
+                            <button
+                                style={{
+                                    flex: 0.1,
+                                    padding: '12px 0',
+                                    border: 'none',
+                                    borderBottom:
+                                        tabIndex === 0
+                                            ? '2px solid #1976d2'
+                                            : 'none',
+                                    background: 'none',
+                                    cursor: 'pointer',
+                                    fontWeight:
+                                        tabIndex === 0 ? 'bold' : 'normal',
+                                }}
+                                onClick={() => handleTabChange(0)}
+                            >
+                                Main
+                            </button>
+                            <button
+                                style={{
+                                    flex: 0.1,
+                                    padding: '12px 0',
+                                    border: 'none',
+                                    borderBottom:
+                                        tabIndex === 1
+                                            ? '2px solid #1976d2'
+                                            : 'none',
+                                    background: 'none',
+                                    cursor: 'pointer',
+                                    fontWeight:
+                                        tabIndex === 1 ? 'bold' : 'normal',
+                                }}
+                                onClick={() => handleTabChange(1)}
+                            >
+                                History
+                            </button>
+                        </div>
+                        {/* Main Layout */}
                         <div className={classes.mainCenterLayout}>
                             <Layout />
                         </div>
+                        {/* Tab Content */}
                         <div className={cx(classes.mainCenterCanvas)}>
-                            {(initialLoadIsComplete &&
-                                (!programId || !orgUnitId) &&
-                                !isLoading) ||
-                            error ? (
-                                <StartScreen />
-                            ) : (
-                                <>
-                                    {isLoading && (
-                                        <div className={classes.loadingCover}>
-                                            <LoadingMask />
+                            {tabIndex === 0 &&
+                                ((initialLoadIsComplete &&
+                                    (!programId || !orgUnitId) &&
+                                    !isLoading) ||
+                                error ? (
+                                    <StartScreen />
+                                ) : (
+                                    <>
+                                        {isLoading && (
+                                            <div
+                                                className={classes.loadingCover}
+                                            >
+                                                <LoadingMask />
+                                            </div>
+                                        )}
+                                        <div
+                                            style={{
+                                                margin: '16px auto',
+                                                maxWidth: '95%',
+                                                overflowX: 'auto',
+                                            }}
+                                        >
+                                            <TEIs />
                                         </div>
-                                    )}
-                                    <div
-                                        style={{
-                                            margin: '16px auto',
-                                            maxWidth: '95%',
-                                            overflowX: 'auto',
-                                        }}
-                                    >
-                                        <TEIs />
-                                    </div>
-                                </>
+                                    </>
+                                ))}
+                            {tabIndex === 1 && (
+                                <div
+                                    style={{
+                                        margin: '16px auto',
+                                        maxWidth: '95%',
+                                        overflowX: 'visible',
+                                    }}
+                                >
+                                    <HistoryTei />
+                                </div>
                             )}
                         </div>
                     </div>
