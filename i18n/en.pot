@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-04T07:24:45.899Z\n"
-"PO-Revision-Date: 2025-07-04T07:24:45.900Z\n"
+"POT-Creation-Date: 2025-07-10T12:58:52.364Z\n"
+"PO-Revision-Date: 2025-07-10T12:58:52.364Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -79,14 +79,8 @@ msgstr ""
 msgid "Could not migrate TEIs"
 msgstr "Could not migrate TEIs"
 
-msgid ""
-"The TEIs couldn't be migrated. \n"
-"{{error}}. \n"
-"Try again or contact your system administrator."
-msgstr ""
-"The TEIs couldn't be migrated. \n"
-"{{error}}. \n"
-"Try again or contact your system administrator."
+msgid "The TEIs couldn't be migrated. {{error}}"
+msgstr "The TEIs couldn't be migrated. {{error}}"
 
 msgid "Migration successful"
 msgstr "Migration successful"
@@ -110,17 +104,32 @@ msgstr ""
 "The TEIs couldn't be retrieved. Try again or contact your system "
 "administrator."
 
+msgid "Sort by Instance ID"
+msgstr "Sort by Instance ID"
+
 msgid "Instance ID"
 msgstr "Instance ID"
+
+msgid "Sort by Created At"
+msgstr "Sort by Created At"
 
 msgid "Created At"
 msgstr "Created At"
 
+msgid "Sort by Last Updated At"
+msgstr "Sort by Last Updated At"
+
 msgid "Last Updated At"
 msgstr "Last Updated At"
 
+msgid "Sort by Stored By"
+msgstr "Sort by Stored By"
+
 msgid "Stored By"
 msgstr "Stored By"
+
+msgid "Sort by Last Updated By"
+msgstr "Sort by Last Updated By"
 
 msgid "Last Updated By"
 msgstr "Last Updated By"
@@ -142,15 +151,6 @@ msgstr "Min value"
 
 msgid "Max value"
 msgstr "Max value"
-
-msgid "Select date range"
-msgstr "Select date range"
-
-msgid "Start date"
-msgstr "Start date"
-
-msgid "End date"
-msgstr "End date"
 
 msgid "Select username"
 msgstr "Select username"
@@ -248,6 +248,12 @@ msgstr "Define start - end dates"
 
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
+
+msgid "Start date"
+msgstr "Start date"
+
+msgid "End date"
+msgstr "End date"
 
 msgid "No items selected"
 msgstr "No items selected"
