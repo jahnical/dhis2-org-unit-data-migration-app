@@ -5,8 +5,15 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-04T07:24:45.899Z\n"
-"PO-Revision-Date: 2025-07-04T07:24:45.900Z\n"
+"POT-Creation-Date: 2025-07-11T08:43:49.914Z\n"
+"PO-Revision-Date: 2025-07-11T08:43:49.915Z\n"
+
+msgid ""
+"The TEIs couldn't be deleted. Please try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be deleted. Please try again or contact your system "
+"administrator."
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -21,9 +28,6 @@ msgstr "An error occurred during deletion. Please check the alert for details."
 
 msgid "Close"
 msgstr "Close"
-
-msgid "Retry"
-msgstr "Retry"
 
 msgid "Soft delete successful"
 msgstr "Soft delete successful"
@@ -118,14 +122,8 @@ msgstr ""
 msgid "Could not migrate TEIs"
 msgstr "Could not migrate TEIs"
 
-msgid ""
-"The TEIs couldn't be migrated. \n"
-"{{error}}. \n"
-"Try again or contact your system administrator."
-msgstr ""
-"The TEIs couldn't be migrated. \n"
-"{{error}}. \n"
-"Try again or contact your system administrator."
+msgid "The TEIs couldn't be migrated. {{error}}"
+msgstr "The TEIs couldn't be migrated. {{error}}"
 
 msgid "Migration successful"
 msgstr "Migration successful"
@@ -139,114 +137,54 @@ msgstr "Next"
 msgid "Confirm Migration"
 msgstr "Confirm Migration"
 
-msgid "Could not load TEIs"
-msgstr "Could not load TEIs"
-
-msgid ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-
-msgid "Instance ID"
-msgstr "Instance ID"
-
-msgid "Created At"
-msgstr "Created At"
-
-msgid "Last Updated At"
-msgstr "Last Updated At"
-
-msgid "Stored By"
-msgstr "Stored By"
-
-msgid "Last Updated By"
-msgstr "Last Updated By"
-
-msgid "Filter by \"{{name}}\""
-msgstr "Filter by \"{{name}}\""
-
-msgid "Failed to restore TEIs. Please try again."
-msgstr "Failed to restore TEIs. Please try again."
-
 msgid "Loading TEI history..."
 msgstr "Loading TEI history..."
 
-msgid "Too many deleted TEIs to display!"
-msgstr "Too many deleted TEIs to display!"
+msgid "No filters selected"
+msgstr "No filters selected"
 
-msgid ""
-"There are too many deleted Tracked Entity Instances to display in the "
-"History tab. Please filter your org unit or program to reduce the number of "
-"deleted TEIs."
-msgstr ""
-"There are too many deleted Tracked Entity Instances to display in the "
-"History tab. Please filter your org unit or program to reduce the number of "
-"deleted TEIs."
+msgid "Please select an organisation unit and program to view deleted TEIs."
+msgstr "Please select an organisation unit and program to view deleted TEIs."
 
-msgid "Successfully restored TEIs."
-msgstr "Successfully restored TEIs."
+msgid "Too many deleted TEIs to display"
+msgstr "Too many deleted TEIs to display"
 
-msgid "Could not load History TEIs"
-msgstr "Could not load History TEIs"
+msgid "Please narrow your filters to view deleted TEIs."
+msgstr "Please narrow your filters to view deleted TEIs."
 
-msgid ""
-"The History TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-msgstr ""
-"The History TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
+msgid "No deleted TEIs found"
+msgstr "No deleted TEIs found"
+
+msgid "There are no deleted TEIs for the selected filters."
+msgstr "There are no deleted TEIs for the selected filters."
+
+msgid "{{count}} Selected of Deleted TEIs"
+msgid_plural "{{count}} Selected of Deleted TEIs"
+msgstr[0] "{{count}} Selected of Deleted TEIs"
+msgstr[1] "{{count}} Selected of Deleted TEIs"
+
+msgid "Restore"
+msgstr "Restore"
 
 msgid "Instance ID"
 msgstr "Instance ID"
 
-msgid "Created At"
-msgstr "Created At"
+msgid "Created"
+msgstr "Created"
 
-msgid "Last Updated At"
-msgstr "Last Updated At"
+msgid "Last Updated"
+msgstr "Last Updated"
 
-msgid "Stored By"
-msgstr "Stored By"
+msgid "Restore TEIs"
+msgstr "Restore TEIs"
 
-msgid "Last Updated By"
-msgstr "Last Updated By"
-
-msgid "No deleted TEIs found for this org unit and program."
-msgstr "No deleted TEIs found for this org unit and program."
-
-msgid "Restore Tracked Entity Instances"
-msgstr "Restore Tracked Entity Instances"
-
-msgid "Confirm Restore"
-msgstr "Confirm Restore"
-
-msgid ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-msgid_plural ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-msgstr[0] ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-msgstr[1] ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-
-msgid ""
-"This will change their status from deleted to active, making them visible "
-"in the main tab."
-msgstr ""
-"This will change their status from deleted to active, making them visible "
-"in the main tab."
+msgid "Are you sure you want to restore {{count}} TEI(s)?"
+msgid_plural "Are you sure you want to restore {{count}} TEI(s)?"
+msgstr[0] "Are you sure you want to restore {{count}} TEI(s)?"
+msgstr[1] "Are you sure you want to restore {{count}} TEI(s)?"
 
 msgid "Restoring..."
 msgstr "Restoring..."
-
-msgid "Restore"
-msgstr "Restore"
 
 msgid "Filter by \"{{name}}\""
 msgstr "Filter by \"{{name}}\""
@@ -284,8 +222,48 @@ msgstr "Remove Filter"
 msgid "Apply Filter"
 msgstr "Apply Filter"
 
+msgid "Could not load TEIs"
+msgstr "Could not load TEIs"
+
+msgid ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
+
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
+
+msgid "No items selected"
+msgstr "No items selected"
+
+msgid "Available options"
+msgstr "Available options"
+
+msgid "Filter options"
+msgstr "Filter options"
+
+msgid "Selected options"
+msgstr "Selected options"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Nothing found for \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "No options"
 
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
@@ -369,23 +347,11 @@ msgstr "Define start - end dates"
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
 
-msgid "No items selected"
-msgstr "No items selected"
+msgid "Start date"
+msgstr "Start date"
 
-msgid "Available options"
-msgstr "Available options"
-
-msgid "Filter options"
-msgstr "Filter options"
-
-msgid "Selected options"
-msgstr "Selected options"
-
-msgid "Nothing found for \"{{- searchTerm}}\""
-msgstr "Nothing found for \"{{- searchTerm}}\""
-
-msgid "No options"
-msgstr "No options"
+msgid "End date"
+msgstr "End date"
 
 msgid "all"
 msgstr "all"

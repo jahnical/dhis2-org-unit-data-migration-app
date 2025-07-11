@@ -1,4 +1,4 @@
-// Redux slice for History TEIs
+// Initial state
 const defaultState = {
     isLoading: false,
     error: null,
@@ -6,8 +6,9 @@ const defaultState = {
     selectedTeis: [],
     filters: {},
     attributesToDisplay: [],
-};
+}
 
+// Action Types
 export const historyTeisActionTypes = {
     SET_LOADING: 'historyTeis/SET_LOADING',
     SET_ERROR: 'historyTeis/SET_ERROR',
@@ -15,28 +16,36 @@ export const historyTeisActionTypes = {
     SET_SELECTED_TEIS: 'historyTeis/SET_SELECTED_TEIS',
     SET_FILTERS: 'historyTeis/SET_FILTERS',
     SET_ATTRIBUTES_TO_DISPLAY: 'historyTeis/SET_ATTRIBUTES_TO_DISPLAY',
-};
+}
 
+// Reducer
 function historyTeisReducer(state = defaultState, action) {
     switch (action.type) {
         case historyTeisActionTypes.SET_LOADING:
-            return { ...state, isLoading: action.payload };
+            return { ...state, isLoading: action.payload }
+
         case historyTeisActionTypes.SET_ERROR:
-            return { ...state, error: action.payload };
+            return { ...state, error: action.payload }
+
         case historyTeisActionTypes.SET_TEIS:
-            return { ...state, teis: action.payload };
+            return { ...state, teis: action.payload }
+
         case historyTeisActionTypes.SET_SELECTED_TEIS:
-            return { ...state, selectedTeis: action.payload };
+            return { ...state, selectedTeis: action.payload }
+
         case historyTeisActionTypes.SET_FILTERS:
-            return { ...state, filters: action.payload };
+            return { ...state, filters: action.payload }
+
         case historyTeisActionTypes.SET_ATTRIBUTES_TO_DISPLAY:
-            return { ...state, attributesToDisplay: action.payload };
+            return { ...state, attributesToDisplay: action.payload }
+
         default:
-            return state;
+            return state
     }
 }
 
-export default historyTeisReducer;
+export default historyTeisReducer
+
 
 // Selectors
 export const sGetHistoryTeisIsLoading = state => state.historyTeis.isLoading;

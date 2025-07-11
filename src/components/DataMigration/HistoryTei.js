@@ -1,388 +1,324 @@
-import { VALUE_TYPE_DATE, VALUE_TYPE_DATETIME } from '@dhis2/analytics';
-import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button } from '@dhis2/ui';
-import { useDataEngine } from '@dhis2/app-runtime';
-import i18n from '@dhis2/d2-i18n';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    TableCellHead,
-    CircularLoader,
-    NoticeBox,
-    TableRowHead,
-    Checkbox,
-    DropdownButton,
-    Menu,
-    MenuItem,
-    AlertBar,
-} from '@dhis2/ui';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deletionSelectors } from '../../reducers/deletion.js';
-import { restoreTeis } from '../../actions/restoreTeis.js';
 import {
-    sGetHistoryTeisIsLoading,
-    sGetHistoryTeisError,
-    sGetHistoryTeis,
-    sGetHistorySelectedTeis,
-    sGetHistoryTeisAttributesToDisplay,
-    sGetHistoryTeisFilters,
-} from '../../reducers/historyTeis.js';
+    Modal, ModalTitle, ModalContent, ModalActions,
+    ButtonStrip, Button, Table, TableBody, TableCell,
+    TableHead, TableRow, TableCellHead, TableRowHead,
+    Checkbox, DropdownButton, Menu, MenuItem,
+    CircularLoader, NoticeBox, AlertBar
+} from '@dhis2/ui';
+import i18n from '@dhis2/d2-i18n';
+import { useDataEngine } from '@dhis2/app-runtime';
+
 import {
-    setHistoryTeisLoading,
-    setHistoryTeisError,
-    setHistoryTeis,
-    setHistorySelectedTeis, 
-    setHistoryTeisFilters,
-} from '../../actions/historyTeis.js';
-import { dataControlSelectors } from '../../reducers/data_controls.js';
-import { dataActionCreators } from '../../actions/data_controls.js';
-import { sGetMetadata } from '../../reducers/metadata.js';
+    sGetHistoryTeis, sGetHistoryTeisIsLoading, sGetHistoryTeisError,
+    sGetHistorySelectedTeis, sGetHistoryTeisAttributesToDisplay
+} from '../../reducers/historyTeis';
+
+import {
+    setHistoryTeis, setHistoryTeisLoading, setHistoryTeisError,
+    setHistorySelectedTeis
+} from '../../actions/historyTeis';
+
+import { restoreTeis } from '../../actions/deletion';
+import { dataActionCreators } from '../../actions/data_controls';
+import { deletionSelectors } from '../../reducers/deletion';
+import { dataControlSelectors } from '../../reducers/data_controls';
 import classes from './styles/Common.module.css';
-import { APP_SOFT_DELETED_ATTR_ID } from '../../constants/appSoftDeletedAttrId.js';
 
 const MAX_SAFE_HISTORY_ROWS = 500;
 const MAX_DISPLAY_ROWS = 100;
 
 const HistoryTei = () => {
-    const loading = useSelector(sGetHistoryTeisIsLoading);
-    const error = useSelector(sGetHistoryTeisError);
-    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs);
+    const dispatch = useDispatch();
+    const engine = useDataEngine();
+
+    // Redux state selectors
     const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit);
     const programId = useSelector(dataControlSelectors.getDataControlProgram);
-    const dispatch = useDispatch();
+    const teis = useSelector(sGetHistoryTeis);
+    const loading = useSelector(sGetHistoryTeisIsLoading);
+    const error = useSelector(sGetHistoryTeisError);
+    const selectedTeis = useSelector(sGetHistorySelectedTeis);
+    const attributesToDisplay = useSelector(sGetHistoryTeisAttributesToDisplay);
+    const restoreLoading = useSelector(deletionSelectors.getDeletionIsLoading);
+
+    // Local state
     const [status, setStatus] = useState('deleted');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showRestoreModal, setShowRestoreModal] = useState(false);
-    const [restoreInProgress, setRestoreInProgress] = useState(false);
-    const [restoreSuccess, setRestoreSuccess] = useState(false);
-    const [restoreError, setRestoreError] = useState(null);
-    const [selectedTeiDetails, setSelectedTeiDetails] = useState([]);
-    const engine = useDataEngine();
-    // Track mount status to avoid state update on unmounted
-    const isMountedRef = React.useRef(true);
-    useEffect(() => {
-        isMountedRef.current = true;
-        return () => { isMountedRef.current = false; };
-    }, []);
+    const [restoreSummary, setRestoreSummary] = useState(null);
 
-    // Helper to check if a TEI is soft deleted by app attribute
-    const isAppSoftDeleted = (tei) =>
-        tei.attributes?.find(a => a.attribute === APP_SOFT_DELETED_ATTR_ID && a.value === 'true');
-
-    // Only show soft-deleted TEIs by app attribute
-    const deletedTeis = React.useMemo(() =>
-        (allTeis || [])
-            .filter(tei =>
-                isAppSoftDeleted(tei) &&
-                tei.deleted !== true &&
-                (tei.orgUnit === orgUnitId || tei.ou === orgUnitId)
-            )
-            .map(tei => ({
-                ...tei,
-                id: tei.trackedEntityInstance || tei.id,
-                storedBy: tei.storedBy || tei.createdByUserInfo?.username || '',
-                createdBy: tei.createdByUserInfo || {},
-                lastUpdatedBy: tei.lastUpdatedByUserInfo || {},
-                owner: tei.owner || tei.programOwners?.[0]?.ownerOrgUnit || '',
-            })),
-        [allTeis, orgUnitId]
+    // Memoized data
+    const deletedTeis = useMemo(() => 
+        (teis || []).filter(tei => tei.deleted === true && tei.trackedEntityInstance), 
+        [teis]
+    );
+    const displayTeis = useMemo(() => 
+        status === 'deleted' ? deletedTeis.slice(0, MAX_DISPLAY_ROWS) : [], 
+        [status, deletedTeis]
     );
 
-    const selectedTeis = useSelector(sGetHistorySelectedTeis);
-    const metadata = useSelector(sGetMetadata);
-    const attributesToDisplay = useSelector(sGetHistoryTeisAttributesToDisplay);
-
-    // Handle individual TEI selection
-    const handleSelectTei = (teiId) => {
-        const updatedSelection = selectedTeis.includes(teiId)
-            ? selectedTeis.filter(id => id !== teiId)
-            : [...selectedTeis, teiId];
-        dispatch(setHistorySelectedTeis(updatedSelection));
-    };
-
-    // Handle select all checkbox
-    const handleSelectAll = (checked) => {
-        if (checked) {
-            const allTeiIds = teis.map(tei => tei.id);
-            dispatch(setHistorySelectedTeis(allTeiIds));
-        } else {
-            dispatch(setHistorySelectedTeis([]));
-        }
-    };
-
-    // Show restore confirmation modal
-    const handleShowRestoreModal = () => {
-        const details = teis.filter(tei => selectedTeis.includes(tei.trackedEntityInstance || tei.id));
-        setSelectedTeiDetails(details);
-        setShowRestoreModal(true);
-    };
-
-    // Close restore modal and clear any alerts
-    const handleCloseRestoreModal = () => {
-        setShowRestoreModal(false);
-    };
-
-    // Restore handler
-    const handleRestore = async () => {
-        if (!engine) {
-            console.error('Engine not available');
-            setRestoreError(i18n.t('Engine not available. Please try again later.'));
-            setTimeout(() => {
-                setRestoreError(null);
-            }, 5000);
+    // Fetch TEIs when orgUnit or program changes
+    useEffect(() => {
+        if (!orgUnitId || !programId) {
+            dispatch(setHistoryTeis([]));
             return;
         }
-        setRestoreInProgress(true);
-        try {
-            const selectedTeiObjects = teis.filter(tei => selectedTeis.includes(tei.trackedEntityInstance || tei.id));
-            // Use new restoreTeis action
-            await dispatch(restoreTeis(
-                engine,
-                selectedTeiObjects,
-                async () => {
-                    // Optionally, fetch updated history TEIs here
-                    // If you have a fetchHistoryTeis function, use it; otherwise, return an empty array or refetch logic
-                    if (orgUnitId && programId) {
-                        await dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine));
-                    }
-                    return [];
-                }
-            ));
-            if (isMountedRef.current) {
-                setRestoreSuccess(true);
-                setTimeout(() => isMountedRef.current && setRestoreSuccess(false), 5000);
-                dispatch(setHistorySelectedTeis([]));
-                setShowRestoreModal(false);
+
+        const fetchTEIs = async () => {
+            dispatch(setHistoryTeisLoading(true));
+            try {
+                const result = await dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine));
+                dispatch(setHistoryTeis(result));
+            } catch (e) {
+                dispatch(setHistoryTeisError(e));
+            } finally {
+                dispatch(setHistoryTeisLoading(false));
             }
-        } catch (error) {
-            const errorMessage = error.message || i18n.t('Failed to restore TEIs. Please try again.');
-            if (isMountedRef.current) setRestoreError(errorMessage);
-        } finally {
-            if (isMountedRef.current) setRestoreInProgress(false);
-        }
+        };
+
+        fetchTEIs();
+    }, [dispatch, engine, orgUnitId, programId]);
+
+    // Handle TEI selection
+    const handleSelectTei = (teiId) => {
+        const updated = selectedTeis.includes(teiId)
+            ? selectedTeis.filter(id => id !== teiId)
+            : [...selectedTeis, teiId];
+        dispatch(setHistorySelectedTeis(updated));
     };
 
-    const labelText = status === 'deleted'
-        ? `${selectedTeis.length} Selected of Deleted Tracked Entity Instances`
-        : `${selectedTeis.length} Selected of Migrated Tracked Entity Instances`;
+    // Handle select all
+    const handleSelectAll = (checked) => {
+        dispatch(setHistorySelectedTeis(
+            checked ? displayTeis.map(tei => tei.trackedEntityInstance) : []
+        ));
+    };
 
-    // Only show up to MAX_DISPLAY_ROWS, and if more than MAX_SAFE_HISTORY_ROWS, show warning and do not render table
-    const teis = status === 'deleted' ? deletedTeis.slice(0, MAX_DISPLAY_ROWS) : [];
+ const handleRestore = async () => {
+    setRestoreSummary(null);
+    
+    const restorableTeis = displayTeis.filter(
+        tei => selectedTeis.includes(tei.trackedEntityInstance) && tei.deleted
+    );
+    
+    if (restorableTeis.length === 0) {
+        setRestoreSummary({
+            success: [],
+            error: i18n.t('No restorable TEIs selected')
+        });
+        return;
+    }
 
-    // Always fetch TEIs (with includeDeleted) when orgUnit or program changes, even in History tab
-    React.useEffect(() => {
-        if (orgUnitId && programId) {
-            if (engine) {
-                dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine));
+    try {
+        setRestoreSummary({
+            success: [],
+            error: null,
+            loading: true
+        });
+
+        const results = await Promise.allSettled(
+            restorableTeis.map(tei => 
+                dispatch(restoreTeis({
+                    teiUids: [tei.trackedEntityInstance],
+                    engine,
+                    orgUnitId,
+                    programId,
+                    fetchAfterRestore: () => dispatch(
+                        dataActionCreators.fetchTEIs(orgUnitId, programId, engine)
+                    )
+                }))
+            )
+        );
+
+        const success = [];
+        const errors = [];
+        
+        results.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                success.push(restorableTeis[index].trackedEntityInstance);
+            } else {
+                errors.push(
+                    `${restorableTeis[index].trackedEntityInstance}: ${result.reason.message}`
+                );
             }
-        }
-    }, [orgUnitId, programId, dispatch]);
+        });
 
+        setRestoreSummary({
+            success,
+            error: errors.length ? errors.join(', ') : null
+        });
+
+        dispatch(setHistorySelectedTeis([]));
+        setShowRestoreModal(false);
+    } catch (error) {
+        setRestoreSummary({
+            success: [],
+            error: error.message || i18n.t('Restore failed')
+        });
+    }
+};
+
+    // Loading state
     if (loading) {
-        return <CircularLoader>{i18n.t('Loading TEI history...')}</CircularLoader>;
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '32px' }}>
+                <CircularLoader />
+            </div>
+        );
+    }
+
+    // Validation states
+    if (!orgUnitId || !programId) {
+        return (
+            <NoticeBox warning title={i18n.t('No filters selected')}>
+                {i18n.t('Please select an organisation unit and program to view deleted TEIs.')}
+            </NoticeBox>
+        );
     }
 
     if (deletedTeis.length > MAX_SAFE_HISTORY_ROWS) {
         return (
-            <NoticeBox error title={i18n.t('Too many deleted TEIs to display!')}>
-                {i18n.t('There are too many deleted Tracked Entity Instances to display in the History tab. Please filter your org unit or program to reduce the number of deleted TEIs.')}
+            <NoticeBox error title={i18n.t('Too many deleted TEIs to display')}>
+                {i18n.t('Please narrow your filters to view deleted TEIs.')}
+            </NoticeBox>
+        );
+    }
+
+    if (!loading && deletedTeis.length === 0) {
+        return (
+            <NoticeBox title={i18n.t('No deleted TEIs found')}>
+                {i18n.t('There are no deleted TEIs for the selected filters.')}
             </NoticeBox>
         );
     }
 
     return (
-        <div style={{ height: '100%' }}>
-            {restoreSuccess && (
-                <AlertBar success onHidden={() => setRestoreSuccess(false)}>{i18n.t('Successfully restored TEIs.')}</AlertBar>
+        <div className={classes.container}>
+            {/* Fixed AlertBar implementation */}
+            {restoreSummary && (
+                <AlertBar 
+                    duration={8000}
+                    {...(restoreSummary.error ? { critical: true } : { success: true })}
+                >
+                    {restoreSummary.success.length > 0 && restoreSummary.error ? (
+                        `${i18n.t('Successfully restored {{count}} TEIs', { count: restoreSummary.success.length })}. ${restoreSummary.error}`
+                    ) : restoreSummary.success.length > 0 ? (
+                        i18n.t('Successfully restored {{count}} TEIs', { count: restoreSummary.success.length })
+                    ) : (
+                        restoreSummary.error
+                    )}
+                </AlertBar>
             )}
-            {restoreError && (
-                <AlertBar critical onHidden={() => setRestoreError(null)}>{restoreError}</AlertBar>
-            )}
-            {error ? (
-                <NoticeBox error title={i18n.t('Could not load History TEIs')}>
-                    {error?.message ||
-                        i18n.t(
-                            "The History TEIs couldn't be retrieved. Try again or contact your system administrator."
-                        )}
-                </NoticeBox>
-            ) : (
-                <div className={classes.tableWrapper}>
-                    {/* Table label at the top */}
-                    <div style={{ color: 'grey', display: 'flex', alignItems: 'center', marginBottom: 0 }}>
-                        <h4 style={{ marginLeft: '16px', marginBottom: 0 }}>{i18n.t(labelText)}</h4>
-                    </div>
-                    {/* Controls below the label */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                        <DropdownButton
-                            onClick={() => setDropdownOpen((open) => !open)}
-                            button={status === 'deleted' ? 'Deleted' : 'Migrated'}
-                            style={{ minWidth: 48, maxWidth: 70, height: 26, fontSize: '0.85rem', padding: '0 6px', border: 'none', boxShadow: 'none', background: '#fff' }}
-                            data-test="dhis2-uicore-dropdownbutton"
-                        >
-                            <Menu>
-                                <MenuItem label="Deleted" onClick={() => setStatus('deleted')} />
-                                <MenuItem label="Migrated" onClick={() => setStatus('migrated')} />
-                            </Menu>
-                        </DropdownButton>
-                        <Button 
-                            style={{ 
-                                height: 36, 
-                                minWidth: 100, 
-                                fontSize: '1rem', 
-                                padding: '0 22px', 
-                                background: '#1976d2', 
-                                color: '#fff', 
-                                border: 'none', 
-                                boxShadow: 'none', 
-                                fontWeight: 400,
-                                transition: 'background 0.15s',
-                                cursor: 'pointer',
-                                outline: 'none',
-                                userSelect: 'none',
-                            }} 
-                            onMouseDown={e => e.currentTarget.style.background = '#115293'}
-                            onMouseUp={e => e.currentTarget.style.background = '#1976d2'}
-                            onMouseLeave={e => e.currentTarget.style.background = '#1976d2'}
-                            onClick={handleShowRestoreModal}
-                            disabled={selectedTeis.length === 0}
-                        >
-                            Restore
-                        </Button>
-                    </div>
-                    {/* Table */}
-                    <Table>
-                        <TableHead className={classes.headerTable}>
-                            <TableRowHead>
-                                <TableCellHead className={classes.checkbox}>
-                                    <Checkbox
-                                        checked={selectedTeis.length === teis.length && teis.length > 0}
-                                        indeterminate={selectedTeis.length > 0 && selectedTeis.length < teis.length}
-                                        onChange={({ checked }) => handleSelectAll(checked)}
-                                    />
-                                </TableCellHead>
-                                <TableCellHead className={classes.columnInstanceId}>
-                                    {i18n.t('Instance ID')}
-                                </TableCellHead>
-                                <TableCellHead className={classes.column}>
-                                    {i18n.t('Created At')}
-                                </TableCellHead>
-                                <TableCellHead className={classes.column}>
-                                    {i18n.t('Last Updated At')}
-                                </TableCellHead>
-                                <TableCellHead className={classes.column}>
-                                    {i18n.t('Stored By')}
-                                </TableCellHead>
-                                <TableCellHead className={classes.column}>
-                                    {i18n.t('Last Updated By')}
-                                </TableCellHead>
-                                {attributesToDisplay.map((attr) => (
-                                    <TableCellHead
-                                        key={attr}
-                                        className={classes.column}
-                                    >
-                                        {attr}
-                                    </TableCellHead>
-                                ))}
-                            </TableRowHead>
-                        </TableHead>
-                        <TableBody className={classes.bodyTable}>
-                            {teis.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6 + attributesToDisplay.length} style={{ textAlign: 'center', color: '#888' }}>
-                                        {i18n.t('No deleted TEIs found for this org unit and program.')}
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                teis.map((instance) => (
-                                    <TableRow key={instance.id}>
-                                        <TableCell className={classes.checkbox}>
-                                            <Checkbox
-                                                checked={selectedTeis.includes(instance.id)}
-                                                onChange={() => handleSelectTei(instance.id)}
-                                            />
-                                        </TableCell>
-                                        <TableCell className={classes.columnInstanceId}>
-                                            {instance.id}
-                                        </TableCell>
-                                        <TableCell className={classes.column}>
-                                            {new Date(instance.created).toLocaleString()}
-                                        </TableCell>
-                                        <TableCell className={classes.column}>
-                                            {new Date(instance.lastUpdated).toLocaleString()}
-                                        </TableCell>
-                                        <TableCell className={classes.column}>
-                                            {instance.storedBy}
-                                        </TableCell>
-                                        <TableCell className={classes.column}>
-                                            {instance.lastUpdatedBy?.username || ''}
-                                        </TableCell>
-                                        {attributesToDisplay.map((attr) => {
-                                            const attribute = instance.attributes?.find(
-                                                (a) => a.name === attr
-                                            ) || { value: '', valueType: '' };
-                                            return (
-                                                <TableCell key={attr} className={classes.column}>
-                                                    {attribute.valueType === VALUE_TYPE_DATE ||
-                                                    attribute.valueType === VALUE_TYPE_DATETIME
-                                                        ? (attribute.value ? new Date(attribute.value).toLocaleString() : '')
-                                                        : attribute.value}
-                                                </TableCell>
-                                            );
-                                        })}
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+
+            {/* Main Table */}
+            <div className={classes.tableWrapper}>
+                <div className={classes.tableHeader}>
+                    <h4>{i18n.t('{{count}} Selected of Deleted TEIs', { count: selectedTeis.length })}</h4>
+
+                    <DropdownButton
+                        open={dropdownOpen}
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                        button="Status"
+                    >
+                        <Menu>
+                            <MenuItem
+                                label="Deleted"
+                                onClick={() => {
+                                    setStatus('deleted');
+                                    setDropdownOpen(false);
+                                }}
+                            />
+                        </Menu>
+                    </DropdownButton>
                 </div>
-            )}
-                 {/* Restore Confirmation Modal */}
+
+                <Button 
+                    disabled={!selectedTeis.length || restoreLoading}
+                    onClick={() => setShowRestoreModal(true)}
+                    className={classes.restoreButton}
+                >
+                    {restoreLoading ? (
+                        <>
+                            <CircularLoader small />
+                            {i18n.t('Restoring...')}
+                        </>
+                    ) : i18n.t('Restore')}
+                </Button>
+
+                <Table>
+                    <TableHead>
+                        <TableRowHead>
+                            <TableCellHead>
+                                <Checkbox
+                                    checked={selectedTeis.length === displayTeis.length && displayTeis.length > 0}
+                                    indeterminate={selectedTeis.length > 0 && selectedTeis.length < displayTeis.length}
+                                    onChange={({ checked }) => handleSelectAll(checked)}
+                                />
+                            </TableCellHead>
+                            <TableCellHead>{i18n.t('Instance ID')}</TableCellHead>
+                            <TableCellHead>{i18n.t('Created')}</TableCellHead>
+                            <TableCellHead>{i18n.t('Last Updated')}</TableCellHead>
+                            {attributesToDisplay.map(attr => (
+                                <TableCellHead key={attr}>{attr}</TableCellHead>
+                            ))}
+                        </TableRowHead>
+                    </TableHead>
+                    <TableBody>
+                        {displayTeis.map(tei => {
+                            const teiId = tei.trackedEntityInstance;
+                            return (
+                                <TableRow key={teiId}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={selectedTeis.includes(teiId)}
+                                            onChange={() => handleSelectTei(teiId)}
+                                        />
+                                    </TableCell>
+                                    <TableCell>{teiId}</TableCell>
+                                    <TableCell>{new Date(tei.created).toLocaleString()}</TableCell>
+                                    <TableCell>{new Date(tei.lastUpdated).toLocaleString()}</TableCell>
+                                    {attributesToDisplay.map(attr => {
+                                        const attribute = tei.attributes?.find(a => a.name === attr);
+                                        return <TableCell key={attr}>{attribute?.value || ''}</TableCell>;
+                                    })}
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {/* Restore Confirmation Modal */}
             {showRestoreModal && (
-                <Modal open={showRestoreModal} onClose={handleCloseRestoreModal}>
-                    <ModalTitle>
-                        {i18n.t('Restore Tracked Entity Instances')}
-                    </ModalTitle>
+                <Modal onClose={() => setShowRestoreModal(false)}>
+                    <ModalTitle>{i18n.t('Confirm Restoration')}</ModalTitle>
                     <ModalContent>
-                        <NoticeBox title={i18n.t('Confirm Restore')} info>
-                            <p style={{ marginBottom: '16px' }}>
-                                {i18n.t('Are you sure you want to restore the following {{count}} Tracked Entity Instance(s)?', { 
-                                    count: selectedTeis.length 
-                                })}
-                            </p>
-                            <p style={{ fontSize: '0.9em', color: '#666' }}>
-                                {i18n.t('This will change their status from deleted to active, making them visible in the main tab.')}
-                            </p>
-                            <div style={{marginTop: '16px'}}>
-                                <strong>{i18n.t('TEIs to be restored:')}</strong>
-                                <ul style={{maxHeight: 150, overflowY: 'auto', margin: 0, paddingLeft: 18, listStyleType: 'none'}}>
-                                    {selectedTeiDetails.map((tei) => (
-                                        <li key={tei.id} style={{marginBottom: '8px'}}>
-                                            <div><strong>{i18n.t('ID:')} </strong>{tei.id}</div>
-                                            <div><strong>{i18n.t('Org Unit:')} </strong>{metadata[tei.owner]?.name || tei.owner || tei.orgUnit || orgUnitId}</div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </NoticeBox>
+                        {i18n.t('You are about to restore {{count}} TEIs. This will make them active again.', {
+                            count: selectedTeis.length
+                        })}
                     </ModalContent>
                     <ModalActions>
                         <ButtonStrip end>
                             <Button 
                                 secondary 
-                                onClick={handleCloseRestoreModal}
-                                disabled={restoreInProgress}
+                                onClick={() => setShowRestoreModal(false)}
+                                disabled={restoreLoading}
                             >
                                 {i18n.t('Cancel')}
                             </Button>
                             <Button 
                                 primary 
                                 onClick={handleRestore}
-                                disabled={restoreInProgress}
+                                disabled={restoreLoading}
                             >
-                                {restoreInProgress ? i18n.t('Restoring...') : i18n.t('Restore')}
+                                {restoreLoading ? (
+                                    <>
+                                        <CircularLoader small />
+                                        {i18n.t('Restoring...')}
+                                    </>
+                                ) : i18n.t('Confirm Restore')}
                             </Button>
                         </ButtonStrip>
                     </ModalActions>
