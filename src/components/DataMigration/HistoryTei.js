@@ -291,7 +291,7 @@ const HistoryTei = () => {
                         <TableBody className={classes.bodyTable}>
                             {teis.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6 + attributesToDisplay.length} style={{ textAlign: 'center', color: '#888' }}>
+                                    <TableCell colSpan={`${6 + attributesToDisplay.length}`} style={{ textAlign: 'center', color: '#888' }}>
                                         {i18n.t('No deleted TEIs found for this org unit and program.')}
                                     </TableCell>
                                 </TableRow>

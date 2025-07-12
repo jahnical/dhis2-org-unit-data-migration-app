@@ -36,6 +36,26 @@ const DataMigrationModal = ({ onClose }) => {
     const engine = useDataEngine()
     const dispatch = useDispatch()
 
+    const setTargetOrgUnit = (orgUnitId) => {
+        if (metadata[orgUnitId]) {
+            console.log('[History][Target OrgUnit Selected]', {
+                id: orgUnitId,
+                name: metadata[orgUnitId].name || metadata[orgUnitId].displayName
+            })
+        }
+        dispatch(migrationActions.setTargetOrgUnit(orgUnitId))
+    }
+
+    // Log target org unit when it becomes available (step to preview or migration)
+    React.useEffect(() => {
+        if (targetOrgUnit && metadata[targetOrgUnit]) {
+            console.log('[History][Target OrgUnit Selected]', {
+                id: targetOrgUnit,
+                name: metadata[targetOrgUnit].name || metadata[targetOrgUnit].displayName
+            })
+        }
+    }, [targetOrgUnit, metadata])
+
     const migrateData = async () => {
         setStep('migrating')
         setMigrationProgress({step: 0})
@@ -86,36 +106,39 @@ const DataMigrationModal = ({ onClose }) => {
         </div>
     )
 
-    const renderProgress = () => (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '16px',
-            padding: '16px'
-        }}>
-            <CircularLoader />
-            {
-                migrationProgress.step == 0? <div>
-                    <p>{i18n.t("Updating Organisation Units")}</p>
-                </div> : <>
-                    <div>
-                        {i18n.t('Transferring Ownerships {{success}} successes and {{failure}} failures of {{total}} TEIs...', {
-                            success: migrationProgress.successfulTeis?.length || 0,
-                            failure: migrationProgress.failedTeis?.length || 0,
-                            total: migrationProgress.total,
-                        })}
-                    </div>
-                    <div>
-                        {Math.round((
-                            ((migrationProgress.successfulTeis?.length || 0) + (migrationProgress.failedTeis?.length || 0))
-                            / migrationProgress.total) * 100)
-                            }%
-                    </div>
-                </>
-            }
-        </div>
-    )
+    const renderProgress = () => {
+        const successCount = (migrationProgress.successfulTeis && migrationProgress.successfulTeis.length) || 0
+        const failureCount = (migrationProgress.failedTeis && migrationProgress.failedTeis.length) || 0
+        const totalCount = migrationProgress.total || 0
+        const percent = totalCount ? Math.round(((successCount + failureCount) / totalCount) * 100) : 0
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '16px',
+                padding: '16px'
+            }}>
+                <CircularLoader />
+                {
+                    migrationProgress.step == 0? <div>
+                        <p>{i18n.t("Updating Organisation Units")}</p>
+                    </div> : <>
+                        <div>
+                            {i18n.t('Transferring Ownerships {{success}} successes and {{failure}} failures of {{total}} TEIs...', {
+                                success: successCount,
+                                failure: failureCount,
+                                total: totalCount,
+                            })}
+                        </div>
+                        <div>
+                            {percent}%
+                        </div>
+                    </>
+                }
+            </div>
+        )
+    }
 
     return (
         <Modal onClose={onCloseClicked} position="middle" large>
@@ -144,7 +167,7 @@ const DataMigrationModal = ({ onClose }) => {
                         ) : step === 'selection' ? (
                             <div style={{ marginBottom: '20px' }}>
                                 <h4>Select Target Organisation Unit</h4>
-                                <OrgUnitSelection isSourceOrgUnit={false} />
+                                <OrgUnitSelection isSourceOrgUnit={false} setSelected={setTargetOrgUnit} />
                             </div>
                         ) : step === 'preview' ? (
                             renderPreview()

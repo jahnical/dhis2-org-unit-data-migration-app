@@ -4,6 +4,7 @@ import { DELETION_TYPES } from '../reducers/deletion'
 import { restoreTEI } from '../api/teis'
 import { setHistoryTeis, setHistoryTeisError, setHistoryTeisLoading } from './historyTeis'
 import { APP_SOFT_DELETED_ATTR_ID } from '../constants/appSoftDeletedAttrId.js'
+import { logHistoryBatchThunk } from './history'
 
 /**
  * Restore selected TEIs and refresh history list
@@ -31,5 +32,29 @@ export const restoreTeis = (engine, teis, fetchHistoryTeis) => async (dispatch) 
         }
     } catch (error) {
         dispatch({ type: DELETION_TYPES.RESTORE_TEIS_ERROR, payload: error })
+    }
+}
+
+// Thunk for restoring soft-deleted TEIs in selected batches
+export const restoreTeisBatchesThunk = (batchIds, engine) => async (dispatch, getState) => {
+    const { histories } = getState().history
+    const batchesToRestore = histories.filter(b => batchIds.includes(b.id) && b.action === 'soft-deleted')
+    try {
+        for (const batch of batchesToRestore) {
+            // Call actual restoreTeis logic here
+            await dispatch(restoreTeis(engine, batch.teis))
+            // Log restore to history
+            const restoredBatch = {
+                ...batch,
+                action: 'restored',
+                timestamp: new Date().toISOString(),
+                date: new Date().toISOString().slice(0, 10),
+                time: new Date().toLocaleTimeString(),
+            }
+            await require('./history').logHistoryBatchThunk(restoredBatch, engine)(dispatch, getState)
+        }
+    } catch (error) {
+        // Optionally handle error
+        console.error('Restore failed:', error)
     }
 }

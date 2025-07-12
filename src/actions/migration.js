@@ -1,4 +1,5 @@
 import { MIGRATION_TYPES } from '../reducers/migration.js'
+import { logHistoryBatchThunk } from './history'
 
 export const migrationActions = {
     setTargetOrgUnit: (orgUnitId) => ({
@@ -151,6 +152,36 @@ export const migrationActions = {
                     type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
                     payload: response,
                 })
+                
+                //Log the migration history batch
+                const state = dispatch((_, getState) => getState()) || {};
+                const programId = state.ui?.program?.id;
+                const programName = state.metadata?.[programId]?.name || '';
+                const user = state.current?.user || { id: '', name: '' };
+                const sourceOrgUnitId = teis[0]?.orgUnit; // Before migration, this is the source
+                const sourceOrgUnitName = state.metadata?.[sourceOrgUnitId]?.name || '';
+                const targetOrgUnitId = targetOrgUnit;
+                const targetOrgUnitNameFinal = state.metadata?.[targetOrgUnitId]?.name || targetOrgUnitName || '';
+                const historyBatch = {
+                    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toISOString().slice(0, 10),
+                    time: new Date().toLocaleTimeString(),
+                    action: 'migrated',
+                    program: { id: programId, name: programName },
+                    sourceOrgUnit: { id: sourceOrgUnitId, name: sourceOrgUnitName },
+                    targetOrgUnit: { id: targetOrgUnitId, name: targetOrgUnitNameFinal },
+                    user,
+                    teis: updatedTeis.map(tei => ({
+                        id: tei.trackedEntityInstance || tei.id,
+                        created: tei.created,
+                        lastUpdated: tei.lastUpdated,
+                        storedBy: tei.storedBy,
+                        lastUpdatedBy: tei.lastUpdatedBy,
+                        attributes: tei.attributes || [],
+                    })),
+                };
+                await dispatch(logHistoryBatchThunk(historyBatch, engine));
 
                 return response
             } catch (error) {

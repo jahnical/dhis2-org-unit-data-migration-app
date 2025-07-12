@@ -42,6 +42,11 @@ const OrgUnitSelection = ({
             addParentGraphMap(forParentGraphMap)
             setSelected(item)
             if (isSourceOrgUnit) {
+                // Log source org unit selection for history/debugging
+                console.log('[History][Source OrgUnit Selected]', {
+                    id: item.id,
+                    name: item.name || item.displayName
+                })
                 dispatch(dataActionCreators.setSourceOrgUnit(item.id))
             } else {
                 dispatch(migrationActions.setTargetOrgUnit(item.id))
