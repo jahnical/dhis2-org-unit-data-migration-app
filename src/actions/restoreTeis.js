@@ -51,10 +51,11 @@ export const restoreTeisBatchesThunk = (batchIds, engine) => async (dispatch, ge
                 date: new Date().toISOString().slice(0, 10),
                 time: new Date().toLocaleTimeString(),
             }
-            await require('./history').logHistoryBatchThunk(restoredBatch, engine)(dispatch, getState)
+            // Corrected: Use the imported logHistoryBatchThunk directly
+            await dispatch(logHistoryBatchThunk(restoredBatch, engine))
         }
     } catch (error) {
         // Optionally handle error
-        console.error('Restore failed:', error)
+        console.error('Error during restore process:', error)
     }
 }

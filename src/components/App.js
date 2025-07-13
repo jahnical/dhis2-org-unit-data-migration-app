@@ -25,10 +25,9 @@ import LoadingMask from './LoadingMask/LoadingMask.js'
 import MainSidebar from './MainSidebar/MainSidebar.js'
 import { Toolbar } from './Toolbar/Toolbar.js'
 import StartScreen from './Visualization/StartScreen.js'
-import History from './MigrationHistory/History'
+import History from './MigrationHistory/History.js'
 import { useDataEngine } from '@dhis2/app-runtime'
-import { useEffect } from 'react'
-import { loadMigrationHistory, cleanupOldHistoryThunk } from '../actions/historyThunks'
+import { loadMigrationHistory, cleanupOldHistory } from '../actions/history'
 
 const App = () => {
     const programId = useSelector(sGetUiProgramId)
@@ -39,8 +38,7 @@ const App = () => {
     const isLoading = useSelector(sGetIsVisualizationLoading)
     const error = useSelector(sGetLoadError)
     const { systemSettings, rootOrgUnits } = useCachedDataQuery()
-    const digitGroupSeparator =
-        systemSettings[SYSTEM_SETTINGS_DIGIT_GROUP_SEPARATOR]
+    const digitGroupSeparator = systemSettings?.[SYSTEM_SETTINGS_DIGIT_GROUP_SEPARATOR]
     const engine = useDataEngine()
 
     const loadVisualization = async (location) => {
@@ -65,9 +63,13 @@ const App = () => {
     const handleTabChange = (index) => setTabIndex(index)
 
     useEffect(() => {
-        dispatch(tSetInitMetadata(rootOrgUnits))
-        loadVisualization(history.location)
-    }, [])
+        if (rootOrgUnits) {
+            dispatch(tSetInitMetadata(rootOrgUnits))
+            if (history?.location) {
+                loadVisualization(history.location)
+            }
+        }
+    }, [rootOrgUnits])
 
     // Log logged-in user on mount
     useEffect(() => {
@@ -87,7 +89,7 @@ const App = () => {
     useEffect(() => {
         // On app startup, load and cleanup migration history
         dispatch(loadMigrationHistory(engine))
-        dispatch(cleanupOldHistoryThunk(engine))
+        dispatch(cleanupOldHistory(engine))
     }, [dispatch, engine])
 
     return (
