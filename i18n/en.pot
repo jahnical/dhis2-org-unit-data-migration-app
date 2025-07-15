@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-14T06:02:07.271Z\n"
-"PO-Revision-Date: 2025-07-14T06:02:07.271Z\n"
+"POT-Creation-Date: 2025-07-15T10:03:54.558Z\n"
+"PO-Revision-Date: 2025-07-15T10:03:54.558Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -190,6 +190,9 @@ msgstr "Remove Filter"
 
 msgid "Apply Filter"
 msgstr "Apply Filter"
+
+msgid "Reset Filters"
+msgstr "Reset Filters"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"

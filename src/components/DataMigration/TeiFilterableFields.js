@@ -24,6 +24,7 @@ import {
     IconSubtractCircle24,
     SingleSelectField,
     SingleSelectOption,
+    IconCross24
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -507,36 +508,31 @@ const TeiFilterableFields = () => {
     }
 
     return (
-        <div className={classes.container}>
-            <Box padding="16px">
-                <div className={classes.attributesWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '0.8em', padding: '16px', fontWeight: '500', color: 'grey' }}>
-                        {i18n.t('Filterable Fields:')}
-                    </span>
-                    <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap' }}>
-                        {fields.map((field) => (
-                            <Chip
-                                key={field.name}
-                                onClick={() => handleFieldClick(field)}
-                                icon={<IconFilter24 />}
-                                selected={isActiveFilter(field)}
-                            >
-                                {field.name}
-                            </Chip>
-                        ))}
-                    </div>
-                    <Button
-                        small
-                        secondary
-                        style={{ marginLeft: 'auto' }}
-                        onClick={() => dispatch(dataActionCreators.setFilters([]))}
-                    >
-                        {i18n.t('Reset Filters')}
-                    </Button>
-                </div>
-            </Box>
-            {renderFilterDialog()}
-        </div>
+<div className={classes.attributesWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <span style={{ fontSize: '0.8em', padding: '16px', fontWeight: '500', color: 'grey' }}>
+        {i18n.t('Filterable Fields:')}
+    </span>
+    <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap' }}>
+        {fields.map((field) => (
+            <Chip
+                key={field.name}
+                onClick={() => handleFieldClick(field)}
+                icon={<IconFilter24 />}
+                selected={isActiveFilter(field)}
+            >
+                {field.name}
+            </Chip>
+        ))}
+    </div>
+    <Chip
+        onClick={() => dispatch(dataActionCreators.setFilters([]))}
+        icon={<IconCross24 />}
+        selected={false}
+        style={{ marginLeft: 16, marginRight: 16 }}
+    >
+        {i18n.t('Reset Filters')}
+    </Chip>
+</div>
     )
 }
 
