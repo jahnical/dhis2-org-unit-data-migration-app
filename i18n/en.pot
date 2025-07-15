@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-11T08:43:49.914Z\n"
-"PO-Revision-Date: 2025-07-11T08:43:49.915Z\n"
+"POT-Creation-Date: 2025-07-14T12:30:02.425Z\n"
+"PO-Revision-Date: 2025-07-14T12:30:02.425Z\n"
 
 msgid ""
 "The TEIs couldn't be deleted. Please try again or contact your system "
@@ -137,8 +137,11 @@ msgstr "Next"
 msgid "Confirm Migration"
 msgstr "Confirm Migration"
 
-msgid "Loading TEI history..."
-msgstr "Loading TEI history..."
+msgid "No restorable TEIs selected"
+msgstr "No restorable TEIs selected"
+
+msgid "Restore failed"
+msgstr "Restore failed"
 
 msgid "No filters selected"
 msgstr "No filters selected"
@@ -158,10 +161,18 @@ msgstr "No deleted TEIs found"
 msgid "There are no deleted TEIs for the selected filters."
 msgstr "There are no deleted TEIs for the selected filters."
 
+msgid "Successfully restored {{count}} TEIs"
+msgid_plural "Successfully restored {{count}} TEIs"
+msgstr[0] "Successfully restored {{count}} TEIs"
+msgstr[1] "Successfully restored {{count}} TEIs"
+
 msgid "{{count}} Selected of Deleted TEIs"
 msgid_plural "{{count}} Selected of Deleted TEIs"
 msgstr[0] "{{count}} Selected of Deleted TEIs"
 msgstr[1] "{{count}} Selected of Deleted TEIs"
+
+msgid "Restoring..."
+msgstr "Restoring..."
 
 msgid "Restore"
 msgstr "Restore"
@@ -175,16 +186,38 @@ msgstr "Created"
 msgid "Last Updated"
 msgstr "Last Updated"
 
-msgid "Restore TEIs"
-msgstr "Restore TEIs"
+msgid "Confirm Restoration"
+msgstr "Confirm Restoration"
 
-msgid "Are you sure you want to restore {{count}} TEI(s)?"
-msgid_plural "Are you sure you want to restore {{count}} TEI(s)?"
-msgstr[0] "Are you sure you want to restore {{count}} TEI(s)?"
-msgstr[1] "Are you sure you want to restore {{count}} TEI(s)?"
+msgid "You are about to restore {{count}} TEIs. This will make them active again."
+msgid_plural "You are about to restore {{count}} TEIs. This will make them active again."
+msgstr[0] "You are about to restore {{count}} TEIs. This will make them active again."
+msgstr[1] "You are about to restore {{count}} TEIs. This will make them active again."
 
-msgid "Restoring..."
-msgstr "Restoring..."
+msgid "Confirm Restore"
+msgstr "Confirm Restore"
+
+msgid "Could not load TEIs"
+msgstr "Could not load TEIs"
+
+msgid ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
 
 msgid "Filter by \"{{name}}\""
 msgstr "Filter by \"{{name}}\""
@@ -222,48 +255,8 @@ msgstr "Remove Filter"
 msgid "Apply Filter"
 msgstr "Apply Filter"
 
-msgid "Could not load TEIs"
-msgstr "Could not load TEIs"
-
-msgid ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-
-msgid "Created At"
-msgstr "Created At"
-
-msgid "Last Updated At"
-msgstr "Last Updated At"
-
-msgid "Stored By"
-msgstr "Stored By"
-
-msgid "Last Updated By"
-msgstr "Last Updated By"
-
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
-
-msgid "No items selected"
-msgstr "No items selected"
-
-msgid "Available options"
-msgstr "Available options"
-
-msgid "Filter options"
-msgstr "Filter options"
-
-msgid "Selected options"
-msgstr "Selected options"
-
-msgid "Nothing found for \"{{- searchTerm}}\""
-msgstr "Nothing found for \"{{- searchTerm}}\""
-
-msgid "No options"
-msgstr "No options"
 
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
@@ -352,6 +345,24 @@ msgstr "Start date"
 
 msgid "End date"
 msgstr "End date"
+
+msgid "No items selected"
+msgstr "No items selected"
+
+msgid "Available options"
+msgstr "Available options"
+
+msgid "Filter options"
+msgstr "Filter options"
+
+msgid "Selected options"
+msgstr "Selected options"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Nothing found for \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "No options"
 
 msgid "all"
 msgstr "all"

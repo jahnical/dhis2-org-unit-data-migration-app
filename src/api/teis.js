@@ -1,3 +1,139 @@
+// Helper to generate a random DHIS2 UID (11 chars, [A-Za-z0-9], first char is a letter)
+    function generateDhis2Uid() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let uid = chars.charAt(Math.floor(Math.random() * 52)); // first char: only letters
+        for (let i = 1; i < 11; i++) {
+            uid += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return uid;
+    }
+
+    const updateUIDs = (tei) => {
+        // Clone the TEI to avoid mutating the original
+        const newTei = { ...tei, id: null };
+
+        // Generate new TEI UID
+        const oldTeiUid = newTei.trackedEntityInstance;
+        const newTeiUid = generateDhis2Uid();
+        newTei.trackedEntityInstance = newTeiUid;
+
+        // Update programOwners
+        if (Array.isArray(newTei.programOwners)) {
+            newTei.programOwners = newTei.programOwners.map(owner => ({
+                ...owner,
+                trackedEntityInstance: newTeiUid
+            }));
+        }
+
+        // Update relationships (if any reference this TEI)
+        if (Array.isArray(newTei.relationships)) {
+            newTei.relationships = newTei.relationships.map(rel => {
+                const newRel = { ...rel };
+                if (newRel.from && newRel.from.trackedEntityInstance && newRel.from.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
+                    newRel.from = {
+                        ...newRel.from,
+                        trackedEntityInstance: {
+                            ...newRel.from.trackedEntityInstance,
+                            trackedEntityInstance: newTeiUid
+                        }
+                    };
+                }
+                if (newRel.to && newRel.to.trackedEntityInstance && newRel.to.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
+                    newRel.to = {
+                        ...newRel.to,
+                        trackedEntityInstance: {
+                            ...newRel.to.trackedEntityInstance,
+                            trackedEntityInstance: newTeiUid
+                        }
+                    };
+                }
+                return newRel;
+            });
+        }
+
+        // Map of old enrollment IDs to new ones
+        const enrollmentIdMap = {};
+        // Map of old event IDs to new ones (not strictly needed, but for completeness)
+        const eventIdMap = {};
+
+        // Update enrollments
+        if (Array.isArray(newTei.enrollments)) {
+            newTei.enrollments = newTei.enrollments.map(enrollment => {
+                const newEnrollment = { ...enrollment };
+                const oldEnrollmentId = newEnrollment.enrollment;
+                const newEnrollmentId = generateDhis2Uid();
+                enrollmentIdMap[oldEnrollmentId] = newEnrollmentId;
+                newEnrollment.enrollment = newEnrollmentId;
+                newEnrollment.trackedEntityInstance = newTeiUid;
+
+                // Update events
+                if (Array.isArray(newEnrollment.events)) {
+                    newEnrollment.events = newEnrollment.events.map(event => {
+                        const newEvent = { ...event };
+                        const oldEventId = newEvent.event;
+                        const newEventId = generateDhis2Uid();
+                        eventIdMap[oldEventId] = newEventId;
+                        newEvent.event = newEventId;
+                        newEvent.trackedEntityInstance = newTeiUid;
+                        newEvent.enrollment = newEnrollmentId;
+                        return newEvent;
+                    });
+                }
+
+                return newEnrollment;
+            });
+        }
+
+        // Update programOwners (again, for completeness, if any reference old TEI UID)
+        if (Array.isArray(newTei.programOwners)) {
+            newTei.programOwners = newTei.programOwners.map(owner => ({
+                ...owner,
+                trackedEntityInstance: newTeiUid
+            }));
+        }
+
+        // Update relationships inside enrollments/events if present
+        if (Array.isArray(newTei.enrollments)) {
+            newTei.enrollments = newTei.enrollments.map(enrollment => {
+                const newEnrollment = { ...enrollment };
+                if (Array.isArray(newEnrollment.events)) {
+                    newEnrollment.events = newEnrollment.events.map(event => {
+                        const newEvent = { ...event };
+                        // If relationships exist in event, update trackedEntityInstance/enrollment/event references
+                        if (Array.isArray(newEvent.relationships)) {
+                            newEvent.relationships = newEvent.relationships.map(rel => {
+                                const newRel = { ...rel };
+                                if (newRel.from && newRel.from.trackedEntityInstance && newRel.from.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
+                                    newRel.from = {
+                                        ...newRel.from,
+                                        trackedEntityInstance: {
+                                            ...newRel.from.trackedEntityInstance,
+                                            trackedEntityInstance: newTeiUid
+                                        }
+                                    };
+                                }
+                                if (newRel.to && newRel.to.trackedEntityInstance && newRel.to.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
+                                    newRel.to = {
+                                        ...newRel.to,
+                                        trackedEntityInstance: {
+                                            ...newRel.to.trackedEntityInstance,
+                                            trackedEntityInstance: newTeiUid
+                                        }
+                                    };
+                                }
+                                return newRel;
+                            });
+                        }
+                        return newEvent;
+                    });
+                }
+                return newEnrollment;
+            });
+        }
+
+        return newTei;
+    };
+
 /**
  * API helpers for soft deleting and restoring TEIs using DHIS2 native endpoints.
  */
@@ -28,6 +164,72 @@ export const deleteTEI = async (engine, teiUid) => {
     // Rethrow a more informative error for the UI
     throw new Error(errorMsg)
   }
+}
+
+export const newRestoreTEI = async (engine, teis) => {
+    if (!teis) {
+        throw new Error('TEIs is required for restoration')
+    }
+
+    try {
+        // Update the deleted flag to false
+        const updatedTeis = teis.map(tei => {
+            console.log(`Restoring TEI: ${tei.trackedEntityInstance || tei.id}`)
+            console.log('Original TEI data:', tei)
+            const updatedTei = { ...tei }
+            updatedTei.deleted = false
+
+            // Update enrollemnts
+            if (updatedTei.enrollments) {
+                updatedTei.enrollments = updatedTei.enrollments.map(enrollment => {
+                    const updatedEnrollment = { ...enrollment }
+                    updatedEnrollment.deleted = false
+
+                    // Update events
+                    if (updatedEnrollment.events) {
+                        updatedEnrollment.events = updatedEnrollment.events.map(event => {
+                            const updatedEvent = { ...event }
+                            updatedEvent.deleted = false
+                            return updatedEvent
+                        })
+                    }
+
+                    return updatedEnrollment
+                })
+            }
+
+            console.log('Updated TEI data for restoration:', updatedTei)
+            return updateUIDs(updatedTei)
+        })
+
+        // for (const tei of updatedTeis) {
+        //
+        //     await engine.mutate({
+        //         resource: `trackedEntityInstances/${tei.trackedEntityInstance}`,
+        //         type: 'update',
+        //         data: tei,
+        //         params: {
+        //             force: true,
+        //             mergeMode: 'MERGE',
+
+        //         },
+        //     });
+        // }
+
+        const response = await engine.mutate({
+            resource: `trackedEntityInstances`,
+            type: 'create',
+            data: {
+                trackedEntityInstances: updatedTeis,
+            },
+        })
+        console.info(`Successfully restored TEIs: ${teis.map(tei => tei.trackedEntityInstance || tei.id).join(', ')}`)
+        return response
+    } catch (error) {
+        console.error('Failed to restore TEIs:', error)
+        // Rethrow a more informative error for the UI
+        throw new Error(`Failed to restore TEIs: ${error.message || error}`)
+    }
 }
 
 /**
@@ -228,7 +430,7 @@ export const restoreTEI = async (engine, teiUid, orgUnitId, programId) => {
 
         // 5. Strategy 3: Step-by-step restoration
         console.log('Attempting step-by-step restoration...');
-        
+
         // Step 3a: First restore just the TEI without enrollments
         const teiOnlyPayload = {
             trackedEntityInstance: teiUid,
@@ -259,7 +461,7 @@ export const restoreTEI = async (engine, teiUid, orgUnitId, programId) => {
         // Step 3b: Then restore enrollments separately if they exist
         if (teiData.enrollments && teiData.enrollments.length > 0) {
             console.log('Restoring enrollments...');
-            
+
             for (const enrollment of teiData.enrollments) {
                 try {
                     const enrollmentPayload = {
@@ -329,7 +531,7 @@ export const restoreTEI = async (engine, teiUid, orgUnitId, programId) => {
 // Helper function to verify restoration
 const verifyRestoration = async (engine, teiUid, orgUnitId, programId, response) => {
     console.log('Verifying restoration...');
-    
+
     try {
         const verificationQuery = {
             verification: {
@@ -349,12 +551,12 @@ const verifyRestoration = async (engine, teiUid, orgUnitId, programId, response)
 
         if (restoredTEI && !restoredTEI.deleted) {
             console.log('TEI restoration verified successfully');
-            
+
             const activeEnrollments = restoredTEI.enrollments?.filter(e => !e.deleted) || [];
             const totalEvents = activeEnrollments.reduce((sum, e) => sum + (e.events?.length || 0), 0);
-            const activeEvents = activeEnrollments.reduce((sum, e) => 
+            const activeEvents = activeEnrollments.reduce((sum, e) =>
                 sum + (e.events?.filter(ev => !ev.deleted)?.length || 0), 0);
-            
+
             return {
                 success: true,
                 trackedEntity: teiUid,
@@ -397,7 +599,7 @@ const verifyRestoration = async (engine, teiUid, orgUnitId, programId, response)
 // Helper function to restore multiple TEIs
 export const restoreMultipleTEIs = async (engine, teiList) => {
     const results = [];
-    
+
     for (const teiInfo of teiList) {
         try {
             const result = await restoreTEI(engine, teiInfo.teiUid, teiInfo.orgUnitId, teiInfo.programId);
@@ -413,7 +615,7 @@ export const restoreMultipleTEIs = async (engine, teiList) => {
             });
         }
     }
-    
+
     return results;
 };
 
@@ -421,12 +623,12 @@ export const restoreMultipleTEIs = async (engine, teiList) => {
 export const runAnalyticsAfterRestore = async (engine) => {
     try {
         console.log('Starting analytics after TEI restoration...');
-        
+
         const analyticsResponse = await engine.mutate({
             resource: 'system/tasks/ANALYTICS_TABLE',
             type: 'create'
         });
-        
+
         console.log('Analytics started:', analyticsResponse);
         return analyticsResponse;
     } catch (error) {
@@ -439,7 +641,7 @@ export const runAnalyticsAfterRestore = async (engine) => {
 const verifyTEIRestoration = async (engine, teiUid, orgUnitId, programId) => {
     try {
         console.log('Verifying TEI restoration...');
-        
+
         // Query for the TEI without includeDeleted to see if it's now active
         const verificationQuery = {
             tei: {
@@ -454,10 +656,10 @@ const verifyTEIRestoration = async (engine, teiUid, orgUnitId, programId) => {
                 }
             }
         };
-        
+
         const verificationResponse = await engine.query(verificationQuery);
         const activeTEI = verificationResponse?.tei?.instances?.[0];
-        
+
         if (activeTEI) {
             console.log('TEI restoration verified: TEI is now active');
             return {
@@ -472,7 +674,7 @@ const verifyTEIRestoration = async (engine, teiUid, orgUnitId, programId) => {
                 message: 'TEI restoration completed but TEI is still not active'
             };
         }
-        
+
     } catch (error) {
         console.error('Error verifying TEI restoration:', error);
         return {

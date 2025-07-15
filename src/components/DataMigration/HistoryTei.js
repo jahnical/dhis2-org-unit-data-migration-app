@@ -40,6 +40,7 @@ const HistoryTei = () => {
     const loading = useSelector(sGetHistoryTeisIsLoading);
     const error = useSelector(sGetHistoryTeisError);
     const selectedTeis = useSelector(sGetHistorySelectedTeis);
+    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
     const attributesToDisplay = useSelector(sGetHistoryTeisAttributesToDisplay);
     const restoreLoading = useSelector(deletionSelectors.getDeletionIsLoading);
 
@@ -50,12 +51,12 @@ const HistoryTei = () => {
     const [restoreSummary, setRestoreSummary] = useState(null);
 
     // Memoized data
-    const deletedTeis = useMemo(() => 
-        (teis || []).filter(tei => tei.deleted === true && tei.trackedEntityInstance), 
+    const deletedTeis = useMemo(() =>
+        (teis || []).filter(tei => tei.deleted === true && tei.trackedEntityInstance),
         [teis]
     );
-    const displayTeis = useMemo(() => 
-        status === 'deleted' ? deletedTeis.slice(0, MAX_DISPLAY_ROWS) : [], 
+    const displayTeis = useMemo(() =>
+        status === 'deleted' ? deletedTeis.slice(0, MAX_DISPLAY_ROWS) : [],
         [status, deletedTeis]
     );
 
@@ -98,11 +99,11 @@ const HistoryTei = () => {
 
  const handleRestore = async () => {
     setRestoreSummary(null);
-    
+
     const restorableTeis = displayTeis.filter(
         tei => selectedTeis.includes(tei.trackedEntityInstance) && tei.deleted
     );
-    
+
     if (restorableTeis.length === 0) {
         setRestoreSummary({
             success: [],
@@ -119,9 +120,10 @@ const HistoryTei = () => {
         });
 
         const results = await Promise.allSettled(
-            restorableTeis.map(tei => 
+            restorableTeis.map(tei =>
                 dispatch(restoreTeis({
                     teiUids: [tei.trackedEntityInstance],
+                    teis: allTeis.filter(t => t.trackedEntityInstance == tei.trackedEntityInstance),
                     engine,
                     orgUnitId,
                     programId,
@@ -134,7 +136,7 @@ const HistoryTei = () => {
 
         const success = [];
         const errors = [];
-        
+
         results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
                 success.push(restorableTeis[index].trackedEntityInstance);
@@ -198,7 +200,7 @@ const HistoryTei = () => {
         <div className={classes.container}>
             {/* Fixed AlertBar implementation */}
             {restoreSummary && (
-                <AlertBar 
+                <AlertBar
                     duration={8000}
                     {...(restoreSummary.error ? { critical: true } : { success: true })}
                 >
@@ -234,7 +236,7 @@ const HistoryTei = () => {
                     </DropdownButton>
                 </div>
 
-                <Button 
+                <Button
                     disabled={!selectedTeis.length || restoreLoading}
                     onClick={() => setShowRestoreModal(true)}
                     className={classes.restoreButton}
@@ -301,15 +303,15 @@ const HistoryTei = () => {
                     </ModalContent>
                     <ModalActions>
                         <ButtonStrip end>
-                            <Button 
-                                secondary 
+                            <Button
+                                secondary
                                 onClick={() => setShowRestoreModal(false)}
                                 disabled={restoreLoading}
                             >
                                 {i18n.t('Cancel')}
                             </Button>
-                            <Button 
-                                primary 
+                            <Button
+                                primary
                                 onClick={handleRestore}
                                 disabled={restoreLoading}
                             >

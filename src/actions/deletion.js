@@ -1,5 +1,5 @@
+import { deleteTEI, restoreTEI, newRestoreTEI } from '../api/teis'
 import { DELETION_TYPES } from '../reducers/deletion'
-import { deleteTEI, restoreTEI } from '../api/teis'
 
 /**
  * Native soft delete multiple TEIs using the DELETE endpoint.
@@ -53,7 +53,7 @@ export const deleteTeis = ({ teiUids, engine }) => async (dispatch) => {
  * @param {object} engine - DHIS2 app-runtime data engine
  * @param {Function} fetchAfterRestore - Optional callback to refresh TEIs
  */
-export const restoreTeis = ({ teiUids, engine, orgUnitId, programId, fetchAfterRestore }) => 
+export const restoreTeis = ({ teiUids, teis, engine, orgUnitId, programId, fetchAfterRestore }) =>
     async (dispatch) => {
         if (!teiUids?.length) {
             dispatch({
@@ -63,28 +63,30 @@ export const restoreTeis = ({ teiUids, engine, orgUnitId, programId, fetchAfterR
             return;
         }
 
+        console.log('Restoring TEIs:', teis, 'for UIDs:', teiUids);
+
         dispatch({ type: DELETION_TYPES.RESTORE_TEIS_START });
-        
+
         try {
             // Process TEIs one at a time to ensure reliable restoration
             const results = [];
-            
+
             for (const teiUid of teiUids) {
                 try {
-                    const result = await restoreTEI(engine, teiUid, orgUnitId, programId);
-                    results.push({ 
-                        status: 'fulfilled', 
+                    const result = await newRestoreTEI(engine, teis);
+                    results.push({
+                        status: 'fulfilled',
                         value: result,
-                        teiUid: teiUid 
+                        teiUid: teiUid
                     });
-                    
+
                     // Small delay between operations
                     await new Promise(resolve => setTimeout(resolve, 300));
                 } catch (error) {
-                    results.push({ 
-                        status: 'rejected', 
+                    results.push({
+                        status: 'rejected',
                         reason: error,
-                        teiUid: teiUid 
+                        teiUid: teiUid
                     });
                 }
             }
@@ -92,10 +94,10 @@ export const restoreTeis = ({ teiUids, engine, orgUnitId, programId, fetchAfterR
             // Process results
             const successes = results.filter(r => r.status === 'fulfilled');
             const failures = results.filter(r => r.status === 'rejected');
-            
+
             // Get successfully restored TEI IDs
             const restoredTeis = successes.map(s => s.value.trackedEntity || s.teiUid);
-            
+
             // Dispatch success for completed restorations
             if (successes.length > 0) {
                 dispatch({
@@ -107,19 +109,19 @@ export const restoreTeis = ({ teiUids, engine, orgUnitId, programId, fetchAfterR
                     }
                 });
             }
-            
+
             // Handle any failures
             if (failures.length > 0) {
-                const errorMessages = failures.map(f => 
+                const errorMessages = failures.map(f =>
                     `TEI ${f.teiUid}: ${f.reason?.message || 'Unknown error'}`
                 );
-                
+
                 dispatch({
                     type: DELETION_TYPES.RESTORE_TEIS_ERROR,
                     payload: `Failed to restore ${failures.length} TEI${failures.length > 1 ? 's' : ''}:\n${errorMessages.join('\n')}`
                 });
             }
-            
+
             // Refresh data if callback provided
             if (typeof fetchAfterRestore === 'function') {
                 try {
@@ -128,9 +130,9 @@ export const restoreTeis = ({ teiUids, engine, orgUnitId, programId, fetchAfterR
                     console.error('Failed to refresh data after restoration:', fetchError);
                 }
             }
-            
+
             return restoredTeis;
-            
+
         } catch (error) {
             console.error('Restoration process failed:', error);
             dispatch({
