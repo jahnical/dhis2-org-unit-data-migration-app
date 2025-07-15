@@ -72,29 +72,49 @@ export const filterTeis = (teis, filters) => {
                 }
             })
 
+    if (!filters || filters.length === 0) {
+        return teis
+    }
+
     const filteredTeis = teis.filter((tei) => {
-        return filters.every((filter) => {
+        return filters.some((filter) => {
             const value = tei.filterableFields.find(
                 (field) => field.name === filter.field
             )?.value
-            if (filter.min && value < filter.min) {
-                return false
-            }
-            if (filter.max && value > filter.max) {
-                return false
-            }
-            if (filter.startDate && value < filter.startDate) {
-                return false
-            }
-            if (filter.endDate && value > filter.endDate) {
-                return false
-            }
-            if (
-                filter.keyword &&
-                !value?.toLowerCase().includes(filter.keyword.toLowerCase())
-            ) {
-                return false
-            }
+                if (filter.type === 'user' && filter.username) {
+                    if (!value || !filter.username) return false
+                    return value.trim().toLowerCase() === filter.username.trim().toLowerCase()
+                }
+                if (filter.min && value < filter.min) {
+                    return false
+                }
+                if (filter.max && value > filter.max) {
+                    return false
+                }
+                if (filter.startDate) {
+                    let filterStart = filter.startDate
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(filterStart)) {
+                        filterStart = filterStart + 'T00:00:00.000'
+                    }
+                    if (value < filterStart) {
+                        return false
+                    }
+                }
+                if (filter.endDate) {
+                    let filterEnd = filter.endDate
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(filterEnd)) {
+                        filterEnd = filterEnd + 'T23:59:59.999'
+                    }
+                    if (value > filterEnd) {
+                        return false
+                    }
+                }
+                if (
+                    filter.keyword &&
+                    !value?.toLowerCase().includes(filter.keyword.toLowerCase())
+                ) {
+                    return false
+                }
             return true
         })
     })

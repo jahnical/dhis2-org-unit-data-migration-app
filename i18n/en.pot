@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-10T12:58:52.364Z\n"
-"PO-Revision-Date: 2025-07-10T12:58:52.364Z\n"
+"POT-Creation-Date: 2025-07-14T06:02:07.271Z\n"
+"PO-Revision-Date: 2025-07-14T06:02:07.271Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -143,8 +143,11 @@ msgstr "Add Column"
 msgid "Remove Column"
 msgstr "Remove Column"
 
-msgid "Select number range"
-msgstr "Select number range"
+msgid "Number Ranges"
+msgstr "Number Ranges"
+
+msgid "Add Range"
+msgstr "Add Range"
 
 msgid "Min value"
 msgstr "Min value"
@@ -152,11 +155,35 @@ msgstr "Min value"
 msgid "Max value"
 msgstr "Max value"
 
-msgid "Select username"
-msgstr "Select username"
+msgid "Remove"
+msgstr "Remove"
 
-msgid "Enter keyword"
-msgstr "Enter keyword"
+msgid "Date Ranges"
+msgstr "Date Ranges"
+
+msgid "Start date"
+msgstr "Start date"
+
+msgid "End date"
+msgstr "End date"
+
+msgid "Select Users"
+msgstr "Select Users"
+
+msgid "Add User Filter"
+msgstr "Add User Filter"
+
+msgid "Select user"
+msgstr "Select user"
+
+msgid "Keywords"
+msgstr "Keywords"
+
+msgid "Add Keyword"
+msgstr "Add Keyword"
+
+msgid "Keyword"
+msgstr "Keyword"
 
 msgid "Remove Filter"
 msgstr "Remove Filter"
@@ -172,9 +199,6 @@ msgstr "Choose a condition type"
 
 msgid "Case sensitive"
 msgstr "Case sensitive"
-
-msgid "Remove"
-msgstr "Remove"
 
 msgid "and"
 msgstr "and"
@@ -248,12 +272,6 @@ msgstr "Define start - end dates"
 
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
-
-msgid "Start date"
-msgstr "Start date"
-
-msgid "End date"
-msgstr "End date"
 
 msgid "No items selected"
 msgstr "No items selected"
