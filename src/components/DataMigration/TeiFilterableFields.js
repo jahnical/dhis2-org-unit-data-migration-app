@@ -47,7 +47,6 @@ const TeiFilterableFields = () => {
         dataControlSelectors.getDataControlAttributesToDisplay
     )
 
-    // Unified conditions state
     const [conditions, setConditions] = useState({})
 
     useEffect(() => {
@@ -65,7 +64,7 @@ const TeiFilterableFields = () => {
                 new Set(
                     allTEIs
                         .map(tei => tei.attributes.find(attr => attr?.storedBy)?.storedBy)
-                        .filter(Boolean) // remove undefined/null
+                        .filter(Boolean)
                 )
             )
         )
@@ -80,12 +79,10 @@ const TeiFilterableFields = () => {
         )
     }, [allTEIs])
 
-    // Get available users based on field type
     const availableUsers = selectedField?.name === 'Stored By' 
         ? storedByOptions 
         : lastUpdatedByOptions
 
-    // Check if user is already selected in other conditions
     const isUserAlreadySelected = (user, currentIndex) => {
         return (conditions[selectedField?.name] || [])
             .some((cond, idx) => idx !== currentIndex && cond.username === user)
@@ -94,7 +91,6 @@ const TeiFilterableFields = () => {
     const handleFieldClick = (field) => {
         setSelectedField(field)
         
-        // Initialize conditions from existing filters
         const fieldFilters = filters.filter(f => f.field === field.name)
         
         if (fieldFilters.length > 0) {
@@ -120,14 +116,10 @@ const TeiFilterableFields = () => {
                 } else if (field.valueType === VALUE_TYPE_TEXT) {
                     return { 
                         type: field.valueType, 
-                        keyword: filter.keyword || '' 
-                    }
-                } else if (field.name === 'Stored By' || field.name === 'Last Updated By') {
-                    return { 
-                        type: 'user', 
+                        keyword: filter.keyword || '',
                         username: filter.username || '' 
                     }
-                }
+                } 
                 return createEmptyCondition(field)
             })
             
@@ -136,7 +128,6 @@ const TeiFilterableFields = () => {
                 [field.name]: newConditions
             }))
         } else {
-            // Ensure at least one empty condition exists
             setConditions(prev => ({
                 ...prev,
                 [field.name]: [createEmptyCondition(field)]
@@ -206,9 +197,7 @@ const TeiFilterableFields = () => {
             case VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE:
                 return { type: field.valueType, min: '', max: '' }
             case VALUE_TYPE_TEXT:
-                return { type: field.valueType, keyword: '' }
-            case 'user':
-                return { type: 'user', username: '' }
+                return { type: field.valueType, keyword: '', username: '' }
             default:
                 return {}
         }
@@ -261,7 +250,7 @@ const TeiFilterableFields = () => {
                         keyword: condition.keyword
                     })
                 }
-                else if (condition.type === 'user' && condition.username) {
+                else if (condition.type === VALUE_TYPE_TEXT && condition.username) {
                     newFilters.push({
                         ...baseFilter,
                         username: condition.username
@@ -289,9 +278,7 @@ const TeiFilterableFields = () => {
             case VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE:
                 return condition.min !== '' && condition.max !== ''
             case VALUE_TYPE_TEXT:
-                return condition.keyword !== ''
-            case 'user':
-                return condition.username !== ''
+                return condition.keyword !== '' || condition.username !== ''
             default:
                 return false
         }
@@ -314,7 +301,6 @@ const TeiFilterableFields = () => {
                     return condition.min !== '' && condition.max !== '' && 
                         !isNaN(condition.min) && !isNaN(condition.max)
                 case VALUE_TYPE_TEXT:
-                case 'user':
                     return condition.keyword || condition.username
                 default:
                     return false
@@ -523,20 +509,30 @@ const TeiFilterableFields = () => {
     return (
         <div className={classes.container}>
             <Box padding="16px">
-                <div className={classes.attributesWrapper}>
+                <div className={classes.attributesWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '0.8em', padding: '16px', fontWeight: '500', color: 'grey' }}>
                         {i18n.t('Filterable Fields:')}
                     </span>
-                    {fields.map((field) => (
-                        <Chip
-                            key={field.name}
-                            onClick={() => handleFieldClick(field)}
-                            icon={<IconFilter24 />}
-                            selected={isActiveFilter(field)}
-                        >
-                            {field.name}
-                        </Chip>
-                    ))}
+                    <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap' }}>
+                        {fields.map((field) => (
+                            <Chip
+                                key={field.name}
+                                onClick={() => handleFieldClick(field)}
+                                icon={<IconFilter24 />}
+                                selected={isActiveFilter(field)}
+                            >
+                                {field.name}
+                            </Chip>
+                        ))}
+                    </div>
+                    <Button
+                        small
+                        secondary
+                        style={{ marginLeft: 'auto' }}
+                        onClick={() => dispatch(dataActionCreators.setFilters([]))}
+                    >
+                        {i18n.t('Reset Filters')}
+                    </Button>
                 </div>
             </Box>
             {renderFilterDialog()}
