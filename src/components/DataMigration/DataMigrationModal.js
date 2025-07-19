@@ -20,7 +20,7 @@ import {
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { sGetMetadata } from '../../reducers/metadata.js'
 import { migrationSelectors } from '../../reducers/migration.js'
-import OrgUnitSelection from './OrgUnitSelection.js'
+import OrgUnitSelection from '../SearchableOrgUnitTree/OrgUnitSelection.js'
 
 const DataMigrationModal = ({ onClose }) => {
     const [step, setStep] = useState('selection') // selection, preview, migrating
