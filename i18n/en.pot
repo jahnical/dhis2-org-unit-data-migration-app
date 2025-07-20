@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-19T23:08:33.952Z\n"
-"PO-Revision-Date: 2025-07-19T23:08:33.953Z\n"
+"POT-Creation-Date: 2025-07-20T11:45:53.563Z\n"
+"PO-Revision-Date: 2025-07-20T11:45:53.563Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -91,6 +91,9 @@ msgstr "Migration successful"
 
 msgid "All TEIs have been successfully migrated to the selected org unit."
 msgstr "All TEIs have been successfully migrated to the selected org unit."
+
+msgid "Back"
+msgstr "Back"
 
 msgid "Next"
 msgstr "Next"

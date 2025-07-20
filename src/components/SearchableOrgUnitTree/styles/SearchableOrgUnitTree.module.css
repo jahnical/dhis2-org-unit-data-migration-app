@@ -102,3 +102,29 @@
 .compactWrapper .searchFilterWrapper {
     padding: var(--spacers-dp4) var(--spacers-dp8);
 }
+
+/* Selected org unit text */
+.selectedOrgUnitWrapper {
+    composes: horizontalPadding;
+    padding: var(--spacers-dp8);
+    font-size: 14px;
+    color: var(--colors-grey800);
+    margin: 0;
+    margin-top: var(--spacers-dp4);
+}
+
+.selectedPrefix {
+    color: var(--colors-grey800);
+}
+
+.selectedName {
+    font-weight: 600;
+    color: var(--colors-grey800);
+}
+
+/* Compact mode adjustments for selected org unit */
+.compactWrapper .selectedOrgUnitWrapper {
+    padding: var(--spacers-dp4) var(--spacers-dp8);
+    font-size: 12px;
+    margin-top: var(--spacers-dp2);
+}
