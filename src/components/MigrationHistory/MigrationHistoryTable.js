@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { DataTable, DataTableHead, DataTableRow, DataTableCell, DataTableColumnHeader, DataTableBody, Checkbox } from '@dhis2/ui'
 
-const COLUMN_DEFS = [
+const ALL_COLUMN_DEFS = [
     { key: 'timestamp', label: 'Timestamp', width: '200px' },
     { key: 'program', label: 'Program', width: '300px' },
     { key: 'sourceOrgUnit', label: 'Source Org Unit', width: '300px' },
@@ -13,39 +13,42 @@ const COLUMN_DEFS = [
     { key: 'action', label: 'Action', width: '160px' },
 ]
 
-const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp }) => {
+const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, customColumns, selectedBatches = [], onRestore }) => {
     const histories = historiesProp || []
+    const COLUMN_DEFS = customColumns
+        ? ALL_COLUMN_DEFS.filter(col => customColumns.includes(col.key))
+        : ALL_COLUMN_DEFS
     const [expandedBatchId, setExpandedBatchId] = useState(null)
-    const [selectedBatches, setSelectedBatches] = useState([])
+    const [selected, setSelected] = useState(selectedBatches)
     const [sortCol, setSortCol] = useState('timestamp')
     const [sortDir, setSortDir] = useState('desc')
 
     useEffect(() => {
         if (onSelectionChange) {
-            onSelectionChange(selectedBatches)
+            onSelectionChange(selected)
         }
-    }, [selectedBatches, onSelectionChange])
+    }, [selected, onSelectionChange])
 
     const handleExpandToggle = (batchId) => {
         setExpandedBatchId(expandedBatchId === batchId ? null : batchId)
     }
 
     const handleSelectBatch = (batchId) => {
-        setSelectedBatches(selectedBatches.includes(batchId)
-            ? selectedBatches.filter(id => id !== batchId)
-            : [...selectedBatches, batchId])
+        setSelected(selected.includes(batchId)
+            ? selected.filter(id => id !== batchId)
+            : [...selected, batchId])
     }
 
     const handleSelectAll = () => {
-        if (selectedBatches.length === histories.length) {
-            setSelectedBatches([])
+        if (selected.length === histories.length) {
+            setSelected([])
         } else {
-            setSelectedBatches(histories.map(batch => batch.id))
+            setSelected(histories.map(batch => batch.id))
         }
     }
 
-    const areAllBatchesSelected = selectedBatches.length === histories.length && histories.length > 0
-    const isPartiallySelected = selectedBatches.length > 0 && selectedBatches.length < histories.length
+    const areAllBatchesSelected = selected.length === histories.length && histories.length > 0
+    const isPartiallySelected = selected.length > 0 && selected.length < histories.length
 
     // Sorting logic
     function getSortValue(batch, col) {
@@ -75,6 +78,9 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp }) 
 
     // Get all attribute display names from the first batch with TEIs
     const attributeNames = (histories.find(b => b.teis && b.teis.length > 0)?.teis[0]?.attributes || []).map(a => a.displayName)
+
+    // Show Restore button in header if onRestore and canRestore are provided (for deleted-current view)
+    const showRestoreHeaderButton = typeof onRestore === 'function' && typeof selectedBatches !== 'undefined' && Array.isArray(selectedBatches);
 
     return (
         <div>
@@ -111,15 +117,16 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp }) 
                                     {col.label}
                                 </DataTableColumnHeader>
                             ))}
+                            {/* Restore button removed from table header; handled by parent component (History.js) */}
                         </DataTableRow>
                     </DataTableHead>
                     <DataTableBody>
-                        {sortedHistories.map(batch => (
-                            <React.Fragment key={batch.id}>
+                        {sortedHistories.map((batch, idx) => (
+                            <React.Fragment key={`${batch.id}-${idx}`}>
                                 <DataTableRow
                                     onExpandToggle={() => handleExpandToggle(batch.id)}
                                     expanded={expandedBatchId === batch.id}
-                                    selected={selectedBatches.includes(batch.id)}
+                                    selected={selected.includes(batch.id)}
                                     onClick={e => {
                                         if (e.target.type !== 'checkbox') handleExpandToggle(batch.id)
                                     }}
@@ -128,21 +135,39 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp }) 
                                     <DataTableCell width="48px">
                                         <Checkbox
                                             value={batch.id}
-                                            checked={selectedBatches.includes(batch.id)}
+                                            checked={selected.includes(batch.id)}
                                             onChange={() => handleSelectBatch(batch.id)}
-                                            disabled={!(isBatchUndoable(batch) || isBatchRestorable(batch))}
+                                            // Allow restore for deleted-current, otherwise use batch logic
+                                            disabled={batch.action !== 'deleted' && !(isBatchUndoable(batch) || isBatchRestorable(batch))}
                                         />
                                     </DataTableCell>
-                                    <DataTableCell width={COLUMN_DEFS[0].width}>{batch.date} {batch.time}</DataTableCell>
-                                    <DataTableCell width={COLUMN_DEFS[1].width}>{batch.program?.name}</DataTableCell>
-                                    <DataTableCell width={COLUMN_DEFS[2].width}>{batch.sourceOrgUnit?.name}</DataTableCell>
-                                    <DataTableCell width={COLUMN_DEFS[3].width}>{batch.targetOrgUnit?.name}</DataTableCell>
-                                    <DataTableCell width={COLUMN_DEFS[4].width}>{batch.user?.name}</DataTableCell>
-                                    <DataTableCell width={COLUMN_DEFS[5].width}>{batch.action}</DataTableCell>
+                                    {COLUMN_DEFS.map((col, idx2) => {
+                                        if (col.key === 'timestamp') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.timestamp}</DataTableCell>;
+                                        }
+                                        // Removed teiUid column
+                                        if (col.key === 'program') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.program?.name}</DataTableCell>;
+                                        }
+                                        if (col.key === 'sourceOrgUnit') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.sourceOrgUnit?.name}</DataTableCell>;
+                                        }
+                                        if (col.key === 'targetOrgUnit') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.targetOrgUnit?.name}</DataTableCell>;
+                                        }
+                                        if (col.key === 'user') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.user?.name}</DataTableCell>;
+                                        }
+                                        if (col.key === 'action') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.action}</DataTableCell>;
+                                        }
+                                        return null;
+                                    })}
                                 </DataTableRow>
-                                {expandedBatchId === batch.id && (
+                                {/* Only show expandable details for history batches */}
+                                {expandedBatchId === batch.id && batch.action !== 'deleted' && (
                                     <DataTableRow>
-                                        <DataTableCell colSpan="8" style={{ background: '#f0f8ff', padding: 0 }}>
+                                        <DataTableCell colSpan={COLUMN_DEFS.length + 1} style={{ background: '#f0f8ff', padding: 0 }}>
                                             <div style={{ margin: '4px 0', padding: '6px', borderRadius: '4px', border: '1px solid #e0e0e0' }}>
                                                 <h5 style={{ marginBottom: '8px', color: '#333' }}>TEIs in this batch:</h5>
                                                 <DataTable>

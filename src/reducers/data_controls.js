@@ -132,5 +132,6 @@ export const dataControlSelectors = {
             state.dataControl.filters
         )
     },
+    getActiveTEIs: (state) => state.dataControl.teis.filter(tei => !tei.deleted),
 }
 

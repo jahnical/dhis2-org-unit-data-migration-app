@@ -1,61 +1,22 @@
-// src/actions/restoreTeis.js
-// Async action creator for restoring TEIs
-import { DELETION_TYPES } from '../reducers/deletion'
-import { restoreTEI } from '../api/teis'
-import { setHistoryTeis, setHistoryTeisError, setHistoryTeisLoading } from './historyTeis'
-import { APP_SOFT_DELETED_ATTR_ID } from '../constants/appSoftDeletedAttrId.js'
-import { logHistoryBatchThunk } from './history'
+
+import { restoreTeis } from './deletion'
 
 /**
- * Restore selected TEIs and refresh history list
+ * Thunk to restore all TEIs in the selected soft-deleted batches from migration history.
+ * @param {Array<string>} batchIds - IDs of the selected history batches
  * @param {object} engine - DHIS2 app-runtime data engine
- * @param {Array} teis - Array of TEI objects to restore
- * @param {Function} fetchHistoryTeis - Function to fetch and update history TEIs (should dispatch setHistoryTeis)
  */
-
-export const restoreTeis = (engine, teis, fetchHistoryTeis) => async (dispatch) => {
-    dispatch({ type: DELETION_TYPES.RESTORE_TEIS_START })
-    try {
-        await Promise.all(
-            teis.map(tei => restoreTEI(engine, tei.trackedEntityInstance || tei.id, APP_SOFT_DELETED_ATTR_ID))
-        )
-        dispatch({ type: DELETION_TYPES.RESTORE_TEIS_SUCCESS })
-        if (fetchHistoryTeis) {
-            dispatch(setHistoryTeisLoading(true))
-            try {
-                const historyTeis = await fetchHistoryTeis()
-                dispatch(setHistoryTeis(historyTeis))
-            } catch (err) {
-                dispatch(setHistoryTeisError(err))
-            }
-            dispatch(setHistoryTeisLoading(false))
-        }
-    } catch (error) {
-        dispatch({ type: DELETION_TYPES.RESTORE_TEIS_ERROR, payload: error })
-    }
-}
-
-// Thunk for restoring soft-deleted TEIs in selected batches
 export const restoreTeisBatchesThunk = (batchIds, engine) => async (dispatch, getState) => {
-    const { histories } = getState().history
-    const batchesToRestore = histories.filter(b => batchIds.includes(b.id) && b.action === 'soft-deleted')
-    try {
-        for (const batch of batchesToRestore) {
-            // Call actual restoreTeis logic here
-            await dispatch(restoreTeis(engine, batch.teis))
-            // Log restore to history
-            const restoredBatch = {
-                ...batch,
-                action: 'restored',
-                timestamp: new Date().toISOString(),
-                date: new Date().toISOString().slice(0, 10),
-                time: new Date().toLocaleTimeString(),
-            }
-            // Corrected: Use the imported logHistoryBatchThunk directly
-            await dispatch(logHistoryBatchThunk(restoredBatch, engine))
-        }
-    } catch (error) {
-        // Optionally handle error
-        console.error('Error during restore process:', error)
-    }
-}
+    if (!batchIds?.length) return;
+    const histories = getState().history.histories;
+    // Find all selected batches
+    const selectedBatches = histories.filter(b => batchIds.includes(b.id) && b.action === 'soft-deleted');
+    // Collect all TEIs from these batches
+    const allTeis = selectedBatches.flatMap(b => b.teis || []);
+    const teiUids = allTeis.map(tei => tei.id).filter(Boolean);
+    if (!teiUids.length) return;
+    // Call restoreTeis action
+    await dispatch(restoreTeis({ teiUids, teis: allTeis, engine }));
+    // Optionally, reload migration history (if needed)
+    // dispatch(loadMigrationHistory(engine));
+};
