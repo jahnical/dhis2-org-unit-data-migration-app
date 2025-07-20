@@ -98,7 +98,7 @@ export function dataControl(state = controlInitialState, action) {
             return { ...state, loading: true, error: null }
 
         case DATA_CONTROL_TYPES.FETCH_TEIS_SUCCESS:
-                    return { ...state, loading: false, teis: action.payload }
+            return { ...state, loading: false, teis: action.payload }
 
         case DATA_CONTROL_TYPES.FETCH_TEIS_ERROR:
             return { ...state, loading: false, error: action.payload }
@@ -106,6 +106,27 @@ export function dataControl(state = controlInitialState, action) {
         case DATA_CONTROL_TYPES.RESET:
             return controlInitialState
 
+        case 'TEIS_MARK_RESTORED':
+            // Mark the restored TEIs in state.teis
+            return {
+                ...state,
+                teis: state.teis.map(tei =>
+                    action.payload.includes(tei.id)
+                        ? { ...tei, restored: true, deleted: false }
+                        : tei
+                ),
+            }
+
+        case 'SOFT_DELETE_TEIS':
+            // Mark the deleted TEIs in state.teis
+            return {
+                ...state,
+                teis: state.teis.map(tei =>
+                    action.payload.includes(tei.id)
+                        ? { ...tei, deleted: true, restored: false }
+                        : tei
+                ),
+            }
         default:
             return state
     }

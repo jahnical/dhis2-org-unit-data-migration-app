@@ -6,9 +6,11 @@ import { DataTable, DataTableHead, DataTableRow, DataTableCell, DataTableColumnH
 
 const ALL_COLUMN_DEFS = [
     { key: 'timestamp', label: 'Timestamp', width: '200px' },
+    { key: 'teiUid', label: 'TEI UID', width: '220px' },
     { key: 'program', label: 'Program', width: '300px' },
     { key: 'sourceOrgUnit', label: 'Source Org Unit', width: '300px' },
     { key: 'targetOrgUnit', label: 'Target Org Unit', width: '300px' },
+    { key: 'orgUnit', label: 'Org Unit', width: '300px' },
     { key: 'user', label: 'User', width: '200px' },
     { key: 'action', label: 'Action', width: '160px' },
 ]
@@ -20,6 +22,10 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
         : ALL_COLUMN_DEFS
     const [expandedBatchId, setExpandedBatchId] = useState(null)
     const [selected, setSelected] = useState(selectedBatches)
+    // Keep local selected state in sync with prop
+    useEffect(() => {
+        setSelected(selectedBatches)
+    }, [selectedBatches])
     const [sortCol, setSortCol] = useState('timestamp')
     const [sortDir, setSortDir] = useState('desc')
 
@@ -145,7 +151,9 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
                                         if (col.key === 'timestamp') {
                                             return <DataTableCell key={col.key} width={col.width}>{batch.timestamp}</DataTableCell>;
                                         }
-                                        // Removed teiUid column
+                                        if (col.key === 'teiUid') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.teiUid}</DataTableCell>;
+                                        }
                                         if (col.key === 'program') {
                                             return <DataTableCell key={col.key} width={col.width}>{batch.program?.name}</DataTableCell>;
                                         }
@@ -154,6 +162,9 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
                                         }
                                         if (col.key === 'targetOrgUnit') {
                                             return <DataTableCell key={col.key} width={col.width}>{batch.targetOrgUnit?.name}</DataTableCell>;
+                                        }
+                                        if (col.key === 'orgUnit') {
+                                            return <DataTableCell key={col.key} width={col.width}>{batch.orgUnit?.name}</DataTableCell>;
                                         }
                                         if (col.key === 'user') {
                                             return <DataTableCell key={col.key} width={col.width}>{batch.user?.name}</DataTableCell>;

@@ -1,5 +1,4 @@
 // src/components/MigrationHistory/History.js
-// Main component for the Migration History tab
 import React, { useState } from 'react'
 import { useAlert } from '@dhis2/app-runtime'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,7 +11,7 @@ import RestoreButton from './RestoreButton'
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 import { undoMigrationBatchesThunk } from '../../actions/undoMigration'
 import { restoreTeisBatchesThunk } from '../../actions/restoreTeis'
-import { restoreTeis } from '../../actions/deletion'
+import { newRestoreTEI } from '../../api/teis'
 
 const History = () => {
     const [selectedBatches, setSelectedBatches] = useState([])
@@ -23,50 +22,56 @@ const History = () => {
     const engine = useDataEngine()
     const histories = useSelector(state => state.history.histories)
 
-    // Select all inactive (deleted) TEIs for the 'Deleted (Current)' filter
+    // Select all inactive (deleted) TEIs for the 'Deleted' filter
     const [selectedDeletedTeis, setSelectedDeletedTeis] = useState([])
     const [restoring, setRestoring] = useState(false)
     const [showRestoreDeletedModal, setShowRestoreDeletedModal] = useState(false)
     const alert = useAlert()
-    const deletedTeis = useSelector(state =>
+    // Show only deleted TEIs for the deleted filter, and only restored for the restored filter
+    // Use raw TEIs to avoid filtering out deleted/restored by search filters
+    const allTeisRaw = useSelector(state =>
         state.dataControl && state.dataControl.teis
-            ? state.dataControl.teis.filter(tei => tei.deleted)
-            : (state.deleteTeis.teis || []).filter(tei => tei.deleted)
-    )
+            ? state.dataControl.teis
+            : (state.deleteTeis.teis || [])
+    );
+    const deletedTeis = allTeisRaw.filter(tei => tei.deleted === true);
+    const restoredTeis = allTeisRaw.filter(tei => tei.restored === true);
 
-    // Filter histories by action type
-    const filteredHistories = filter === 'all' ? histories : histories.filter(h => h.action === filter)
-
-    // Batch selection safety logic
     function isBatchUndoable(batch) {
-        return batch.action === 'migrated'
+        return batch.action === 'migrated';
     }
     function isBatchRestorable(batch) {
-        return batch.action === 'soft-deleted'
+        return batch.action === 'soft-deleted';
     }
-    const selectedBatchObjs = filteredHistories.filter(b => selectedBatches.includes(b.id))
-    const canUndo = selectedBatchObjs.length > 0 && selectedBatchObjs.every(isBatchUndoable)
+    const selectedBatchObjs = histories
+        .filter(h => filter === 'all' || h.action === filter)
+        .filter(b => selectedBatches.includes(b.id));
+    const canUndo = selectedBatchObjs.length > 0 && selectedBatchObjs.every(isBatchUndoable);
 
-    // For deleted-current: enable restore if at least one deleted TEI is selected
-    const canRestoreDeletedTeis = filter === 'deleted-current' && selectedDeletedTeis.length > 0;
-    const canRestore = filter === 'deleted-current' ? canRestoreDeletedTeis : (selectedBatchObjs.length > 0 && selectedBatchObjs.every(isBatchRestorable));
+    // For deleted: enable restore if at least one deleted TEI is selected
+    const canRestoreDeletedTeis = filter === 'deleted' && selectedDeletedTeis.length > 0;
+    const canRestore = filter === 'deleted'
+        ? canRestoreDeletedTeis
+        : (selectedBatchObjs.length > 0 && selectedBatchObjs.every(isBatchRestorable));
 
-    // Restore handler for current deleted TEIs
-
+    // Restore handler for deleted TEIs
     const handleRestoreDeletedTeis = async () => {
         if (!selectedDeletedTeis.length) return;
         setShowRestoreDeletedModal(true);
     };
 
+    // Confirm restore for deleted TEIs (clone-as-new logic, persist 'restored' state)
     const confirmRestoreDeletedTeis = async () => {
         setRestoring(true);
         try {
             // Find the full TEI objects
             const teisToRestore = deletedTeis.filter(tei => selectedDeletedTeis.includes(tei.id));
-            const teiUids = teisToRestore.map(tei => tei.id);
             // Call the actual restore logic (which clones the TEI as in teis.js)
-            await dispatch(restoreTeis({ teiUids, teis: teisToRestore, engine }));
+            await newRestoreTEI(engine, teisToRestore);
+            // Persist restored state in Redux
+            dispatch({ type: 'TEIS_MARK_RESTORED', payload: selectedDeletedTeis });
             alert.show('Successfully restored TEI(s).', { success: true });
+            // Do not auto-switch filter; restored TEIs will appear in 'restored' filter
         } catch (e) {
             alert.show('Failed to restore TEI(s).', { critical: true });
         } finally {
@@ -77,7 +82,6 @@ const History = () => {
     };
 
     const handleUndoConfirm = (batchIds) => {
-        // Dispatch the undo thunk
         dispatch(undoMigrationBatchesThunk(batchIds, engine))
     }
     const handleRestoreConfirm = (batchIds) => {
@@ -87,16 +91,22 @@ const History = () => {
     return (
         <div>
             <div style={{ marginTop: 10, marginBottom: 10, fontWeight: 600, fontSize: 18, color: '#333' }}>
-                {filter === 'deleted-current'
-                    ? `${deletedTeis.length} currently deleted TEI${deletedTeis.length !== 1 ? 's' : ''}`
-                    : `${filteredHistories.length} migration batch${filteredHistories.length !== 1 ? 'es' : ''} in history`}
+                {filter === 'deleted'
+                    ? `${deletedTeis.length} deleted TEI${deletedTeis.length !== 1 ? 's' : ''}`
+                    : filter === 'restored'
+                        ? `${restoredTeis.length} restored TEI${restoredTeis.length !== 1 ? 's' : ''}`
+                        : `${histories.filter(h => filter === 'all' || h.action === filter).length} migration batch${histories.length !== 1 ? 'es' : ''} in history`}
             </div>
             <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center' }}>
                 <UndoMigrationButton selectedBatches={selectedBatches} onClick={() => setShowUndoModal(true)} disabled={!canUndo} />
-                <RestoreButton selectedBatches={selectedBatches} onClick={() => setShowRestoreModal(true)} disabled={!canRestore} />
+                <RestoreButton
+                    selectedBatches={selectedBatches}
+                    onClick={filter === 'deleted' ? handleRestoreDeletedTeis : () => setShowRestoreModal(true)}
+                    disabled={!canRestore}
+                />
                 <HistoryFilter value={filter} onFilterChange={setFilter} />
             </div>
-            {filter === 'deleted-current' ? (
+            {filter === 'deleted' ? (
                 deletedTeis.length === 0 ? (
                     <div style={{ color: '#888', textAlign: 'center', margin: '32px 0' }}>
                         No deleted TEIs found. Only inactive (deleted) TEIs are shown here.
@@ -108,29 +118,52 @@ const History = () => {
                             timestamp: tei.lastUpdated || tei.created || '',
                             teiUid: tei.id,
                             program: { name: tei.program?.name || tei.programName || tei.enrollmentProgramName || '' },
-                            sourceOrgUnit: { name: tei.orgUnitName || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnitNameFromLookup || '' },
-                            targetOrgUnit: { name: tei.targetOrgUnitName || tei.targetOrgUnit?.name || tei.targetOrgUnit || '' },
-                            user: { name: tei.storedBy || (tei.lastUpdatedBy && tei.lastUpdatedBy.username) || tei.createdBy || tei.user || '' },
-                            action: selectedDeletedTeis.includes(tei.id) ? 'restored' : 'deleted',
+                            orgUnit: { name: tei.orgUnitName || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnitNameFromLookup || '' },
+                            user: { name: tei.createdBy || tei.storedBy || tei.lastUpdatedBy?.username || tei.user || '' },
+                            action: 'deleted',
                             teis: [tei],
                         }))}
                         onSelectionChange={setSelectedDeletedTeis}
-                        customColumns={['timestamp', 'program', 'sourceOrgUnit', 'targetOrgUnit', 'user', 'action']}
+                        customColumns={['timestamp', 'teiUid', 'program', 'orgUnit', 'user', 'action']}
                         selectedBatches={selectedDeletedTeis}
                         onRestore={handleRestoreDeletedTeis}
                         canRestore={canRestore && !restoring}
                     />
                 )
+            ) : filter === 'restored' ? (
+                restoredTeis.length === 0 ? (
+                    <div style={{ color: '#888', textAlign: 'center', margin: '32px 0' }}>
+                        No restored TEIs found.
+                    </div>
+                ) : (
+                    <MigrationHistoryTable
+                        histories={restoredTeis.map(tei => ({
+                            id: tei.id,
+                            timestamp: tei.lastUpdated || tei.created || '',
+                            teiUid: tei.id,
+                            program: { name: tei.program?.name || tei.programName || tei.enrollmentProgramName || '' },
+                            orgUnit: { name: tei.orgUnitName || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnitNameFromLookup || '' },
+                            user: { name: tei.createdBy || tei.storedBy || tei.lastUpdatedBy?.username || tei.user || '' },
+                            action: 'restored',
+                            teis: [tei],
+                        }))}
+                        onSelectionChange={() => {}}
+                        customColumns={['timestamp', 'teiUid', 'program', 'orgUnit', 'user', 'action']}
+                        selectedBatches={[]}
+                    />
+                )
             ) : (
                 <>
                     <MigrationHistoryTable
-                        histories={filteredHistories.map(batch => ({
-                            ...batch,
-                            program: batch.program || { name: batch.programName || batch.enrollmentProgramName || '' },
-                            sourceOrgUnit: batch.sourceOrgUnit || { name: batch.orgUnitName || (batch.orgUnit && batch.orgUnit.name) || batch.enrollmentOrgUnitName || batch.orgUnitNameFromLookup || '' },
-                            targetOrgUnit: batch.targetOrgUnit || { name: batch.targetOrgUnitName || (batch.targetOrgUnit && batch.targetOrgUnit.name) || batch.targetOrgUnit || '' },
-                            user: batch.user || { name: batch.storedBy || (batch.lastUpdatedBy && batch.lastUpdatedBy.username) || batch.createdBy || batch.user || '' },
-                        }))}
+                        histories={histories
+                            .filter(h => filter === 'all' || h.action === filter)
+                            .map(batch => ({
+                                ...batch,
+                                program: batch.program || { name: batch.programName || batch.enrollmentProgramName || '' },
+                                sourceOrgUnit: batch.sourceOrgUnit || { name: batch.orgUnitName || (batch.orgUnit && batch.orgUnit.name) || batch.enrollmentOrgUnitName || batch.orgUnitNameFromLookup || '' },
+                                targetOrgUnit: batch.targetOrgUnit || { name: batch.targetOrgUnitName || (batch.targetOrgUnit && batch.targetOrgUnit.name) || batch.targetOrgUnit || '' },
+                                user: batch.user || { name: batch.storedBy || (batch.lastUpdatedBy && batch.lastUpdatedBy.username) || batch.createdBy || batch.user || '' },
+                            }))}
                         onSelectionChange={setSelectedBatches}
                         customColumns={['timestamp', 'program', 'sourceOrgUnit', 'targetOrgUnit', 'user', 'action']}
                         selectedBatches={selectedBatches}
@@ -160,5 +193,4 @@ const History = () => {
         </div>
     )
 }
-
 export default History

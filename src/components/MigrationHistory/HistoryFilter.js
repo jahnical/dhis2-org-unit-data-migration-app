@@ -6,8 +6,7 @@ import { SingleSelect, SingleSelectOption } from '@dhis2/ui'
 const ACTION_OPTIONS = [
     { label: 'All', value: 'all' },
     { label: 'Migrated', value: 'migrated' },
-    { label: 'Deleted (History)', value: 'soft-deleted' },
-    { label: 'Deleted (Current)', value: 'deleted-current' },
+    { label: 'Deleted', value: 'deleted' },
     { label: 'Undone', value: 'undone' },
     { label: 'Restored', value: 'restored' },
 ]
