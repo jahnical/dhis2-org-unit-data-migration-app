@@ -46,20 +46,33 @@ export const undoMigrationBatchesThunk = (batchIds, engine) => async (dispatch, 
         dispatch(undoMigrationBatch(batchIds))
         for (const batch of batchesToUndo) {
             // Prepare TEIs and swap org units
-            const teis = batch.teis
-            const selectedTeis = teis.map(tei => tei.id)
+            // Retrieve TEIs
+            const teiPromises = batch.teis.map(async (tei) => {
+                const teiData = await engine.query({
+                    teis: {
+                        resource: `trackedEntityInstances/${tei.id}`,
+                        params: { fields: '*'}
+                    }
+                });
+                return teiData.teis;
+            });
+            const updatedTeis = await Promise.all(teiPromises);
+            const selectedTeis = batch.teis.map(tei => tei.id)
             const sourceOrgUnit = batch.targetOrgUnit.id
             const targetOrgUnit = batch.sourceOrgUnit.id
             const targetOrgUnitName = batch.sourceOrgUnit.name
+            console.log('Undoing migration for batch:', batch.id, 'from', sourceOrgUnit, 'to', targetOrgUnit)
+            console.log('Selected TEIs:', updatedTeis)
+
             // Call migration logic with swapped org units
             await dispatch(migrationActions.migrateTEIs({
-                teis,
-                selectedTeis,
-                targetOrgUnit,
-                targetOrgUnitName,
-                engine,
-                onProgress: () => {},
-            }))
+                teis: updatedTeis,
+                selectedTeis: selectedTeis,
+                targetOrgUnit: targetOrgUnit,
+                targetOrgUnitName: targetOrgUnitName,
+                engine: engine,
+                onProgress: (pg) => {console.log('Migration progress:', pg)},
+        }))
             // Log undo to history
             const undoneBatch = swapOrgUnits(batch)
             await dispatch(logHistoryBatchThunk(undoneBatch, engine))

@@ -36,6 +36,8 @@ export const migrationActions = {
 
                 const customEngine = engine
 
+                console.log("Selected TEIs for migration:", selectedTeis)
+
                 teis = teis.filter((tei) =>
                     selectedTeis.includes(tei.trackedEntityInstance)
                 )
@@ -152,7 +154,7 @@ export const migrationActions = {
                     type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
                     payload: response,
                 })
-                
+
                 //Log the migration history batch
                 const state = dispatch((_, getState) => getState()) || {};
                 const programId = state.ui?.program?.id;
