@@ -13,6 +13,7 @@ import RestoreConfirmationModal from './RestoreConfirmationModal'
 import { undoMigrationBatchesThunk } from '../../actions/undoMigration'
 import { restoreTeisBatchesThunk } from '../../actions/restoreTeis'
 import { newRestoreTEI } from '../../api/teis'
+import { acAddMetadata } from '../../actions/metadata'
 
 const History = () => {
     const [selectedBatches, setSelectedBatches] = useState([])
@@ -38,6 +39,7 @@ const History = () => {
     }
     function isBatchRestorable(batch) {
         return batch.action === 'soft-deleted';
+
     }
     const selectedBatchObjs = histories
         .filter(h => filter === 'all' || h.action === filter)
@@ -66,6 +68,7 @@ const History = () => {
             const newTeis = await newRestoreTEI(engine, teisToRestore);
             // Move the original deleted TEIs to restored (update their action/flags)
             dispatch({ type: 'TEIS_MARK_RESTORED', payload: selectedDeletedTeis });
+    const metadata = useSelector(state => state.metadata);
             alert.show('Successfully restored TEI(s).', { success: true });
         } catch (e) {
             alert.show('Failed to restore TEI(s).', { critical: true });

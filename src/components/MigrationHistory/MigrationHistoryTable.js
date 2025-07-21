@@ -53,9 +53,14 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
                         return <DataTableCell key={col.key} width={col.width}>{batch.targetOrgUnit?.name}</DataTableCell>;
                     }
                     if (col.key === 'orgUnit') {
-                        // Try batch.orgUnit?.name, then metadata lookup, then fallback to ID
+                        // Show human-readable org unit name if available, fallback to metadata, then ID
                         let orgUnitName = '';
-                        if (batch.orgUnit) {
+                        // Prefer batch.orgUnitName or batch.orgUnitNameFromLookup if present
+                        if (batch.orgUnitName) {
+                            orgUnitName = batch.orgUnitName;
+                        } else if (batch.orgUnitNameFromLookup) {
+                            orgUnitName = batch.orgUnitNameFromLookup;
+                        } else if (batch.orgUnit) {
                             if (typeof batch.orgUnit === 'object') {
                                 orgUnitName = batch.orgUnit.name || metadata[batch.orgUnit.id]?.name || metadata[batch.orgUnit.id]?.displayName || batch.orgUnit.id;
                             } else {
