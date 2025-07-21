@@ -107,23 +107,34 @@ export function dataControl(state = controlInitialState, action) {
             return controlInitialState
 
         case 'TEIS_MARK_RESTORED':
-            // Mark the restored TEIs in state.teis
+            // Move the original deleted TEIs to restored (update only their action)
+            // Also ensure deleted/restored flags are set correctly
             return {
                 ...state,
                 teis: state.teis.map(tei =>
                     action.payload.includes(tei.id)
-                        ? { ...tei, restored: true, deleted: false }
+                        ? { ...tei, action: 'restored', deleted: false, restored: true }
                         : tei
                 ),
-            }
+            };
+
+        // TEIS_RESTORE_CLONE case removed; handled by TEIS_MARK_RESTORED now
 
         case 'SOFT_DELETE_TEIS':
-            // Mark the deleted TEIs in state.teis
+            // Mark the deleted TEIs in state.teis, but preserve orgUnit, program, and user info
             return {
                 ...state,
                 teis: state.teis.map(tei =>
                     action.payload.includes(tei.id)
-                        ? { ...tei, deleted: true, restored: false }
+                        ? {
+                            ...tei,
+                            deleted: true,
+                            restored: false,
+                            // Ensure orgUnit, program, and user info are preserved
+                            orgUnit: tei.orgUnit,
+                            program: tei.program,
+                            user: tei.user
+                        }
                         : tei
                 ),
             }
@@ -154,5 +165,9 @@ export const dataControlSelectors = {
         )
     },
     getActiveTEIs: (state) => state.dataControl.teis.filter(tei => !tei.deleted),
+    // Selector for restored TEIs (persist in restore filter)
+    getRestoredTEIs: (state) => state.dataControl.teis.filter(tei => tei.action === 'restored'),
+    // Selector for deleted TEIs (show orgUnit, program, user info)
+    getDeletedTEIs: (state) => state.dataControl.teis.filter(tei => tei.deleted),
 }
 

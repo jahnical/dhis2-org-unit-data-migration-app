@@ -4,6 +4,7 @@ import { useAlert } from '@dhis2/app-runtime'
 import { useDispatch, useSelector } from 'react-redux'
 import { useDataEngine } from '@dhis2/app-runtime'
 import MigrationHistoryTable from './MigrationHistoryTable'
+import { dataControlSelectors } from '../../reducers/data_controls'
 import UndoMigrationButton from './UndoMigrationButton'
 import UndoMigrationModal from './UndoMigrationModal'
 import HistoryFilter from './HistoryFilter'
@@ -27,15 +28,10 @@ const History = () => {
     const [restoring, setRestoring] = useState(false)
     const [showRestoreDeletedModal, setShowRestoreDeletedModal] = useState(false)
     const alert = useAlert()
-    // Show only deleted TEIs for the deleted filter, and only restored for the restored filter
-    // Use raw TEIs to avoid filtering out deleted/restored by search filters
-    const allTeisRaw = useSelector(state =>
-        state.dataControl && state.dataControl.teis
-            ? state.dataControl.teis
-            : (state.deleteTeis.teis || [])
-    );
-    const deletedTeis = allTeisRaw.filter(tei => tei.deleted === true);
-    const restoredTeis = allTeisRaw.filter(tei => tei.restored === true);
+    // Use selectors for deleted and restored TEIs
+    // Show all deleted/restored TEIs
+    const deletedTeis = useSelector(dataControlSelectors.getDeletedTEIs);
+    const restoredTeis = useSelector(dataControlSelectors.getRestoredTEIs);
 
     function isBatchUndoable(batch) {
         return batch.action === 'migrated';
@@ -67,15 +63,15 @@ const History = () => {
             // Find the full TEI objects
             const teisToRestore = deletedTeis.filter(tei => selectedDeletedTeis.includes(tei.id));
             // Call the actual restore logic (which clones the TEI as in teis.js)
-            await newRestoreTEI(engine, teisToRestore);
-            // Persist restored state in Redux
+            const newTeis = await newRestoreTEI(engine, teisToRestore);
+            // Move the original deleted TEIs to restored (update their action/flags)
             dispatch({ type: 'TEIS_MARK_RESTORED', payload: selectedDeletedTeis });
             alert.show('Successfully restored TEI(s).', { success: true });
-            // Do not auto-switch filter; restored TEIs will appear in 'restored' filter
         } catch (e) {
             alert.show('Failed to restore TEI(s).', { critical: true });
         } finally {
             setRestoring(false);
+            // Clear selection and modal after restore
             setSelectedDeletedTeis([]);
             setShowRestoreDeletedModal(false);
         }
@@ -117,13 +113,17 @@ const History = () => {
                             id: tei.id,
                             timestamp: tei.lastUpdated || tei.created || '',
                             teiUid: tei.id,
-                            program: { name: tei.program?.name || tei.programName || tei.enrollmentProgramName || '' },
-                            orgUnit: { name: tei.orgUnitName || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnitNameFromLookup || '' },
-                            user: { name: tei.createdBy || tei.storedBy || tei.lastUpdatedBy?.username || tei.user || '' },
+                            program: { name: tei.program?.name || tei.programName || tei.enrollmentProgramName || tei.programNameFromLookup || '' },
+                            orgUnit: { name: tei.orgUnitName || tei.orgUnitNameFromLookup || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnit || '' },
+                            user: { name: tei.createdBy || tei.storedBy || (tei.lastUpdatedBy && tei.lastUpdatedBy.username) || tei.user || (tei.lastUpdatedByUserInfo && tei.lastUpdatedByUserInfo.username) || '' },
                             action: 'deleted',
                             teis: [tei],
                         }))}
-                        onSelectionChange={setSelectedDeletedTeis}
+                        onSelectionChange={ids => {
+                            // Only keep IDs that are still in the deleted list
+                            const validIds = ids.filter(id => deletedTeis.some(tei => tei.id === id));
+                            setSelectedDeletedTeis(validIds);
+                        }}
                         customColumns={['timestamp', 'teiUid', 'program', 'orgUnit', 'user', 'action']}
                         selectedBatches={selectedDeletedTeis}
                         onRestore={handleRestoreDeletedTeis}
@@ -141,9 +141,9 @@ const History = () => {
                             id: tei.id,
                             timestamp: tei.lastUpdated || tei.created || '',
                             teiUid: tei.id,
-                            program: { name: tei.program?.name || tei.programName || tei.enrollmentProgramName || '' },
-                            orgUnit: { name: tei.orgUnitName || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnitNameFromLookup || '' },
-                            user: { name: tei.createdBy || tei.storedBy || tei.lastUpdatedBy?.username || tei.user || '' },
+                            program: { name: tei.program?.name || tei.programName || tei.enrollmentProgramName || tei.programNameFromLookup || '' },
+                            orgUnit: { name: tei.orgUnitName || tei.orgUnitNameFromLookup || tei.orgUnit?.name || tei.enrollmentOrgUnitName || tei.orgUnit || '' },
+                            user: { name: tei.createdBy || tei.storedBy || (tei.lastUpdatedBy && tei.lastUpdatedBy.username) || tei.user || (tei.lastUpdatedByUserInfo && tei.lastUpdatedByUserInfo.username) || '' },
                             action: 'restored',
                             teis: [tei],
                         }))}
