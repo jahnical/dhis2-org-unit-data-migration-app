@@ -63,93 +63,142 @@ const DataMigrationModal = _ref => {
         if (migrationStatus === 'success') {
             dispatch(dataActionCreators.reset());
             dispatch(migrationActions.resetMigration());
+        } else {
+            dispatch(migrationActions.resetMigration())
         }
-        onClose();
-    };
+        onClose()
+    }
 
-    const handleNextClick = () => {
-        // Store the current org unit before going to preview
-        setPreservedOrgUnit(targetOrgUnit);
-        setStep('preview');
-    };
+    const renderPreview = () => (
+        <div style={{ padding: '16px' }}>
+            <NoticeBox title={i18n.t('Migration Preview')} warning>
+                <p>{i18n.t('You are about to migrate:')}</p>
+                <ul>
+                    <li>
+                        {i18n.t('{{count}} TEIs', { count: selectedTeis.length })}
+                    </li>
+                    <li>
+                        {i18n.t('To {{orgUnit}}', {
+                            orgUnit: metadata[targetOrgUnit].displayName,
+                        })}
+                    </li>
+                </ul>
+                <p>{i18n.t('Are you sure you want to continue?')}</p>
+            </NoticeBox>
+        </div>
+    )
 
-    const handleBackClick = () => {
-        // Restore the preserved org unit when going back
-        if (preservedOrgUnit) {
-            dispatch(migrationActions.setTargetOrgUnit(preservedOrgUnit));
-        }
-        setStep('selection');
-    };
-
-    const renderPreview = () => /*#__PURE__*/React.createElement("div", {
-        style: {
+    const renderProgress = () => (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
             padding: '16px'
-        }
-    }, /*#__PURE__*/React.createElement(NoticeBox, {
-        title: i18n.t('Migration Preview'),
-        warning: true
-    }, /*#__PURE__*/React.createElement("p", null, i18n.t('You are about to migrate:')), /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("li", null, i18n.t('{{count}} TEIs', {
-        count: selectedTeis.length
-    })), /*#__PURE__*/React.createElement("li", null, i18n.t('To {{orgUnit}}', {
-        orgUnit: metadata[targetOrgUnit].displayName
-    }))), /*#__PURE__*/React.createElement("p", null, i18n.t('Are you sure you want to continue?'))));
-
-    const renderProgress = () => {
-        var _migrationProgress$su, _migrationProgress$fa, _migrationProgress$su2, _migrationProgress$fa2;
-        return /*#__PURE__*/React.createElement("div", {
-            style: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '16px',
-                padding: '16px'
+        }}>
+            <CircularLoader />
+            {
+                migrationProgress.step == 0? <div>
+                    <p>{i18n.t("Updating Organisation Units")}</p>
+                </div> : <>
+                    <div>
+                        {i18n.t('Transferring Ownerships {{success}} successes and {{failure}} failures of {{total}} TEIs...', {
+                            success: migrationProgress.successfulTeis?.length || 0,
+                            failure: migrationProgress.failedTeis?.length || 0,
+                            total: migrationProgress.total,
+                        })}
+                    </div>
+                    <div>
+                        {Math.round((
+                            ((migrationProgress.successfulTeis?.length || 0) + (migrationProgress.failedTeis?.length || 0))
+                            / migrationProgress.total) * 100)
+                            }%
+                    </div>
+                </>
             }
-        }, /*#__PURE__*/React.createElement(CircularLoader, null), migrationProgress.step == 0 ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", null, i18n.t("Updating Organisation Units"))) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", null, i18n.t('Transferring Ownerships {{success}} successes and {{failure}} failures of {{total}} TEIs...', {
-            success: ((_migrationProgress$su = migrationProgress.successfulTeis) === null || _migrationProgress$su === void 0 ? void 0 : _migrationProgress$su.length) || 0,
-            failure: ((_migrationProgress$fa = migrationProgress.failedTeis) === null || _migrationProgress$fa === void 0 ? void 0 : _migrationProgress$fa.length) || 0,
-            total: migrationProgress.total
-        })), /*#__PURE__*/React.createElement("div", null, Math.round(((((_migrationProgress$su2 = migrationProgress.successfulTeis) === null || _migrationProgress$su2 === void 0 ? void 0 : _migrationProgress$su2.length) || 0) + (((_migrationProgress$fa2 = migrationProgress.failedTeis) === null || _migrationProgress$fa2 === void 0 ? void 0 : _migrationProgress$fa2.length) || 0)) / migrationProgress.total * 100), "%")));
-    };
+        </div>
+    )
 
-    return /*#__PURE__*/React.createElement(Modal, {
-        onClose: onClose,
-        position: "middle",
-        large: true
-    }, /*#__PURE__*/React.createElement(ModalTitle, null, "Data Migration"), loading && step === 'migrating' ? /*#__PURE__*/React.createElement(ModalContent, null, renderProgress()) : error ? /*#__PURE__*/React.createElement(ModalContent, null, /*#__PURE__*/React.createElement(NoticeBox, {
-        error: true,
-        title: i18n.t('Could not migrate TEIs')
-    }, (error === null || error === void 0 ? void 0 : error.message) || i18n.t("The TEIs couldn't be migrated. Try again or contact your system administrator."))) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ModalContent, null, migrationStatus === 'success' ? /*#__PURE__*/React.createElement(NoticeBox, {
-        success: true,
-        title: i18n.t('Migration successful')
-    }, i18n.t('All TEIs have been successfully migrated to the selected org unit.')) : step === 'selection' ? /*#__PURE__*/React.createElement("div", {
-        style: {
-            marginBottom: '20px'
-        }
-    }, /*#__PURE__*/React.createElement("h4", null, "Select Target Organisation Unit"), /*#__PURE__*/React.createElement(OrgUnitSelection, {
-        isSourceOrgUnit: false
-    })) : step === 'preview' ? renderPreview() : null), /*#__PURE__*/React.createElement(ModalActions, null, migrationStatus === 'success' ? /*#__PURE__*/React.createElement(ButtonStrip, null, /*#__PURE__*/React.createElement(Button, {
-        secondary: true,
-        onClick: onCloseClicked,
-        dataTest: "data-migration-modal-confirm"
-    }, i18n.t('Close'))) : /*#__PURE__*/React.createElement(ButtonStrip, null, step === 'preview' ? /*#__PURE__*/React.createElement(Button, {
-        secondary: true,
-        onClick: handleBackClick,
-        dataTest: "data-migration-modal-back"
-    }, i18n.t('Back')) : /*#__PURE__*/React.createElement(Button, {
-        secondary: true,
-        onClick: onCloseClicked,
-        dataTest: "data-migration-modal-cancel"
-    }, i18n.t('Cancel')), step === 'selection' && /*#__PURE__*/React.createElement(Button, {
-        disabled: !targetOrgUnit,
-        primary: true,
-        onClick: handleNextClick,
-        dataTest: "data-migration-modal-next"
-    }, i18n.t('Next')), step === 'preview' && /*#__PURE__*/React.createElement(Button, {
-        primary: true,
-        onClick: migrateData,
-        dataTest: "data-migration-modal-confirm"
-    }, i18n.t('Confirm Migration'))))));
-};
+    return (
+        <Modal onClose={onCloseClicked} position="middle" large>
+            <ModalTitle>Data Migration</ModalTitle>
+            {loading && step === 'migrating' ? (
+                <ModalContent>
+                    {renderProgress()}
+                </ModalContent>
+            ) : error ? (
+                <ModalContent>
+                    <NoticeBox error title={i18n.t('Could not migrate TEIs')}>
+                        {error?.message ||
+                            i18n.t(
+                                "The TEIs couldn't be migrated. {{error}}",
+                                { error: error }
+                            )}
+                    </NoticeBox>
+                </ModalContent>
+            ) : (
+                <>
+                    <ModalContent>
+                        {migrationStatus === 'success' ? (
+                            <NoticeBox success title={i18n.t('Migration successful')}>
+                                {i18n.t('All TEIs have been successfully migrated to the selected org unit.')}
+                            </NoticeBox>
+                        ) : step === 'selection' ? (
+                            <div style={{ marginBottom: '20px' }}>
+                                <h4>Select Target Organisation Unit</h4>
+                                <OrgUnitSelection isSourceOrgUnit={false} />
+                            </div>
+                        ) : step === 'preview' ? (
+                            renderPreview()
+                        ) : null}
+                    </ModalContent>
+                    <ModalActions>
+                        {migrationStatus === 'success' ? (
+                            <ButtonStrip>
+                                <Button
+                                    secondary
+                                    onClick={onCloseClicked}
+                                    dataTest="data-migration-modal-confirm"
+                                >
+                                    {i18n.t('Close')}
+                                </Button>
+                            </ButtonStrip>
+                        ) : (
+                            <ButtonStrip>
+                                <Button
+                                    secondary
+                                    onClick={onCloseClicked}
+                                    dataTest="data-migration-modal-cancel"
+                                >
+                                    {i18n.t('Cancel')}
+                                </Button>
+                                {step === 'selection' && (
+                                    <Button
+                                        disabled={!targetOrgUnit}
+                                        primary
+                                        onClick={() => setStep('preview')}
+                                        dataTest="data-migration-modal-next"
+                                    >
+                                        {i18n.t('Next')}
+                                    </Button>
+                                )}
+                                {step === 'preview' && (
+                                    <Button
+                                        primary
+                                        onClick={migrateData}
+                                        dataTest="data-migration-modal-confirm"
+                                    >
+                                        {i18n.t('Confirm Migration')}
+                                    </Button>
+                                )}
+                            </ButtonStrip>
+                        )}
+                    </ModalActions>
+                </>
+            )}
+        </Modal>
+    )
+}
 
 DataMigrationModal.propTypes = {
     onClose: PropTypes.func.isRequired
