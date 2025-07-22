@@ -7,6 +7,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "POT-Creation-Date: 2025-07-04T07:24:45.899Z\n"
 "PO-Revision-Date: 2025-07-04T07:24:45.900Z\n"
+"POT-Creation-Date: 2025-07-20T11:45:53.563Z\n"
+"PO-Revision-Date: 2025-07-20T11:45:53.563Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -157,6 +159,9 @@ msgstr "Migration successful"
 
 msgid "All TEIs have been successfully migrated to the selected org unit."
 msgstr "All TEIs have been successfully migrated to the selected org unit."
+
+msgid "Back"
+msgstr "Back"
 
 msgid "Next"
 msgstr "Next"

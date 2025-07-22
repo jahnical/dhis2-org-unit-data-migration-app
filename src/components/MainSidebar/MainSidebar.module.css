@@ -76,3 +76,12 @@
     /* Prevent line from fading while resizing and when focussed */
     opacity: 1;
 }
+
+
+.orgUnitSelectionWrapper {
+    padding: var(--spacers-dp8);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Important: allows flex child to shrink */
+}
