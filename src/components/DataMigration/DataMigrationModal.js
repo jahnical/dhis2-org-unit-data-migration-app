@@ -1,40 +1,43 @@
-import { useDataEngine } from '@dhis2/app-runtime'
-import i18n from '@dhis2/d2-i18n'
-import {
-    Modal,
-    ModalContent,
-    ModalActions,
-    ButtonStrip,
-    ModalTitle,
-    Button,
-    CircularLoader,
-    NoticeBox,
-} from '@dhis2/ui'
-import PropTypes from 'prop-types'
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { dataActionCreators } from '../../actions/data_controls.js'
-import {
-    migrationActions,
-} from '../../actions/migration.js'
-import { dataControlSelectors } from '../../reducers/data_controls.js'
-import { sGetMetadata } from '../../reducers/metadata.js'
-import { migrationSelectors } from '../../reducers/migration.js'
-import OrgUnitSelection from './OrgUnitSelection.js'
+import { useDataEngine } from '@dhis2/app-runtime';
+import i18n from '@dhis2/d2-i18n';
+import { Modal, ModalContent, ModalActions, ButtonStrip, ModalTitle, Button, CircularLoader, NoticeBox } from '@dhis2/ui';
+import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { dataActionCreators } from '../../actions/data_controls.js';
+import { migrationActions } from '../../actions/migration.js';
+import { dataControlSelectors } from '../../reducers/data_controls.js';
+import { sGetMetadata } from '../../reducers/metadata.js';
+import { migrationSelectors } from '../../reducers/migration.js';
+import OrgUnitSelection from '../SearchableOrgUnitTree/OrgUnitSelection.js';
 
-const DataMigrationModal = ({ onClose }) => {
-    const [step, setStep] = useState('selection') // selection, preview, migrating
-    const [migrationProgress, setMigrationProgress] = useState({step: 0})
+const DataMigrationModal = _ref => {
+    let {
+        onClose
+    } = _ref;
+    const [step, setStep] = useState('selection'); // selection, preview, migrating
+    const [migrationProgress, setMigrationProgress] = useState({
+        step: 0
+    });
+    const [preservedOrgUnit, setPreservedOrgUnit] = useState(null); // Store org unit when going to preview
 
-    const targetOrgUnit = useSelector(migrationSelectors.getMigrationTargetOrgUnitId)
-    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
-    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
-    const loading = useSelector(migrationSelectors.getMigrationIsLoading)
-    const error = useSelector(migrationSelectors.getMigrationError)
-    const migrationStatus = useSelector(migrationSelectors.getMigrationMigrationStatus)
-    const metadata = useSelector(sGetMetadata)
-    const engine = useDataEngine()
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    const targetOrgUnit = useSelector(migrationSelectors.getMigrationTargetOrgUnitId);
+    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs);
+    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs);
+    const loading = useSelector(migrationSelectors.getMigrationIsLoading);
+    const error = useSelector(migrationSelectors.getMigrationError);
+    const migrationStatus = useSelector(migrationSelectors.getMigrationMigrationStatus);
+    const metadata = useSelector(sGetMetadata);
+    const engine = useDataEngine();
+
+    useEffect(() => {
+        // Clear target org unit when modal opens
+        dispatch(migrationActions.setTargetOrgUnit(null));
+        setPreservedOrgUnit(null);
+    }, [dispatch]);
+
+    console.log('targetOrgUnit value:', targetOrgUnit);
     const [currentUser, setCurrentUser] = useState(null)
 
     // Fetch logged-in user on mount
@@ -74,8 +77,10 @@ const DataMigrationModal = ({ onClose }) => {
     }, [targetOrgUnit, metadata])
 
     const migrateData = async () => {
-        setStep('migrating')
-        setMigrationProgress({step: 0})
+        setStep('migrating');
+        setMigrationProgress({
+            step: 0
+        });
 
         // Simulating progress updates
         const updateProgress = (progress) => {
@@ -97,8 +102,8 @@ const DataMigrationModal = ({ onClose }) => {
 
     const onCloseClicked = () => {
         if (migrationStatus === 'success') {
-            dispatch(dataActionCreators.reset())
-            dispatch(migrationActions.resetMigration())
+            dispatch(dataActionCreators.reset());
+            dispatch(migrationActions.resetMigration());
         } else {
             dispatch(migrationActions.resetMigration())
         }
@@ -241,7 +246,7 @@ const DataMigrationModal = ({ onClose }) => {
 }
 
 DataMigrationModal.propTypes = {
-    onClose: PropTypes.func.isRequired,
-}
+    onClose: PropTypes.func.isRequired
+};
 
-export default DataMigrationModal
+export default DataMigrationModal;

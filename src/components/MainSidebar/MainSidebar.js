@@ -13,7 +13,7 @@ import {
 import DataDeletionModal from '../DataDeletion/DataDeletionModal.js'
 import DataDownloadModal from '../DataDownload/DataDownloadModal.js'
 import DataMigrationModal from '../DataMigration/DataMigrationModal.js'
-import OrgUnitSelection from '../DataMigration/OrgUnitSelection.js'
+import OrgUnitSelection from '../SearchableOrgUnitTree/OrgUnitSelection.js'
 import { InputPanel } from './InputPanel/index.js'
 import styles from './MainSidebar.module.css'
 import { useSelectedDimensions } from './SelectedDimensionsContext.js'
@@ -104,14 +104,15 @@ const MainSidebar = () => {
 
                     <Divider />
 
-                    <div
-                        style={{
-                            overflow: 'auto',
-                            maxHeight: '512px',
-                        }}
-                    >
-                        <h4>Select Source Organisation Unit</h4>
-                        <OrgUnitSelection isSourceOrgUnit={true} />
+                    {/* Updated OrgUnitSelection with compact mode and custom styling */}
+                    <div className={styles.orgUnitSelectionWrapper}>
+                        <OrgUnitSelection
+                            isSourceOrgUnit={true}
+                            title="Select Source Organisation Unit"
+                            description="" // No description for compact mode
+                            compact={true}
+                            maxHeight="400px" // Custom max height for sidebar
+                        />
                     </div>
 
                     <Divider />
