@@ -139,17 +139,24 @@ const TEIs = () => {
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            dispatch(dataActionCreators.setSelectedTEIs(displayTeis.map(tei => tei.id)))
+            const selectedIds = displayTeis.map(tei => tei.id)
+            const selectedTeiObjs = displayTeis.map(tei => ({ id: tei.id, ...tei }))
+            console.log('[History][TEIs Selected][All]', selectedTeiObjs)
+            dispatch(dataActionCreators.setSelectedTEIs(selectedIds))
         } else {
+            console.log('[History][TEIs Deselected][All]')
             dispatch(dataActionCreators.setSelectedTEIs([]))
         }
     }
 
     const handleSelectTei = (teiId) => {
         const isSelected = selectedTeis.includes(teiId)
+        const teiObj = displayTeis.find(tei => tei.id === teiId)
         if (isSelected) {
+            console.log('[History][TEI Deselected]', teiObj)
             dispatch(dataActionCreators.setSelectedTEIs(selectedTeis.filter(id => id !== teiId)))
         } else {
+            console.log('[History][TEI Selected]', teiObj)
             dispatch(dataActionCreators.setSelectedTEIs([...selectedTeis, teiId]))
         }
     }

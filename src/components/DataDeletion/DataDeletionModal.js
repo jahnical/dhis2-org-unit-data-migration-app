@@ -15,8 +15,10 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { dataActionCreators } from '../../actions/data_controls.js'
 import { deletionAsyncActions } from '../../actions/deletion.js'
+import { logHistoryBatchThunk } from '../../actions/history'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { deletionSelectors } from '../../reducers/deletion.js'
+import { buildSoftDeleteHistoryRecord } from '../../utils/buildSoftDeleteHistoryRecord'
 
 const DataDeletionModal = ({ onClose }) => {
     const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs);
@@ -28,6 +30,15 @@ const DataDeletionModal = ({ onClose }) => {
     const engine = useDataEngine();
     const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit);
     const programId = useSelector(dataControlSelectors.getDataControlProgram);
+    const currentUser = useSelector(state => state.current.user || { id: '', name: '' })
+    const programName = useSelector(state => {
+        const program = state.metadata.programs?.find(p => p.id === programId)
+        return program?.name || ''
+    })
+    const orgUnitName = useSelector(state => {
+        const ou = state.metadata.orgUnits?.find(o => o.id === orgUnitId)
+        return ou?.name || ''
+    })
 
     // Local state
     const [showConfirm, setShowConfirm] = React.useState(false);
@@ -66,8 +77,18 @@ const DataDeletionModal = ({ onClose }) => {
         if (deletionStatus === 'soft_deleted') {
             setDeletionComplete(true);
             dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine));
+            // Log to migration history
+            const historyRecord = buildSoftDeleteHistoryRecord({
+                programId,
+                programName,
+                orgUnitId,
+                orgUnitName,
+                user: currentUser,
+                teis: selectedTeiObjects,
+            })
+            dispatch(logHistoryBatchThunk(historyRecord, engine))
         }
-    }, [deletionStatus, orgUnitId, programId, engine, dispatch]);
+    }, [deletionStatus, orgUnitId, programId, engine, dispatch, programName, orgUnitName, currentUser, selectedTeiObjects]);
 
     // Reset local state on open/unmount
     useEffect(() => {
