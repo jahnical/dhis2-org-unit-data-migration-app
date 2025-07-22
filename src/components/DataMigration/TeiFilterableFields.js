@@ -326,7 +326,7 @@ const TeiFilterableFields = () => {
 
                 {selectedField.name === 'Household Member Number' && (
                 <InputField
-                    label={i18n.t('Enter Househould Member Number')}
+                    label={i18n.t('Enter Household Member Number')}
                     type="number"
                     value={keyword}
                     onChange={({ value }) => {
