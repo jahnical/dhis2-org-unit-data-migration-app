@@ -19,6 +19,7 @@ export const migrationActions = {
             targetOrgUnitName,
             engine,
             onProgress,
+            currentUser,
         }) =>
         async (dispatch) => {
             if (
@@ -42,12 +43,19 @@ export const migrationActions = {
                     selectedTeis.includes(tei.trackedEntityInstance)
                 )
 
+                // Use currentUser for storedBy/lastUpdatedBy
+                const migrationUser = currentUser || { uid: '', username: '', displayName: '' }
                 const updatedTeis = teis.map((tei) => {
                     // Update all orgUnit references in the TEI
                     const updatedTei = {
                         ...tei,
                         orgUnit: targetOrgUnit,
                         lastUpdated: new Date().toISOString(),
+                        lastUpdatedBy: {
+                            username: migrationUser.username || '',
+                            displayName: migrationUser.displayName || migrationUser.username || '',
+                        },
+                        storedBy: migrationUser.username || migrationUser.displayName || '',
                     }
 
                     // Update orgUnit in all enrollments
@@ -159,7 +167,12 @@ export const migrationActions = {
                 const state = dispatch((_, getState) => getState()) || {};
                 const programId = state.ui?.program?.id;
                 const programName = state.metadata?.[programId]?.name || '';
-                const user = state.current?.user || { id: '', name: '' };
+                // Use currentUser for user field in history
+                const user = migrationUser && (migrationUser.uid || migrationUser.username || migrationUser.displayName) ? {
+                    id: migrationUser.uid || '',
+                    name: migrationUser.displayName || migrationUser.username || '',
+                    username: migrationUser.username || '',
+                } : { id: '', name: '' };
                 const sourceOrgUnitId = teis[0]?.orgUnit; // Before migration, this is the source
                 const sourceOrgUnitName = state.metadata?.[sourceOrgUnitId]?.name || '';
                 const targetOrgUnitId = targetOrgUnit;
@@ -180,7 +193,10 @@ export const migrationActions = {
                         lastUpdated: tei.lastUpdated,
                         storedBy: tei.storedBy,
                         lastUpdatedBy: tei.lastUpdatedBy,
-                        attributes: tei.attributes || [],
+                        attributes: (tei.attributes || []).map(attr => ({
+                            ...attr,
+                            lastUpdatedBy: tei.lastUpdatedBy?.username || tei.lastUpdatedBy || '',
+                        })),
                     })),
                 };
                 await dispatch(logHistoryBatchThunk(historyBatch, engine));

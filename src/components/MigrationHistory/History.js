@@ -13,21 +13,32 @@ import { undoMigrationBatchesThunk } from '../../actions/undoMigration'
 import { restoreTeisBatchesThunk } from '../../actions/restoreTeis'
 
 const History = () => {
-    const [selectedBatches, setSelectedBatches] = useState([])
-    const [showUndoModal, setShowUndoModal] = useState(false)
-    const [showRestoreModal, setShowRestoreModal] = useState(false)
-    const [filter, setFilter] = useState('all')
-    const dispatch = useDispatch()
-    const engine = useDataEngine()
-    const histories = useSelector(state => state.history.histories)
+    const [selectedBatches, setSelectedBatches] = useState([]);
+    const [showUndoModal, setShowUndoModal] = useState(false);
+    const [showRestoreModal, setShowRestoreModal] = useState(false);
+    const [filter, setFilter] = useState('all');
+    const dispatch = useDispatch();
+    const engine = useDataEngine();
+    const histories = useSelector(state => state.history.histories);
+    const [currentUser, setCurrentUser] = useState({});
+    React.useEffect(() => {
+        async function fetchUser() {
+            try {
+                const { me } = await engine.query({ me: { resource: 'me' } });
+                setCurrentUser(me);
+            } catch (e) {
+                setCurrentUser({});
+            }
+        }
+        if (engine) fetchUser();
+    }, [engine]);
 
     const handleUndoConfirm = (batchIds) => {
-        // Dispatch the undo thunk
-        dispatch(undoMigrationBatchesThunk(batchIds, engine))
-    }
+        dispatch(undoMigrationBatchesThunk(batchIds, engine, currentUser));
+    };
     const handleRestoreConfirm = (batchIds) => {
-        dispatch(restoreTeisBatchesThunk(batchIds, engine))
-    }
+        dispatch(restoreTeisBatchesThunk(batchIds, engine));
+    };
 
     // Filter histories by action type
     const filteredHistories = filter === 'all' ? histories : histories.filter(h => h.action === filter)
@@ -54,7 +65,15 @@ const History = () => {
                 <HistoryFilter value={filter} onFilterChange={setFilter} />
             </div>
             <MigrationHistoryTable onSelectionChange={setSelectedBatches} histories={filteredHistories} />
-            <UndoMigrationModal open={showUndoModal} onClose={() => setShowUndoModal(false)} selectedBatches={selectedBatches} onConfirm={handleUndoConfirm} />
+            <UndoMigrationModal
+                open={showUndoModal}
+                onClose={() => setShowUndoModal(false)}
+                selectedBatches={selectedBatches}
+                engine={engine}
+                currentUser={currentUser}
+                histories={histories}
+                onConfirm={handleUndoConfirm}
+            />
             <RestoreConfirmationModal open={showRestoreModal} onClose={() => setShowRestoreModal(false)} selectedBatches={selectedBatches} onConfirm={handleRestoreConfirm} />
         </div>
     )

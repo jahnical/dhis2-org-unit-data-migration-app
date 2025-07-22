@@ -35,6 +35,23 @@ const DataMigrationModal = ({ onClose }) => {
     const metadata = useSelector(sGetMetadata)
     const engine = useDataEngine()
     const dispatch = useDispatch()
+    const [currentUser, setCurrentUser] = useState(null)
+
+    // Fetch logged-in user on mount
+    React.useEffect(() => {
+        async function fetchUser() {
+            try {
+                const { me } = await engine.query({
+                    me: { resource: 'me' },
+                })
+                setCurrentUser(me)
+                console.log('Logged-in user:', me)
+            } catch (e) {
+                console.error('Failed to fetch logged-in user', e)
+            }
+        }
+        fetchUser()
+    }, [engine])
 
     const setTargetOrgUnit = (orgUnitId) => {
         if (metadata[orgUnitId]) {
@@ -73,6 +90,7 @@ const DataMigrationModal = ({ onClose }) => {
                 targetOrgUnitName: metadata[targetOrgUnit].name,
                 engine: engine,
                 onProgress: updateProgress,
+                currentUser: currentUser,
             })
         )
     }
@@ -84,7 +102,8 @@ const DataMigrationModal = ({ onClose }) => {
         } else {
             dispatch(migrationActions.resetMigration())
         }
-        onClose()
+        dispatch({ type: 'MIGRATE_TEIS_RESET' });
+        onClose();
     }
 
     const renderPreview = () => (

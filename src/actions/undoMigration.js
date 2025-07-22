@@ -39,11 +39,11 @@ function swapOrgUnits(batch) {
 }
 
 // Main thunk
-export const undoMigrationBatchesThunk = (batchIds, engine) => async (dispatch, getState) => {
-    const { histories } = getState().history
-    const batchesToUndo = histories.filter(b => batchIds.includes(b.id) && b.action === 'migrated')
+export const undoMigrationBatchesThunk = (batchIds, engine, currentUser) => async (dispatch, getState) => {
+    const { histories } = getState().history;
+    const batchesToUndo = histories.filter(b => batchIds.includes(b.id) && b.action === 'migrated');
     try {
-        dispatch(undoMigrationBatch(batchIds))
+        dispatch(undoMigrationBatch(batchIds));
         for (const batch of batchesToUndo) {
             // Prepare TEIs and swap org units
             // Retrieve TEIs
@@ -51,18 +51,18 @@ export const undoMigrationBatchesThunk = (batchIds, engine) => async (dispatch, 
                 const teiData = await engine.query({
                     teis: {
                         resource: `trackedEntityInstances/${tei.id}`,
-                        params: { fields: '*'}
+                        params: { fields: '*' }
                     }
                 });
                 return teiData.teis;
             });
             const updatedTeis = await Promise.all(teiPromises);
-            const selectedTeis = batch.teis.map(tei => tei.id)
-            const sourceOrgUnit = batch.targetOrgUnit.id
-            const targetOrgUnit = batch.sourceOrgUnit.id
-            const targetOrgUnitName = batch.sourceOrgUnit.name
-            console.log('Undoing migration for batch:', batch.id, 'from', sourceOrgUnit, 'to', targetOrgUnit)
-            console.log('Selected TEIs:', updatedTeis)
+            const selectedTeis = batch.teis.map(tei => tei.id);
+            const sourceOrgUnit = batch.targetOrgUnit.id;
+            const targetOrgUnit = batch.sourceOrgUnit.id;
+            const targetOrgUnitName = batch.sourceOrgUnit.name;
+            console.log('Undoing migration for batch:', batch.id, 'from', sourceOrgUnit, 'to', targetOrgUnit);
+            console.log('Selected TEIs:', updatedTeis);
 
             // Call migration logic with swapped org units
             await dispatch(migrationActions.migrateTEIs({
@@ -72,13 +72,24 @@ export const undoMigrationBatchesThunk = (batchIds, engine) => async (dispatch, 
                 targetOrgUnitName: targetOrgUnitName,
                 engine: engine,
                 onProgress: (pg) => {console.log('Migration progress:', pg)},
-        }))
+                currentUser: currentUser,
+            }));
             // Log undo to history
-            const undoneBatch = swapOrgUnits(batch)
-            await dispatch(logHistoryBatchThunk(undoneBatch, engine))
+            const undoneBatch = swapOrgUnits(batch);
+            await dispatch(logHistoryBatchThunk(undoneBatch, engine));
+
+            // --- Cleanup migration history and update Redux state ---
+            const { getLocalHistory, setLocalHistory, cleanUpAfterUndo, setDataStoreHistory } = require('../utils/migrationHistoryStorage');
+            let localHistory = getLocalHistory();
+            localHistory = cleanUpAfterUndo(localHistory, batch.id);
+            setLocalHistory(localHistory);
+            if (engine) {
+                await setDataStoreHistory(engine, localHistory);
+            }
+            dispatch({ type: 'SET_MIGRATION_HISTORY', payload: localHistory });
         }
-        dispatch(undoMigrationSuccess(batchIds))
+        dispatch(undoMigrationSuccess(batchIds));
     } catch (error) {
-        dispatch(undoMigrationFailure(error.message))
+        dispatch(undoMigrationFailure(error.message));
     }
 }

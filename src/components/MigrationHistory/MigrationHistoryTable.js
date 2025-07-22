@@ -9,8 +9,8 @@ const COLUMN_DEFS = [
     { key: 'program', label: 'Program', width: '300px' },
     { key: 'sourceOrgUnit', label: 'Source Org Unit', width: '300px' },
     { key: 'targetOrgUnit', label: 'Target Org Unit', width: '300px' },
-    { key: 'user', label: 'User', width: '200px' },
-    { key: 'action', label: 'Action', width: '160px' },
+    { key: 'user', label: 'User', width: '160px' },
+    { key: 'action', label: 'Action', width: '120px' },
 ]
 
 const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp }) => {
@@ -75,6 +75,32 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp }) 
 
     // Get all attribute display names from the first batch with TEIs
     const attributeNames = (histories.find(b => b.teis && b.teis.length > 0)?.teis[0]?.attributes || []).map(a => a.displayName)
+
+    // ...existing code...
+
+    // Render expandable row for TEI attributes
+    function renderTeiAttributes(batch) {
+        if (!batch.teis || batch.teis.length === 0) return null
+        return (
+            <div style={{ padding: '12px 24px', background: '#f9f9f9', borderTop: '1px solid #eee' }}>
+                <div style={{ fontWeight: 600, marginBottom: 8 }}>TEI Attributes:</div>
+                {batch.teis.map((tei, idx) => (
+                    <div key={tei.id || idx} style={{ marginBottom: 8 }}>
+                        <div style={{ fontWeight: 500 }}>TEI ID: {tei.id}</div>
+                        <ul style={{ marginLeft: 16 }}>
+                            {tei.attributes && tei.attributes.map(attr => (
+                                <li key={attr.displayName}>
+                                    <strong>{attr.displayName}:</strong> {attr.value}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
+    // ...existing code...
 
     return (
         <div>
