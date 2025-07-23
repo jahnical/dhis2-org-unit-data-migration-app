@@ -35,18 +35,22 @@ export function useDeletionHistoryLogic() {
 
     const confirmRestoreDeletedTeis = async () => {
         setRestoring(true);
+        let success = false;
         try {
             const teisToRestore = deletedTeis.filter(tei => selectedDeletedTeis.includes(tei.id));
             await newRestoreTEI(engine, teisToRestore);
             dispatch({ type: 'TEIS_MARK_RESTORED', payload: selectedDeletedTeis });
-            alert.show('Successfully restored TEI(s).', { success: true });
+            alert.show({ message: 'Successfully restored TEI(s).', type: 'success' });
+            success = true;
         } catch (e) {
-            alert.show('Failed to restore TEI(s).', { critical: true });
+            alert.show({ message: 'Failed to restore TEI(s).', type: 'critical' });
+            success = false;
         } finally {
             setRestoring(false);
             setSelectedDeletedTeis([]);
             setShowRestoreDeletedModal(false);
         }
+        return success;
     };
 
     return {

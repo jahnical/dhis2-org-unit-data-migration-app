@@ -149,7 +149,6 @@ const History = () => {
                         }}
                         customColumns={['timestamp', 'teiUid', 'program', 'orgUnit', 'user', 'action']}
                         selectedBatches={deletion.selectedDeletedTeis}
-                        onRestore={deletion.handleRestoreDeletedTeis}
                         canRestore={deletion.canRestoreDeletedTeis && !deletion.restoring}
                         metadata={metadata}
                     />
@@ -180,10 +179,7 @@ const History = () => {
                     open={deletion.showRestoreDeletedModal}
                     onClose={() => deletion.setShowRestoreDeletedModal(false)}
                     selectedTeis={deletion.selectedDeletedTeis}
-                    onConfirm={async () => {
-                        await handleRestoreConfirm(deletion.selectedDeletedTeis);
-                        deletion.confirmRestoreDeletedTeis();
-                    }}
+                    onConfirm={deletion.confirmRestoreDeletedTeis}
                     restoring={deletion.restoring}
                 />
             )}

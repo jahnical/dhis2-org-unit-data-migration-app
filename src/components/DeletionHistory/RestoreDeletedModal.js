@@ -2,6 +2,11 @@ import React from 'react';
 import { Modal, ModalTitle, ModalContent, ModalActions, Button, ButtonStrip } from '@dhis2/ui';
 
 const RestoreDeletedModal = ({ open, onClose, selectedTeis, onConfirm, restoring }) => {
+    const handleConfirm = async () => {
+        await onConfirm();
+        onClose();
+    };
+
     if (!open) return null;
     return (
         <Modal small onClose={onClose} position="middle">
@@ -17,7 +22,7 @@ const RestoreDeletedModal = ({ open, onClose, selectedTeis, onConfirm, restoring
             <ModalActions>
                 <ButtonStrip end>
                     <Button secondary onClick={onClose} disabled={restoring}>Cancel</Button>
-                    <Button primary onClick={() => { onConfirm(); }} disabled={restoring}>Confirm Restore</Button>
+                    <Button primary onClick={handleConfirm} disabled={restoring}>Confirm Restore</Button>
                 </ButtonStrip>
             </ModalActions>
         </Modal>
