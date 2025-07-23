@@ -1,4 +1,3 @@
-// MigrationHistoryTable.js
 // Renders the DataTable UI for displaying migration history
 import React, { useState, useEffect, memo } from 'react'
 import { useSelector } from 'react-redux'
@@ -198,7 +197,6 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
     // Get all attribute display names from the first batch with TEIs
     const attributeNames = (histories.find(b => b.teis && b.teis.length > 0)?.teis[0]?.attributes || []).map(a => a.displayName)
 
-    // Show Restore button in header if onRestore and canRestore are provided (for deleted-current view)
     const showRestoreHeaderButton = typeof onRestore === 'function' && typeof selectedBatches !== 'undefined' && Array.isArray(selectedBatches);
 
     return (
@@ -236,7 +234,6 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
                                     {col.label}
                                 </DataTableColumnHeader>
                             ))}
-                            {/* Restore button removed from table header; handled by parent component (History.js) */}
                         </DataTableRow>
                     </DataTableHead>
                     <DataTableBody>

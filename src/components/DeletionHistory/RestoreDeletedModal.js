@@ -1,5 +1,3 @@
-// RestoreDeletedModal.js
-// Modal for confirming restore of deleted TEIs
 import React from 'react';
 import { Modal, ModalTitle, ModalContent, ModalActions, Button, ButtonStrip } from '@dhis2/ui';
 

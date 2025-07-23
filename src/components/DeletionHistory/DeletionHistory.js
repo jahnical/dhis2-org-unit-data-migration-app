@@ -1,16 +1,11 @@
-// src/components/DeletionHistory/DeletionHistory.js
+
 import { useState } from 'react';
 import { useAlert } from '@dhis2/app-runtime';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDataEngine } from '@dhis2/app-runtime';
-import MigrationHistoryTable from '../MigrationHistory/MigrationHistoryTable';
 import { dataControlSelectors } from '../../reducers/data_controls';
-import UndoMigrationButton from '../MigrationHistory/UndoMigrationButton';
-import RestoreButton from '../MigrationHistory/RestoreButton';
-import HistoryFilter from '../MigrationHistory/HistoryFilter';
 import { newRestoreTEI } from '../../api/teis';
 
-// Modular hook for deleted TEI restore logic
 export function useDeletionHistoryLogic() {
     const [selectedDeletedTeis, setSelectedDeletedTeis] = useState([]);
     const [restoring, setRestoring] = useState(false);
@@ -20,7 +15,6 @@ export function useDeletionHistoryLogic() {
     const alert = useAlert();
     const deletedTeis = useSelector(dataControlSelectors.getDeletedTEIs);
 
-    // Show org unit name, not ID
     const histories = deletedTeis.map(tei => ({
         id: tei.id,
         timestamp: tei.lastUpdated || tei.created || '',
@@ -33,7 +27,6 @@ export function useDeletionHistoryLogic() {
     }));
 
     const canRestoreDeletedTeis = selectedDeletedTeis.length > 0;
-    const canUndo = false; // Undo logic for deleted TEIs can be implemented if needed
 
     const handleRestoreDeletedTeis = async () => {
         if (!selectedDeletedTeis.length) return;
@@ -64,7 +57,6 @@ export function useDeletionHistoryLogic() {
         showRestoreDeletedModal,
         setShowRestoreDeletedModal,
         canRestoreDeletedTeis,
-        canUndo,
         handleRestoreDeletedTeis,
         confirmRestoreDeletedTeis,
         deletedTeis,

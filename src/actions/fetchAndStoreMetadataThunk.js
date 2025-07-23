@@ -1,5 +1,3 @@
-// src/actions/metadata.js
-
 import { useDataEngine } from '@dhis2/app-runtime';
 
 export const fetchAndStoreMetadataThunk = (deletedTeis, engine) => async (dispatch) => {
@@ -16,10 +14,6 @@ export const fetchAndStoreMetadataThunk = (deletedTeis, engine) => async (dispat
         if (tei.orgUnit) orgUnitIds.add(tei.orgUnit);
         if (tei.orgUnitId) orgUnitIds.add(tei.orgUnitId);
     });
-
-    // Log all program and org unit IDs being requested
-    console.log('Requesting program IDs:', Array.from(programIds));
-    console.log('Requesting orgUnit IDs:', Array.from(orgUnitIds));
 
     // Fetch program names using DHIS2 data engine
     const programNames = {};
@@ -52,9 +46,6 @@ export const fetchAndStoreMetadataThunk = (deletedTeis, engine) => async (dispat
             console.warn('Failed to fetch orgUnit', id, e);
         }
     }
-
-    console.log('Fetched programNames:', programNames);
-    console.log('Fetched orgUnitNames:', orgUnitNames);
     const metadataPayload = { programs: programNames, orgUnits: orgUnitNames };
     dispatch({ type: 'SET_METADATA', payload: metadataPayload });
 };

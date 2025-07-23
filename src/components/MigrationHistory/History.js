@@ -1,4 +1,3 @@
-// src/components/MigrationHistory/History.js
 import React, { useState } from 'react'
 import { useAlert } from '@dhis2/app-runtime'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,22 +9,18 @@ import RestoreDeletedModal from '../DeletionHistory/RestoreDeletedModal';
 import UndoMigrationButton from './UndoMigrationButton';
 import UndoMigrationModal from './UndoMigrationModal';
 import HistoryFilter from './HistoryFilter';
-import RestoreButton from './RestoreButton';
 import RestoreConfirmationModal from './RestoreConfirmationModal';
 import { undoMigrationBatchesThunk } from '../../actions/undoMigration';
 import { restoreTeisBatchesThunk } from '../../actions/restoreTeis';
-import { newRestoreTEI } from '../../api/teis';
 import { fetchAndStoreMetadataThunk } from '../../actions/fetchAndStoreMetadataThunk';
 
 const History = () => {
+    const { show: showAlert } = useAlert();
     const engine = useDataEngine();
     const dispatch = useDispatch();
     const deletion = useDeletionHistoryLogic();
     const histories = useSelector(state => state.history.histories)
     const metadata = useSelector(state => state.metadata)
-    // Debug: log metadata contents at render time
-    console.log('metadata.programs:', metadata.programs);
-    console.log('metadata.orgUnits:', metadata.orgUnits);
 
     // Fetch and store program/orgUnit names after deleted TEIs are loaded
     React.useEffect(() => {
@@ -37,8 +32,13 @@ const History = () => {
     const handleUndoConfirm = (batchIds) => {
         dispatch(undoMigrationBatchesThunk(batchIds, engine));
     };
-    const handleRestoreConfirm = (batchIds) => {
-        dispatch(restoreTeisBatchesThunk(batchIds, engine));
+    const handleRestoreConfirm = async (batchIds) => {
+        try {
+            await dispatch(restoreTeisBatchesThunk(batchIds, engine));
+            showAlert({ message: 'Successfully restored deleted TEIs.', type: 'success' });
+        } catch (error) {
+            showAlert({ message: 'Failed to restore deleted TEIs.', type: 'critical' });
+        }
     };
     const [selectedBatches, setSelectedBatches] = useState([])
     const [showUndoModal, setShowUndoModal] = useState(false)
@@ -121,7 +121,6 @@ const History = () => {
             <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center' }}>
                 {filter === 'deleted' ? (
                     <>
-                        <UndoMigrationButton selectedBatches={deletion.selectedDeletedTeis} onClick={() => {}} disabled={!deletion.canUndo} />
                         <RestoreDeletedButton
                             selectedTeis={deletion.selectedDeletedTeis}
                             onClick={deletion.handleRestoreDeletedTeis}
@@ -181,7 +180,10 @@ const History = () => {
                     open={deletion.showRestoreDeletedModal}
                     onClose={() => deletion.setShowRestoreDeletedModal(false)}
                     selectedTeis={deletion.selectedDeletedTeis}
-                    onConfirm={deletion.confirmRestoreDeletedTeis}
+                    onConfirm={async () => {
+                        await handleRestoreConfirm(deletion.selectedDeletedTeis);
+                        deletion.confirmRestoreDeletedTeis();
+                    }}
                     restoring={deletion.restoring}
                 />
             )}

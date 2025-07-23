@@ -24,7 +24,5 @@ export default (state = EMPTY_METADATA, action) => {
 }
 
 // Selectors
-
 export const sGetMetadata = (state) => state.metadata
-
 export const sGetMetadataById = (state, id) => state.metadata[id]

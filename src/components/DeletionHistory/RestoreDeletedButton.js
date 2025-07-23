@@ -1,5 +1,3 @@
-// RestoreDeletedButton.js
-// Button for restoring deleted TEIs (distinct icon)
 import React from 'react';
 import { Button } from '@dhis2/ui';
 
