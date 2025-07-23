@@ -33,6 +33,7 @@ const History = () => {
     const dispatch = useDispatch()
     const engine = useDataEngine()
     const histories = useSelector(state => state.history.histories)
+    const metadata = useSelector(state => state.metadata)
 
     const deletion = useDeletionHistoryLogic();
 
@@ -47,6 +48,12 @@ const History = () => {
         .filter(h => filter === 'all' || h.action === filter)
         .filter(b => selectedBatches.includes(b.id));
     const canUndo = selectedBatchObjs.length > 0 && selectedBatchObjs.every(isBatchUndoable);
+
+    // Debug: log the first deleted TEI to inspect available fields
+    if (filter === 'deleted' && deletion.deletedTeis.length > 0) {
+        // eslint-disable-next-line no-console
+        console.log('First deleted TEI:', deletion.deletedTeis[0]);
+    }
 
     return (
         <div>
@@ -80,7 +87,20 @@ const History = () => {
                     </div>
                 ) : (
                     <MigrationHistoryTable
-                        histories={deletion.histories}
+                        histories={deletion.deletedTeis.map(tei => {
+                            const programId = (tei.enrollments && tei.enrollments.length > 0) ? tei.enrollments[0].program : tei.program || '';
+                            const orgUnitId = tei.orgUnit || tei.orgUnitId || '';
+                            return {
+                                id: tei.id,
+                                timestamp: tei.lastUpdated || tei.created || '',
+                                teiUid: tei.id,
+                                program: { name: metadata.programs && metadata.programs[programId]?.name ? metadata.programs[programId].name : programId || '' },
+                                orgUnit: { name: metadata.orgUnits && metadata.orgUnits[orgUnitId]?.name ? metadata.orgUnits[orgUnitId].name : orgUnitId || '' },
+                                user: { name: tei.createdBy || tei.storedBy || (tei.lastUpdatedBy && tei.lastUpdatedBy.username) || tei.user || (tei.lastUpdatedByUserInfo && tei.lastUpdatedByUserInfo.username) || '' },
+                                action: 'deleted',
+                                teis: [tei],
+                            };
+                        })}
                         onSelectionChange={ids => {
                             const validIds = ids.filter(id => deletion.deletedTeis.some(tei => tei.id === id));
                             deletion.setSelectedDeletedTeis(validIds);
@@ -89,6 +109,7 @@ const History = () => {
                         selectedBatches={deletion.selectedDeletedTeis}
                         onRestore={deletion.handleRestoreDeletedTeis}
                         canRestore={deletion.canRestoreDeletedTeis && !deletion.restoring}
+                        metadata={metadata}
                     />
                 )
             ) : (

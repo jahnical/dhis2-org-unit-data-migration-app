@@ -20,7 +20,7 @@ const RestoreDeletedButton = ({ selectedTeis, onClick, disabled }) => (
         style={{ minWidth: 120 }}
         icon={RestoreDeletedIcon}
     >
-        Restore Deleted
+        Restore
     </Button>
 );
 
