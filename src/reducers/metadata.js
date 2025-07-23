@@ -5,6 +5,10 @@ const EMPTY_METADATA = {}
 
 export default (state = EMPTY_METADATA, action) => {
     switch (action.type) {
+        case 'SET_METADATA': {
+            // Overwrite the metadata state with the new payload
+            return { ...state, ...action.payload };
+        }
         case ADD_METADATA: {
             const result = { ...state }
             Object.entries(action.value).forEach(
