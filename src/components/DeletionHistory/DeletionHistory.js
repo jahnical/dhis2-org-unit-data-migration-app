@@ -60,6 +60,13 @@ export function useDeletionHistoryLogic() {
         setRestoring(false);
         // Only reset after alert is shown and restore completes
         if (success) {
+            // Refetch deleted TEIs from DataStore so UI updates
+            try {
+                const teis = await getDataStoreDeletedTeis(engine);
+                setDeletedTeis(teis);
+            } catch (e) {
+                setDeletedTeis([]);
+            }
             setSelectedDeletedTeis([]);
             setShowRestoreDeletedModal(false);
         }

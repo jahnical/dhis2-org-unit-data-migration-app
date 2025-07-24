@@ -141,7 +141,6 @@ const History = () => {
                         No deleted TEIs found. Only inactive (deleted) TEIs are shown here.
                     </div>
                 ) : (
-                    {(() => { window.__SHOW_DELETED_TEIS__ = true; return null })()}
                     <MigrationHistoryTable
                         histories={mappedDeletedTeis}
                         showDeleted={true}
@@ -154,11 +153,9 @@ const History = () => {
                         canRestore={deletion.canRestoreDeletedTeis && !deletion.restoring}
                         metadata={metadata}
                     />
-                    {(() => { window.__SHOW_DELETED_TEIS__ = false; return null })()}
                 )
             ) : (
                 <>
-                    {(() => { window.__SHOW_DELETED_TEIS__ = false; return null })()}
                     <MigrationHistoryTable
                         histories={histories
                             .filter(h => filter === 'all' || h.action === filter)
