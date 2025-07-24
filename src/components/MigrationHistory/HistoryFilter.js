@@ -8,7 +8,6 @@ const ACTION_OPTIONS = [
     { label: 'Migrated', value: 'migrated' },
     { label: 'Deleted', value: 'deleted' },
     { label: 'Undone', value: 'undone' },
-    { label: 'Restored', value: 'restored' },
 ]
 
 const HistoryFilter = ({ value = 'all', onFilterChange }) => {
