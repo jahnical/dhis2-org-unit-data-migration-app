@@ -10,7 +10,9 @@ export async function getDataStoreDeletedTeis(engine) {
     }
 }
 // Plain JS utility for managing deleted TEIs in DHIS2 datastore
-export async function trackDeletedTei(engine, tei) {
+
+// Store a batch of deleted TEIs in DataStore (overwrites previous batch)
+export async function trackDeletedTeiBatch(engine, teis) {
     let current = [];
     try {
         const { deletedTeis = [] } = await engine.query({
@@ -20,16 +22,17 @@ export async function trackDeletedTei(engine, tei) {
     } catch (e) {
         current = [];
     }
-    // Remove any existing TEI with the same id
-    const filtered = current.filter(t => t.id !== tei.id);
-    // Build full TEI object with orgUnit, timestamp, user
-    const fullTei = {
+    // Remove any existing TEIs with the same ids
+    const deletedIds = teis.map(t => t.trackedEntityInstance || t.id);
+    const filtered = current.filter(t => !deletedIds.includes(t.trackedEntityInstance || t.id));
+    // Build full TEI objects with orgUnit, timestamp, user
+    const fullTeis = teis.map(tei => ({
         ...tei,
         orgUnit: tei.orgUnit || tei.orgUnitName || '',
         timestamp: tei.lastUpdated || tei.created || new Date().toISOString(),
         user: tei.createdBy || tei.storedBy || (tei.lastUpdatedBy && tei.lastUpdatedBy.username) || tei.user || (tei.lastUpdatedByUserInfo && tei.lastUpdatedByUserInfo.username) || '',
-    };
-    const updated = [...filtered, fullTei];
+    }));
+    const updated = [...filtered, ...fullTeis];
     await engine.mutate({
         resource: 'dataStore/migration_history/deleted_teis',
         type: 'update', // Always use PUT for create/update

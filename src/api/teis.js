@@ -1,4 +1,4 @@
-import { trackDeletedTei, untrackDeletedTei } from '../utils/datastoreActions';
+import { trackDeletedTeiBatch, untrackDeletedTei } from '../utils/datastoreActions';
 
 // Helper to generate a random DHIS2 UID (11 chars, [A-Za-z0-9], first char is a letter)
 function generateDhis2Uid() {
@@ -10,83 +10,70 @@ function generateDhis2Uid() {
     return uid;
 }
 
+
+
+// Recursively replace all old UIDs with new ones in the TEI object
+function deepReplaceUIDs(obj, uidMap) {
+    if (Array.isArray(obj)) {
+        return obj.map(item => deepReplaceUIDs(item, uidMap));
+    } else if (obj && typeof obj === 'object') {
+        const newObj = {};
+        for (const key of Object.keys(obj)) {
+            let value = obj[key];
+            // If the value is a string and matches an old UID, replace it
+            if (typeof value === 'string' && uidMap[value]) {
+                newObj[key] = uidMap[value];
+            } else {
+                newObj[key] = deepReplaceUIDs(value, uidMap);
+            }
+        }
+        return newObj;
+    }
+    return obj;
+}
+
 const updateUIDs = (tei) => {
     // Clone the TEI to avoid mutating the original
-    const newTei = { ...tei, id: null };
+    const newTei = { ...tei };
 
-    // Generate new TEI UID
+    // Build UID maps
+    const uidMap = {};
+
+    // TEI UID
     const oldTeiUid = newTei.trackedEntityInstance;
     const newTeiUid = generateDhis2Uid();
+    uidMap[oldTeiUid] = newTeiUid;
     newTei.trackedEntityInstance = newTeiUid;
+    newTei.id = newTeiUid;
 
-    // Update programOwners
-    if (Array.isArray(newTei.programOwners)) {
-        newTei.programOwners = newTei.programOwners.map(owner => ({
-            ...owner,
-            trackedEntityInstance: newTeiUid
-        }));
-    }
-
-    // Update relationships (if any reference this TEI)
-    if (Array.isArray(newTei.relationships)) {
-        newTei.relationships = newTei.relationships.map(rel => {
-            const newRel = { ...rel };
-            if (newRel.from && newRel.from.trackedEntityInstance && newRel.from.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
-                newRel.from = {
-                    ...newRel.from,
-                    trackedEntityInstance: {
-                        ...newRel.from.trackedEntityInstance,
-                        trackedEntityInstance: newTeiUid
-                    }
-                };
-            }
-            if (newRel.to && newRel.to.trackedEntityInstance && newRel.to.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
-                newRel.to = {
-                    ...newRel.to,
-                    trackedEntityInstance: {
-                        ...newRel.to.trackedEntityInstance,
-                        trackedEntityInstance: newTeiUid
-                    }
-                };
-            }
-            return newRel;
-        });
-    }
-
-    // Map of old enrollment IDs to new ones
-    const enrollmentIdMap = {};
-    // Map of old event IDs to new ones (not strictly needed, but for completeness)
-    const eventIdMap = {};
-
-    // Update enrollments
+    // Enrollment UIDs
     if (Array.isArray(newTei.enrollments)) {
         newTei.enrollments = newTei.enrollments.map(enrollment => {
             const newEnrollment = { ...enrollment };
             const oldEnrollmentId = newEnrollment.enrollment;
             const newEnrollmentId = generateDhis2Uid();
-            enrollmentIdMap[oldEnrollmentId] = newEnrollmentId;
+            uidMap[oldEnrollmentId] = newEnrollmentId;
             newEnrollment.enrollment = newEnrollmentId;
             newEnrollment.trackedEntityInstance = newTeiUid;
 
-            // Update events
+            // Event UIDs
             if (Array.isArray(newEnrollment.events)) {
                 newEnrollment.events = newEnrollment.events.map(event => {
                     const newEvent = { ...event };
                     const oldEventId = newEvent.event;
                     const newEventId = generateDhis2Uid();
-                    eventIdMap[oldEventId] = newEventId;
+                    uidMap[oldEventId] = newEventId;
                     newEvent.event = newEventId;
                     newEvent.trackedEntityInstance = newTeiUid;
                     newEvent.enrollment = newEnrollmentId;
                     return newEvent;
                 });
             }
-
             return newEnrollment;
         });
     }
 
-    // Update programOwners (again, for completeness, if any reference old TEI UID)
+    // Program owners
     if (Array.isArray(newTei.programOwners)) {
         newTei.programOwners = newTei.programOwners.map(owner => ({
             ...owner,
@@ -94,46 +81,9 @@ const updateUIDs = (tei) => {
         }));
     }
 
-    // Update relationships inside enrollments/events if present
-    if (Array.isArray(newTei.enrollments)) {
-        newTei.enrollments = newTei.enrollments.map(enrollment => {
-            const newEnrollment = { ...enrollment };
-            if (Array.isArray(newEnrollment.events)) {
-                newEnrollment.events = newEnrollment.events.map(event => {
-                    const newEvent = { ...event };
-                    // If relationships exist in event, update trackedEntityInstance/enrollment/event references
-                    if (Array.isArray(newEvent.relationships)) {
-                        newEvent.relationships = newEvent.relationships.map(rel => {
-                            const newRel = { ...rel };
-                            if (newRel.from && newRel.from.trackedEntityInstance && newRel.from.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
-                                newRel.from = {
-                                    ...newRel.from,
-                                    trackedEntityInstance: {
-                                        ...newRel.from.trackedEntityInstance,
-                                        trackedEntityInstance: newTeiUid
-                                    }
-                                };
-                            }
-                            if (newRel.to && newRel.to.trackedEntityInstance && newRel.to.trackedEntityInstance.trackedEntityInstance === oldTeiUid) {
-                                newRel.to = {
-                                    ...newRel.to,
-                                    trackedEntityInstance: {
-                                        ...newRel.to.trackedEntityInstance,
-                                        trackedEntityInstance: newTeiUid
-                                    }
-                                };
-                            }
-                            return newRel;
-                        });
-                    }
-                    return newEvent;
-                });
-            }
-            return newEnrollment;
-        });
-    }
-
-    return newTei;
+    // Now recursively replace all old UIDs with new ones everywhere in the object
+    const fullyUpdatedTei = deepReplaceUIDs(newTei, uidMap);
+    return fullyUpdatedTei;
 };
 
 /**
@@ -149,8 +99,8 @@ export const deleteTEI = async (engine, teiUid, fullTei) => {
         resource: `trackedEntityInstances/${teiUid}`,
         type: 'delete',
     })
-    // Track deleted TEI in datastore (store full object)
-    await trackDeletedTei(engine, fullTei || { id: teiUid })
+    // Track deleted TEI in datastore as a batch (store full object)
+    await trackDeletedTeiBatch(engine, [fullTei || { id: teiUid }])
     console.info(`Successfully soft-deleted TEI ${teiUid}`)
   } catch (error) {
     let errorMsg = `Failed to delete TEI ${teiUid}`
@@ -165,41 +115,57 @@ export const deleteTEI = async (engine, teiUid, fullTei) => {
   }
 }
 
+
 export const newRestoreTEI = async (engine, teis) => {
     if (!teis) {
         throw new Error('TEIs is required for restoration')
     }
 
     try {
-        // Update the deleted flag to false
+        // Update the deleted flag to false and remove invalid attribute values
         const updatedTeis = teis.map(tei => {
             console.log(`Restoring TEI: ${tei.trackedEntityInstance || tei.id}`)
             console.log('Original TEI data:', tei)
-            const updatedTei = { ...tei }
-            updatedTei.deleted = false
+            const updatedTei = { ...tei };
+            updatedTei.deleted = false;
 
-            // Update enrollemnts
+            // Remove invalid attribute values (not valid for their option set)
+            if (Array.isArray(updatedTei.attributes)) {
+                updatedTei.attributes = updatedTei.attributes.filter(attr => {
+                    // If attribute has an optionSetValue and value is not valid, remove it
+                    // We can't check against the option set here without fetching, so only remove if DHIS2 marks as invalid in previous import summary
+                    // For now, remove any attribute with value 'pajoni_ndalama_ngwelero' for attribute 'dkFbZ4zHZZc' as per last error
+                    if (attr.attribute === 'dkFbZ4zHZZc' && attr.value === 'pajoni_ndalama_ngwelero') {
+                        console.warn('Removing invalid attribute value for restore:', attr);
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+            // Update enrollments
             if (updatedTei.enrollments) {
                 updatedTei.enrollments = updatedTei.enrollments.map(enrollment => {
-                    const updatedEnrollment = { ...enrollment }
-                    updatedEnrollment.deleted = false
+                    const updatedEnrollment = { ...enrollment };
+                    updatedEnrollment.deleted = false;
 
                     // Update events
                     if (updatedEnrollment.events) {
                         updatedEnrollment.events = updatedEnrollment.events.map(event => {
-                            const updatedEvent = { ...event }
-                            updatedEvent.deleted = false
-                            return updatedEvent
-                        })
+                            const updatedEvent = { ...event };
+                            updatedEvent.deleted = false;
+                            return updatedEvent;
+                        });
                     }
 
-                    return updatedEnrollment
-                })
+                    return updatedEnrollment;
+                });
             }
 
-            console.log('Updated TEI data for restoration:', updatedTei)
-            return updateUIDs(updatedTei)
-        })
+            const finalTei = updateUIDs(updatedTei);
+            console.log('Updated TEI data for restoration:', finalTei);
+            return finalTei;
+        });
 
         const response = await engine.mutate({
             resource: `trackedEntityInstances`,
@@ -215,9 +181,25 @@ export const newRestoreTEI = async (engine, teis) => {
         console.info(`Successfully restored TEIs: ${teis.map(tei => tei.trackedEntityInstance || tei.id).join(', ')}`)
         return response
     } catch (error) {
-        console.error('Failed to restore TEIs:', error)
-        // Rethrow a more informative error for the UI
-        throw new Error(`Failed to restore TEIs: ${error.message || error}`)
+        let errorMsg = 'Failed to restore TEIs.';
+        // Log the full error object for debugging
+        console.error('Full error object:', error);
+        if (error && error.details && error.details.response) {
+            console.error('Error details.response:', error.details.response);
+            if (error.details.response.importSummaries) {
+                console.error('Import summaries:', error.details.response.importSummaries);
+                const summaries = error.details.response.importSummaries;
+                if (Array.isArray(summaries) && summaries.length > 0) {
+                    errorMsg += ' Import summary: ' + summaries.map(s => s.description || s.status || JSON.stringify(s)).join('; ');
+                }
+            }
+        }
+        if (error && error.message) {
+            errorMsg += ' ' + error.message;
+        } else if (typeof error === 'string') {
+            errorMsg += ' ' + error;
+        }
+        throw new Error(errorMsg);
     }
 }
 

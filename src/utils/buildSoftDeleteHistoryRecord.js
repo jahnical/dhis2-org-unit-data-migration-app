@@ -9,7 +9,10 @@ export function buildSoftDeleteHistoryRecord({ programId, programName, orgUnitId
         program: { id: programId, name: programName },
         sourceOrgUnit: { id: orgUnitId, name: orgUnitName },
         targetOrgUnit: null,
-        user: { id: user.id, name: user.name },
+        user: {
+            id: (user && user.id) ? user.id : '',
+            name: (user && user.name) ? user.name : '',
+        },
         action: 'soft-deleted',
         teis: teis.map(tei => ({
             id: tei.trackedEntityInstance,

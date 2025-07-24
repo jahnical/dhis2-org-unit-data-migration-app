@@ -11,6 +11,7 @@ export function useDeletionHistoryLogic() {
     const [selectedDeletedTeis, setSelectedDeletedTeis] = useState([]);
     const [restoring, setRestoring] = useState(false);
     const [showRestoreDeletedModal, setShowRestoreDeletedModal] = useState(false);
+    const [restoreComplete, setRestoreComplete] = useState(false);
     const [deletedTeis, setDeletedTeis] = useState([]);
     const dispatch = useDispatch();
     const engine = useDataEngine();
@@ -41,6 +42,7 @@ export function useDeletionHistoryLogic() {
 
     const handleRestoreDeletedTeis = async () => {
         if (!selectedDeletedTeis.length) return;
+        setRestoreComplete(false);
         setShowRestoreDeletedModal(true);
     };
 
@@ -58,8 +60,8 @@ export function useDeletionHistoryLogic() {
             success = false;
         }
         setRestoring(false);
-        // Only reset after alert is shown and restore completes
         if (success) {
+            setRestoreComplete(true);
             // Refetch deleted TEIs from DataStore so UI updates
             try {
                 const teis = await getDataStoreDeletedTeis(engine);
@@ -68,7 +70,7 @@ export function useDeletionHistoryLogic() {
                 setDeletedTeis([]);
             }
             setSelectedDeletedTeis([]);
-            setShowRestoreDeletedModal(false);
+            // Do not close modal here; let user close after seeing success message
         }
         return success;
     };
@@ -80,6 +82,8 @@ export function useDeletionHistoryLogic() {
         restoring,
         showRestoreDeletedModal,
         setShowRestoreDeletedModal,
+        restoreComplete,
+        setRestoreComplete,
         canRestoreDeletedTeis,
         handleRestoreDeletedTeis,
         confirmRestoreDeletedTeis,

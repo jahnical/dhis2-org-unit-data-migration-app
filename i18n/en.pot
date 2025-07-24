@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-24T13:06:22.872Z\n"
-"PO-Revision-Date: 2025-07-24T13:06:22.874Z\n"
+"POT-Creation-Date: 2025-07-24T19:00:40.935Z\n"
+"PO-Revision-Date: 2025-07-24T19:00:40.936Z\n"
 
 msgid "Please select at least one TEI to delete."
 msgstr "Please select at least one TEI to delete."
@@ -312,6 +312,22 @@ msgstr "Sort by Stored By"
 
 msgid "Sort by Last Updated By"
 msgstr "Sort by Last Updated By"
+
+msgid "Restore Deleted TEIs"
+msgstr "Restore Deleted TEIs"
+
+msgid "Restore successful"
+msgstr "Restore successful"
+
+msgid ""
+"All selected TEIs have been restored and are now available in the active "
+"list."
+msgstr ""
+"All selected TEIs have been restored and are now available in the active "
+"list."
+
+msgid "Are you sure you want to restore the selected deleted TEI(s)?"
+msgstr "Are you sure you want to restore the selected deleted TEI(s)?"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"

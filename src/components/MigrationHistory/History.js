@@ -176,13 +176,17 @@ const History = () => {
                 </>
             )}
             {/* Restore confirmation modal for deleted TEIs */}
-            {filter === 'deleted' && deletion.showRestoreDeletedModal && deletion.selectedDeletedTeis.length > 0 && (
+            {filter === 'deleted' && deletion.showRestoreDeletedModal && (
                 <RestoreDeletedModal
                     open={deletion.showRestoreDeletedModal}
-                    onClose={() => deletion.setShowRestoreDeletedModal(false)}
+                    onClose={() => {
+                        deletion.setShowRestoreDeletedModal(false);
+                        deletion.setRestoreComplete(false);
+                    }}
                     selectedTeis={deletion.selectedDeletedTeis}
                     onConfirm={deletion.confirmRestoreDeletedTeis}
                     restoring={deletion.restoring}
+                    restoreComplete={deletion.restoreComplete}
                 />
             )}
         </div>

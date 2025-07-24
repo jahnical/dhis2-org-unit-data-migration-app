@@ -1,5 +1,4 @@
 import { deleteTEI, restoreTEI, newRestoreTEI } from '../api/teis'
-import { trackDeletedTei } from '../utils/datastoreActions'
 import { DELETION_TYPES } from '../reducers/deletion'
 import { logHistoryBatchThunk } from './history'
 import { buildSoftDeleteHistoryRecord } from '../utils/buildSoftDeleteHistoryRecord'
@@ -19,31 +18,32 @@ export const deleteTeis = ({ teiUids, engine, allTeis }) => async (dispatch) => 
     console.log('[deleteTeis] Dispatching DELETE_TEIS_START', teiUids);
     dispatch({ type: DELETION_TYPES.DELETE_TEIS_START })
 
-    const errors = []
-    const deleted = []
+    const errors = [];
+    const deletedTeis = [];
     const allTeisList = allTeis || [];
     for (const teiId of teiUids) {
         try {
             // Find full TEI object
             const fullTei = allTeisList.find(t => t.trackedEntityInstance === teiId || t.id === teiId) || { id: teiId };
-            await deleteTEI(engine, teiId, fullTei)
-            deleted.push(teiId)
+            await deleteTEI(engine, teiId, fullTei);
+            deletedTeis.push(fullTei);
         } catch (error) {
             // If 404 or already deleted, skip and collect error
             if (error.message && error.message.includes('404')) {
-                errors.push(`${teiId}: Not found or already deleted`)
+                errors.push(`${teiId}: Not found or already deleted`);
             } else {
-                errors.push(`${teiId}: ${error.message}`)
+                errors.push(`${teiId}: ${error.message}`);
             }
         }
     }
 
-    if (deleted.length) {
-        console.log('[deleteTeis] Dispatching SOFT_DELETE_TEIS', deleted);
+    if (deletedTeis.length) {
+        const deletedIds = deletedTeis.map(t => t.trackedEntityInstance || t.id);
+        console.log('[deleteTeis] Dispatching SOFT_DELETE_TEIS', deletedIds);
         dispatch({
             type: DELETION_TYPES.SOFT_DELETE_TEIS,
-            payload: deleted,
-        })
+            payload: deletedIds,
+        });
 
         // Build and log soft-delete history batch so it appears in history tab
         const historyBatch = buildSoftDeleteHistoryRecord({
@@ -52,16 +52,22 @@ export const deleteTeis = ({ teiUids, engine, allTeis }) => async (dispatch) => 
             orgUnitId: null, // Fill if available
             orgUnitName: null, // Fill if available
             user: null, // Fill if available
-            teis: deleted.map(id => ({ id })),
+            teis: deletedTeis,
         });
         await dispatch(logHistoryBatchThunk(historyBatch, engine));
+
+        // Store the batch in DataStore as a batch (array of TEIs)
+        if (engine && deletedTeis.length) {
+            const { trackDeletedTeiBatch } = await import('../utils/datastoreActions');
+            await trackDeletedTeiBatch(engine, deletedTeis);
+        }
     }
     if (errors.length) {
         console.error('[deleteTeis] Dispatching DELETE_TEIS_ERROR', errors);
         dispatch({
             type: DELETION_TYPES.DELETE_TEIS_ERROR,
             payload: errors.join('; '),
-        })
+        });
         // Do not throw, allow UI to show partial success
     }
 }
