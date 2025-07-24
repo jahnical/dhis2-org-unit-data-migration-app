@@ -5,8 +5,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-19T11:47:16.663Z\n"
-"PO-Revision-Date: 2025-07-19T11:47:16.664Z\n"
+"POT-Creation-Date: 2025-07-24T13:06:22.872Z\n"
+"PO-Revision-Date: 2025-07-24T13:06:22.874Z\n"
+
+msgid "Please select at least one TEI to delete."
+msgstr "Please select at least one TEI to delete."
+
+msgid "No TEIs selected for deletion."
+msgstr "No TEIs selected for deletion."
 
 msgid ""
 "The TEIs couldn't be deleted. Please try again or contact your system "

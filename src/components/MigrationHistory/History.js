@@ -141,8 +141,10 @@ const History = () => {
                         No deleted TEIs found. Only inactive (deleted) TEIs are shown here.
                     </div>
                 ) : (
+                    {(() => { window.__SHOW_DELETED_TEIS__ = true; return null })()}
                     <MigrationHistoryTable
                         histories={mappedDeletedTeis}
+                        showDeleted={true}
                         onSelectionChange={ids => {
                             const validIds = ids.filter(id => deletion.deletedTeis.some(tei => tei.id === id));
                             deletion.setSelectedDeletedTeis(validIds);
@@ -152,9 +154,11 @@ const History = () => {
                         canRestore={deletion.canRestoreDeletedTeis && !deletion.restoring}
                         metadata={metadata}
                     />
+                    {(() => { window.__SHOW_DELETED_TEIS__ = false; return null })()}
                 )
             ) : (
                 <>
+                    {(() => { window.__SHOW_DELETED_TEIS__ = false; return null })()}
                     <MigrationHistoryTable
                         histories={histories
                             .filter(h => filter === 'all' || h.action === filter)
@@ -165,6 +169,7 @@ const History = () => {
                                 targetOrgUnit: batch.targetOrgUnit || { name: batch.targetOrgUnitName || (batch.targetOrgUnit && batch.targetOrgUnit.name) || batch.targetOrgUnit || '' },
                                 user: batch.user || { name: batch.storedBy || (batch.lastUpdatedBy && batch.lastUpdatedBy.username) || batch.createdBy || batch.user || '' },
                             }))}
+                        showDeleted={false}
                         onSelectionChange={setSelectedBatches}
                         customColumns={['timestamp', 'program', 'sourceOrgUnit', 'targetOrgUnit', 'user', 'action']}
                         selectedBatches={selectedBatches}

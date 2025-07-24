@@ -143,14 +143,14 @@ const updateUIDs = (tei) => {
  * @param {object} engine - The DHIS2 app-runtime data engine
  * @param {string} teiUid - The UID of the TEI to delete
  */
-export const deleteTEI = async (engine, teiUid) => {
+export const deleteTEI = async (engine, teiUid, fullTei) => {
   try {
     await engine.mutate({
         resource: `trackedEntityInstances/${teiUid}`,
         type: 'delete',
     })
-    // Track deleted TEI in datastore
-    await trackDeletedTei(engine, { id: teiUid })
+    // Track deleted TEI in datastore (store full object)
+    await trackDeletedTei(engine, fullTei || { id: teiUid })
     console.info(`Successfully soft-deleted TEI ${teiUid}`)
   } catch (error) {
     let errorMsg = `Failed to delete TEI ${teiUid}`

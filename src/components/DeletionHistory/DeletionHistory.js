@@ -1,19 +1,30 @@
 
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { useAlert } from '@dhis2/app-runtime';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useDataEngine } from '@dhis2/app-runtime';
-import { dataControlSelectors } from '../../reducers/data_controls';
 import { newRestoreTEI } from '../../api/teis';
+import { getDataStoreDeletedTeis } from '../../utils/datastoreActions';
 
 export function useDeletionHistoryLogic() {
     const [selectedDeletedTeis, setSelectedDeletedTeis] = useState([]);
     const [restoring, setRestoring] = useState(false);
     const [showRestoreDeletedModal, setShowRestoreDeletedModal] = useState(false);
+    const [deletedTeis, setDeletedTeis] = useState([]);
     const dispatch = useDispatch();
     const engine = useDataEngine();
     const alert = useAlert();
-    const deletedTeis = useSelector(dataControlSelectors.getDeletedTEIs);
+    useEffect(() => {
+        (async () => {
+            try {
+                const teis = await getDataStoreDeletedTeis(engine);
+                setDeletedTeis(teis);
+            } catch (e) {
+                setDeletedTeis([]);
+            }
+        })();
+    }, [engine]);
 
     const histories = deletedTeis.map(tei => ({
         id: tei.id,
@@ -45,8 +56,10 @@ export function useDeletionHistoryLogic() {
         } catch (e) {
             alert.show({ message: 'Failed to restore TEI(s).', type: 'critical' });
             success = false;
-        } finally {
-            setRestoring(false);
+        }
+        setRestoring(false);
+        // Only reset after alert is shown and restore completes
+        if (success) {
             setSelectedDeletedTeis([]);
             setShowRestoreDeletedModal(false);
         }

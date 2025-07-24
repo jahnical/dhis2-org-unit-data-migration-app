@@ -128,9 +128,9 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
             )}
         </React.Fragment>
     ));
-    // Use deleted TEIs from datastore for history
+    // Only use deletedTeis if showDeleted is true (passed from parent)
     const deletedTeis = useDeletedTeisHistory()
-    const histories = deletedTeis.length > 0 ? deletedTeis : (historiesProp || [])
+    const histories = (typeof showDeleted !== 'undefined' && showDeleted) ? deletedTeis : (historiesProp || [])
     const COLUMN_DEFS = customColumns
         ? ALL_COLUMN_DEFS.filter(col => customColumns.includes(col.key))
         : ALL_COLUMN_DEFS

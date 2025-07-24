@@ -1,4 +1,5 @@
 import { deleteTEI, restoreTEI, newRestoreTEI } from '../api/teis'
+import { trackDeletedTei } from '../utils/datastoreActions'
 import { DELETION_TYPES } from '../reducers/deletion'
 import { logHistoryBatchThunk } from './history'
 import { buildSoftDeleteHistoryRecord } from '../utils/buildSoftDeleteHistoryRecord'
@@ -9,7 +10,7 @@ import { buildSoftDeleteHistoryRecord } from '../utils/buildSoftDeleteHistoryRec
  * @param {Array<string>} teiUids - UIDs of the TEIs to delete
  * @param {object} engine - DHIS2 app-runtime data engine
  */
-export const deleteTeis = ({ teiUids, engine }) => async (dispatch) => {
+export const deleteTeis = ({ teiUids, engine, allTeis }) => async (dispatch) => {
     if (!teiUids?.length || !engine) {
         console.error('[deleteTeis] Missing TEI UIDs or engine.', { teiUids, engine });
         throw new Error('Missing TEI UIDs or engine.')
@@ -20,9 +21,12 @@ export const deleteTeis = ({ teiUids, engine }) => async (dispatch) => {
 
     const errors = []
     const deleted = []
+    const allTeisList = allTeis || [];
     for (const teiId of teiUids) {
         try {
-            await deleteTEI(engine, teiId)
+            // Find full TEI object
+            const fullTei = allTeisList.find(t => t.trackedEntityInstance === teiId || t.id === teiId) || { id: teiId };
+            await deleteTEI(engine, teiId, fullTei)
             deleted.push(teiId)
         } catch (error) {
             // If 404 or already deleted, skip and collect error
@@ -42,15 +46,13 @@ export const deleteTeis = ({ teiUids, engine }) => async (dispatch) => {
         })
 
         // Build and log soft-delete history batch so it appears in history tab
-        // You may need to pass program/orgUnit/user/teis info as needed
-        // For now, we try to get minimal info from arguments (expand as needed)
         const historyBatch = buildSoftDeleteHistoryRecord({
             programId: null, // Fill if available
             programName: null, // Fill if available
             orgUnitId: null, // Fill if available
             orgUnitName: null, // Fill if available
             user: null, // Fill if available
-            teis: (typeof teis !== 'undefined') ? teis : deleted.map(id => ({ id })),
+            teis: deleted.map(id => ({ id })),
         });
         await dispatch(logHistoryBatchThunk(historyBatch, engine));
     }

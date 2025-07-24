@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useDatastore } from '../utils/datastore'
+import { getDataStoreDeletedTeis } from '../utils/datastoreActions'
+import { useDataEngine } from '@dhis2/app-runtime'
 
 export function useDeletedTeisHistory() {
-    const { getDeletedTeis } = useDatastore()
+    const engine = useDataEngine()
     const [deletedTeis, setDeletedTeis] = useState([])
 
     useEffect(() => {
-        getDeletedTeis().then(setDeletedTeis)
-    }, [])
+        getDataStoreDeletedTeis(engine).then(setDeletedTeis)
+    }, [engine])
 
     return deletedTeis
 }

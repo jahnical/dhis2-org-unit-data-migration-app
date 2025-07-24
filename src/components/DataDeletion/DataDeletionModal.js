@@ -21,6 +21,10 @@ import { deletionSelectors } from '../../reducers/deletion.js'
 
 const DataDeletionModal = ({ onClose }) => {
     const dispatch = useDispatch()
+    // Reset deletion state when modal opens
+    useEffect(() => {
+        dispatch({ type: 'RESET_DELETION_STATE' })
+    }, [dispatch])
     const engine = useDataEngine()
     const alert = useAlert()
 
@@ -44,7 +48,6 @@ const DataDeletionModal = ({ onClose }) => {
 
     // Reset modal and redux state on close (only for cancel/close)
     const resetAndClose = useCallback(() => {
-        dispatch(dataActionCreators.reset())
         setDeletionComplete(false)
         setShowConfirm(false)
         onClose()
@@ -52,16 +55,22 @@ const DataDeletionModal = ({ onClose }) => {
 
     // Show confirmation modal
     const handleSoftDeleteClick = useCallback(() => {
+        if (!selectedTeis.length) {
+            alert.show({ message: i18n.t('Please select at least one TEI to delete.'), critical: true })
+            return
+        }
         setShowConfirm(true)
-    }, [])
+    }, [selectedTeis, alert])
 
     // Confirm deletion: dispatch native deleteTeis action
     const handleConfirmDelete = useCallback(() => {
-        if (!selectedTeis.length) return;
+        if (!selectedTeis.length) {
+            alert.show({ message: i18n.t('No TEIs selected for deletion.'), critical: true })
+            return
+        }
         setShowConfirm(false)
-        // Do NOT reset dataControl state here; just delete
-        dispatch(deleteTeis({ teiUids: selectedTeis, engine }))
-    }, [dispatch, selectedTeis, engine])
+        dispatch(deleteTeis({ teiUids: selectedTeis, engine, allTeis }))
+    }, [dispatch, selectedTeis, engine, allTeis])
 
     // When deletionStatus changes, react accordingly
     useEffect(() => {
@@ -69,7 +78,10 @@ const DataDeletionModal = ({ onClose }) => {
         if (deletionStatus === 'soft_deleted' && isMountedRef.current) {
             console.log('[DataDeletionModal] Deletion complete, setting deletionComplete and fetching TEIs');
             setDeletionComplete(true)
-            dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine))
+            dispatch(dataActionCreators.reset()) // Only reset selection after success
+            if (orgUnitId && programId) {
+                dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine))
+            }
         }
     }, [deletionStatus, orgUnitId, programId, engine, dispatch])
 
@@ -103,11 +115,9 @@ const DataDeletionModal = ({ onClose }) => {
     const selectedTeiObjects = allTeis.filter(tei =>
         selectedTeis.includes(tei.trackedEntityInstance || tei.id)
     )
-
     return (
         <Modal onClose={resetAndClose} position="middle">
             <ModalTitle>{i18n.t('Confirm Data Deletion')}</ModalTitle>
-
             {loading ? (
                 <ModalContent>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
@@ -124,9 +134,6 @@ const DataDeletionModal = ({ onClose }) => {
                         </Button>
                     </ButtonStrip>
                 </ModalContent>
-
-
-
             ) : deletionComplete ? (
                 <>
                     <ModalContent>
