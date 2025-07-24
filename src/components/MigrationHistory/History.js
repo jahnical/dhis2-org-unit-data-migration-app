@@ -145,8 +145,12 @@ const History = () => {
                         histories={mappedDeletedTeis}
                         showDeleted={true}
                         onSelectionChange={ids => {
-                            const validIds = ids.filter(id => deletion.deletedTeis.some(tei => tei.id === id));
-                            deletion.setSelectedDeletedTeis(validIds);
+                            // Select all/deselect all logic for deleted TEIs
+                            if (ids.length === mappedDeletedTeis.length) {
+                                deletion.setSelectedDeletedTeis(mappedDeletedTeis.map(tei => tei.id));
+                            } else {
+                                deletion.setSelectedDeletedTeis(ids);
+                            }
                         }}
                         customColumns={['timestamp', 'teiUid', 'program', 'orgUnit', 'user', 'action']}
                         selectedBatches={deletion.selectedDeletedTeis}
