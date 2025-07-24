@@ -21,6 +21,7 @@ import { sGetUiProgramId } from '../../reducers/ui.js'
 import classes from './styles/Common.module.css'
 
 const TEIs = () => {
+    // ...existing code...
     const loading = useSelector(dataControlSelectors.getDataControlIsLoading)
     const error = useSelector(dataControlSelectors.getDataControlError)
     const dispatch = useDispatch()
@@ -29,7 +30,7 @@ const TEIs = () => {
     const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
     const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
     const rawTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
-    const activeTeis = useMemo(() => rawTeis.filter(tei => !tei.deleted), [rawTeis])
+    const activeTeis = useMemo(() => rawTeis.filter(tei => tei.deleted !== true), [rawTeis])
     const filters = useSelector(dataControlSelectors.getDataControlFilters)
     const attributesToDisplay = useSelector(dataControlSelectors.getDataControlAttributesToDisplay)
     const engine = useDataEngine()
@@ -165,6 +166,7 @@ const TEIs = () => {
     if (loading) {
         return <CircularLoader />
     }
+
 
     return (
         <div style={{ height: '100%' }}>

@@ -1,6 +1,15 @@
+// Usage example for deletion and restore logic:
+// import { useDatastoreTeiActions } from '../../hooks/useDatastoreTeiActions'
+// const { trackDeletedTei, untrackDeletedTei } = useDatastoreTeiActions()
+// To track a deleted TEI after successful DHIS2 delete:
+// await trackDeletedTei(tei)
+// To untrack a TEI after successful restore/clone:
+// await untrackDeletedTei(tei.id)
+
 // Renders the DataTable UI for displaying migration history
 import React, { useState, useEffect, memo } from 'react'
 import { useSelector } from 'react-redux'
+import { useDeletedTeisHistory } from '../../hooks/useDeletedTeisHistory'
 import { DataTable, DataTableHead, DataTableRow, DataTableCell, DataTableColumnHeader, DataTableBody, Checkbox } from '@dhis2/ui'
 
 const ALL_COLUMN_DEFS = [
@@ -119,7 +128,9 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
             )}
         </React.Fragment>
     ));
-    const histories = historiesProp || []
+    // Use deleted TEIs from datastore for history
+    const deletedTeis = useDeletedTeisHistory()
+    const histories = deletedTeis.length > 0 ? deletedTeis : (historiesProp || [])
     const COLUMN_DEFS = customColumns
         ? ALL_COLUMN_DEFS.filter(col => customColumns.includes(col.key))
         : ALL_COLUMN_DEFS
