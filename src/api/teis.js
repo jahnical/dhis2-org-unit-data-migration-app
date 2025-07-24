@@ -116,70 +116,71 @@ export const deleteTEI = async (engine, teiUid, fullTei) => {
 }
 
 
-export const newRestoreTEI = async (engine, teis) => {
+export const newRestoreTEI = async (engine, teis, batchSize = 20, onProgress) => {
     if (!teis) {
         throw new Error('TEIs is required for restoration')
     }
 
+    // Helper to process in batches
+    const batches = [];
+    for (let i = 0; i < teis.length; i += batchSize) {
+        batches.push(teis.slice(i, i + batchSize));
+    }
+    let allResponses = [];
+    let restoredIds = [];
     try {
-        // Update the deleted flag to false and remove invalid attribute values
-        const updatedTeis = teis.map(tei => {
-            console.log(`Restoring TEI: ${tei.trackedEntityInstance || tei.id}`)
-            console.log('Original TEI data:', tei)
-            const updatedTei = { ...tei };
-            updatedTei.deleted = false;
-
-            // Remove invalid attribute values (not valid for their option set)
-            if (Array.isArray(updatedTei.attributes)) {
-                updatedTei.attributes = updatedTei.attributes.filter(attr => {
-                    // If attribute has an optionSetValue and value is not valid, remove it
-                    // We can't check against the option set here without fetching, so only remove if DHIS2 marks as invalid in previous import summary
-                    // For now, remove any attribute with value 'pajoni_ndalama_ngwelero' for attribute 'dkFbZ4zHZZc' as per last error
-                    if (attr.attribute === 'dkFbZ4zHZZc' && attr.value === 'pajoni_ndalama_ngwelero') {
-                        console.warn('Removing invalid attribute value for restore:', attr);
-                        return false;
-                    }
-                    return true;
-                });
+        for (let b = 0; b < batches.length; b++) {
+            const batch = batches[b];
+            // Update the deleted flag to false and remove invalid attribute values
+            const updatedTeis = batch.map(tei => {
+                // ...existing code...
+                const updatedTei = { ...tei };
+                updatedTei.deleted = false;
+                if (Array.isArray(updatedTei.attributes)) {
+                    updatedTei.attributes = updatedTei.attributes.filter(attr => {
+                        if (attr.attribute === 'dkFbZ4zHZZc' && attr.value === 'pajoni_ndalama_ngwelero') {
+                            console.warn('Removing invalid attribute value for restore:', attr);
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+                if (updatedTei.enrollments) {
+                    updatedTei.enrollments = updatedTei.enrollments.map(enrollment => {
+                        const updatedEnrollment = { ...enrollment };
+                        updatedEnrollment.deleted = false;
+                        if (updatedEnrollment.events) {
+                            updatedEnrollment.events = updatedEnrollment.events.map(event => {
+                                const updatedEvent = { ...event };
+                                updatedEvent.deleted = false;
+                                return updatedEvent;
+                            });
+                        }
+                        return updatedEnrollment;
+                    });
+                }
+                const finalTei = updateUIDs(updatedTei);
+                return finalTei;
+            });
+            const response = await engine.mutate({
+                resource: `trackedEntityInstances`,
+                type: 'create',
+                data: {
+                    trackedEntityInstances: updatedTeis,
+                },
+            });
+            allResponses.push(response);
+            // Untrack restored TEIs in datastore
+            for (const tei of batch) {
+                await untrackDeletedTei(engine, tei.trackedEntityInstance || tei.id);
+                restoredIds.push(tei.trackedEntityInstance || tei.id);
             }
-
-            // Update enrollments
-            if (updatedTei.enrollments) {
-                updatedTei.enrollments = updatedTei.enrollments.map(enrollment => {
-                    const updatedEnrollment = { ...enrollment };
-                    updatedEnrollment.deleted = false;
-
-                    // Update events
-                    if (updatedEnrollment.events) {
-                        updatedEnrollment.events = updatedEnrollment.events.map(event => {
-                            const updatedEvent = { ...event };
-                            updatedEvent.deleted = false;
-                            return updatedEvent;
-                        });
-                    }
-
-                    return updatedEnrollment;
-                });
+            if (typeof onProgress === 'function') {
+                onProgress({ batch: b + 1, totalBatches: batches.length, restored: restoredIds.length, total: teis.length });
             }
-
-            const finalTei = updateUIDs(updatedTei);
-            console.log('Updated TEI data for restoration:', finalTei);
-            return finalTei;
-        });
-
-        const response = await engine.mutate({
-            resource: `trackedEntityInstances`,
-            type: 'create',
-            data: {
-                trackedEntityInstances: updatedTeis,
-            },
-        })
-        // Untrack restored TEIs in datastore
-        for (const tei of teis) {
-            await untrackDeletedTei(engine, tei.trackedEntityInstance || tei.id)
         }
-        console.info(`Successfully restored TEIs: ${teis.map(tei => tei.trackedEntityInstance || tei.id).join(', ')}`)
-        return response
+        console.info(`Successfully restored TEIs: ${restoredIds.join(', ')}`);
+        return allResponses;
     } catch (error) {
         let errorMsg = 'Failed to restore TEIs.';
         // Log the full error object for debugging

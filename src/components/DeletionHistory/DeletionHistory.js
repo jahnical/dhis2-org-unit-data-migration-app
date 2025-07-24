@@ -1,6 +1,5 @@
 
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAlert } from '@dhis2/app-runtime';
 import { useDispatch } from 'react-redux';
 import { useDataEngine } from '@dhis2/app-runtime';
@@ -12,10 +11,17 @@ export function useDeletionHistoryLogic() {
     const [restoring, setRestoring] = useState(false);
     const [showRestoreDeletedModal, setShowRestoreDeletedModal] = useState(false);
     const [restoreComplete, setRestoreComplete] = useState(false);
+    const [restoreError, setRestoreError] = useState(null);
     const [deletedTeis, setDeletedTeis] = useState([]);
     const dispatch = useDispatch();
     const engine = useDataEngine();
     const alert = useAlert();
+    const [restoreProgress, setRestoreProgress] = useState(null);
+    const isMounted = useRef(true);
+    useEffect(() => {
+        isMounted.current = true;
+        return () => { isMounted.current = false; };
+    }, []);
     useEffect(() => {
         (async () => {
             try {
@@ -43,34 +49,38 @@ export function useDeletionHistoryLogic() {
     const handleRestoreDeletedTeis = async () => {
         if (!selectedDeletedTeis.length) return;
         setRestoreComplete(false);
+        setRestoreError(null);
         setShowRestoreDeletedModal(true);
     };
 
     const confirmRestoreDeletedTeis = async () => {
         setRestoring(true);
+        setRestoreError(null);
+        setRestoreProgress({ batch: 0, totalBatches: 1, restored: 0, total: selectedDeletedTeis.length });
         let success = false;
         try {
             const teisToRestore = deletedTeis.filter(tei => selectedDeletedTeis.includes(tei.id));
-            await newRestoreTEI(engine, teisToRestore);
+            const onProgress = ({ batch, totalBatches, restored, total }) => {
+                if (isMounted.current) setRestoreProgress({ batch, totalBatches, restored, total });
+            };
+            await newRestoreTEI(engine, teisToRestore, 20, onProgress);
             dispatch({ type: 'TEIS_MARK_RESTORED', payload: selectedDeletedTeis });
+            if (isMounted.current) setDeletedTeis(prev => prev.filter(tei => !selectedDeletedTeis.includes(tei.id)));
             alert.show({ message: 'Successfully restored TEI(s).', type: 'success' });
             success = true;
         } catch (e) {
+            let errorMsg = e && e.message ? e.message : 'Failed to restore TEI(s).';
+            setRestoreError(errorMsg);
             alert.show({ message: 'Failed to restore TEI(s).', type: 'critical' });
             success = false;
         }
-        setRestoring(false);
-        if (success) {
+        if (isMounted.current) setRestoring(false);
+        if (success && isMounted.current) {
             setRestoreComplete(true);
-            // Refetch deleted TEIs from DataStore so UI updates
-            try {
-                const teis = await getDataStoreDeletedTeis(engine);
-                setDeletedTeis(teis);
-            } catch (e) {
-                setDeletedTeis([]);
-            }
             setSelectedDeletedTeis([]);
-            // Do not close modal here; let user close after seeing success message
+            setRestoreProgress(null);
+            // Optionally, refetch from server in background for consistency
+            getDataStoreDeletedTeis(engine).then(teis => { if (isMounted.current) setDeletedTeis(teis); }).catch(() => {});
         }
         return success;
     };
@@ -84,9 +94,12 @@ export function useDeletionHistoryLogic() {
         setShowRestoreDeletedModal,
         restoreComplete,
         setRestoreComplete,
+        restoreError,
+        setRestoreError,
         canRestoreDeletedTeis,
         handleRestoreDeletedTeis,
         confirmRestoreDeletedTeis,
         deletedTeis,
+        restoreProgress,
     };
 }

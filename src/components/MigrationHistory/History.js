@@ -186,11 +186,14 @@ const History = () => {
                     onClose={() => {
                         deletion.setShowRestoreDeletedModal(false);
                         deletion.setRestoreComplete(false);
+                        deletion.setRestoreError(null);
                     }}
                     selectedTeis={deletion.selectedDeletedTeis}
                     onConfirm={deletion.confirmRestoreDeletedTeis}
                     restoring={deletion.restoring}
                     restoreComplete={deletion.restoreComplete}
+                    restoreProgress={deletion.restoreProgress}
+                    restoreError={deletion.restoreError}
                 />
             )}
         </div>
