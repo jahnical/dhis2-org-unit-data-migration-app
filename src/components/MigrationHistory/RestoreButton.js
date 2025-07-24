@@ -1,5 +1,3 @@
-// RestoreButton.js
-// Button to trigger restore for soft-deleted batches
 import React from 'react'
 import { Button } from '@dhis2/ui'
 

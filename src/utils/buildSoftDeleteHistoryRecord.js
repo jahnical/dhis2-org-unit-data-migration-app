@@ -1,4 +1,3 @@
-// src/utils/buildSoftDeleteHistoryRecord.js
 // Utility to build a migration history record for soft-deleted TEIs
 export function buildSoftDeleteHistoryRecord({ programId, programName, orgUnitId, orgUnitName, user, teis }) {
     return {

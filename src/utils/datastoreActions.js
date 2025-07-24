@@ -9,8 +9,6 @@ export async function getDataStoreDeletedTeis(engine) {
         return [];
     }
 }
-// Plain JS utility for managing deleted TEIs in DHIS2 datastore
-
 // Store a batch of deleted TEIs in DataStore (overwrites previous batch)
 export async function trackDeletedTeiBatch(engine, teis) {
     let current = [];
@@ -35,7 +33,7 @@ export async function trackDeletedTeiBatch(engine, teis) {
     const updated = [...filtered, ...fullTeis];
     await engine.mutate({
         resource: 'dataStore/migration_history/deleted_teis',
-        type: 'update', // Always use PUT for create/update
+        type: 'update', 
         data: updated,
     });
 }
@@ -53,7 +51,7 @@ export async function untrackDeletedTei(engine, teiId) {
     const updated = current.filter(tei => tei.id !== teiId)
     await engine.mutate({
         resource: 'dataStore/migration_history/deleted_teis',
-        type: 'update', // Always use PUT for create/update
+        type: 'update',
         data: updated,
     })
 }

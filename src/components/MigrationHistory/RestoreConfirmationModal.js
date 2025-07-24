@@ -1,5 +1,3 @@
-// RestoreConfirmationModal.js
-// Modal for confirming restore operations
 import React from 'react'
 import { Modal, ModalTitle, ModalContent, ModalActions, Button, ButtonStrip } from '@dhis2/ui'
 

@@ -145,7 +145,6 @@ const History = () => {
                         histories={mappedDeletedTeis}
                         showDeleted={true}
                         onSelectionChange={ids => {
-                            // Select all/deselect all logic for deleted TEIs
                             if (ids.length === mappedDeletedTeis.length) {
                                 deletion.setSelectedDeletedTeis(mappedDeletedTeis.map(tei => tei.id));
                             } else {

@@ -7,7 +7,11 @@ export function useDeletedTeisHistory() {
     const [deletedTeis, setDeletedTeis] = useState([])
 
     useEffect(() => {
-        getDataStoreDeletedTeis(engine).then(setDeletedTeis)
+        let isMounted = true;
+        getDataStoreDeletedTeis(engine).then(data => {
+            if (isMounted) setDeletedTeis(data);
+        });
+        return () => { isMounted = false; };
     }, [engine])
 
     return deletedTeis

@@ -66,12 +66,12 @@ export function useDeletionHistoryLogic() {
             await newRestoreTEI(engine, teisToRestore, 20, onProgress);
             dispatch({ type: 'TEIS_MARK_RESTORED', payload: selectedDeletedTeis });
             if (isMounted.current) setDeletedTeis(prev => prev.filter(tei => !selectedDeletedTeis.includes(tei.id)));
-            alert.show({ message: 'Successfully restored TEI(s).', type: 'success' });
+            //alert.show({ message: 'Successfully restored TEI(s).', type: 'success' });
             success = true;
         } catch (e) {
             let errorMsg = e && e.message ? e.message : 'Failed to restore TEI(s).';
             setRestoreError(errorMsg);
-            alert.show({ message: 'Failed to restore TEI(s).', type: 'critical' });
+            //alert.show({ message: 'Failed to restore TEI(s).', type: 'critical' });
             success = false;
         }
         if (isMounted.current) setRestoring(false);
@@ -79,7 +79,7 @@ export function useDeletionHistoryLogic() {
             setRestoreComplete(true);
             setSelectedDeletedTeis([]);
             setRestoreProgress(null);
-            // Optionally, refetch from server in background for consistency
+            getDataStoreDeletedTeis(engine).then(teis => { if (isMounted.current) setDeletedTeis(teis); }).catch(() => {});
             getDataStoreDeletedTeis(engine).then(teis => { if (isMounted.current) setDeletedTeis(teis); }).catch(() => {});
         }
         return success;

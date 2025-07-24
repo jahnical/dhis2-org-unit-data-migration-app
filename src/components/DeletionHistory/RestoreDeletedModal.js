@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Modal, ModalTitle, ModalContent, ModalActions, Button, ButtonStrip, NoticeBox, CircularLoader } from '@dhis2/ui';
 import i18n from '@dhis2/d2-i18n';
 
 
-const RestoreDeletedModal = ({ open, onClose, selectedTeis, onConfirm, restoring, restoreComplete, restoreProgress, restoreError }) => {
+const RestoreDeletedModal = ({ open, onClose, selectedTeis, onConfirm, restoring, restoreComplete, restoreError }) => {
     const handleConfirm = async () => {
         await onConfirm();
     };
