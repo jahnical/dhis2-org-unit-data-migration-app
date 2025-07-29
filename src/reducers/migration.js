@@ -11,14 +11,16 @@ const migrationInitialState = {
     loading: false,
     error: null,
     targetOrgUnitId: null,
-    migrationStatus: null
+    migrationStatus: null,
+    failedTeis: [],
+    successfulTeis: [],
 }
 
 // Migration Process Reducer
 export function migration(state = migrationInitialState, action) {
     switch (action.type) {
         case MIGRATION_TYPES.SET_TARGET_ORG_UNIT:
-                    return { ...state, targetOrgUnitId: action.payload }
+            return { ...state, targetOrgUnitId: action.payload }
 
         case MIGRATION_TYPES.MIGRATE_TEIS_START:
             return { ...state, loading: true, error: null }
@@ -27,8 +29,10 @@ export function migration(state = migrationInitialState, action) {
             return {
                 ...state,
                 loading: false,
-                migrationStatus: 'success',
-                teis: [],
+                migrationStatus: action.payload.migrationStatus, // Use the status from payload
+                failedTeis: action.payload.failedTeis || [], // Update failed TEIs
+                successfulTeis: action.payload.successfulTeis || [], // Update successful TEIs
+                error: null,
             }
 
         case MIGRATION_TYPES.MIGRATE_TEIS_ERROR:
@@ -48,4 +52,6 @@ export const migrationSelectors = {
     getMigrationError: (state) => state.migration.error,
     getMigrationMigrationStatus: (state) => state.migration.migrationStatus,
     getMigrationTargetOrgUnitId: (state) => state.migration.targetOrgUnitId,
+    getMigrationFailedTeis: (state) => state.migration.failedTeis, // Added missing selector
+    getMigrationSuccessfulTeis: (state) => state.migration.successfulTeis, // Added for completeness
 }
