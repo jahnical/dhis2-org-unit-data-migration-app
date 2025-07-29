@@ -16,17 +16,27 @@ const historyReducer = (state = initialState, action) => {
             return {
                 ...state,
                 histories: [action.payload, ...state.histories],
-            }
+            };
         case LOAD_HISTORY:
             return {
                 ...state,
                 histories: action.payload,
-            }
+            };
+        case 'SET_MIGRATION_HISTORY':
+            return {
+                ...state,
+                histories: action.payload,
+            };
+        case 'CLEAR_MIGRATION_HISTORY':
+            return {
+                ...state,
+                histories: [],
+            };
         case CLEANUP_OLD_HISTORY:
             // Actual cleanup logic will be handled by a thunk/middleware
-            return state
+            return state;
         default:
-            return state
+            return state;
     }
 }
 

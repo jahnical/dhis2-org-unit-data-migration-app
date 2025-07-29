@@ -18,10 +18,10 @@ const migrationInitialState = {
 export function migration(state = migrationInitialState, action) {
     switch (action.type) {
         case MIGRATION_TYPES.SET_TARGET_ORG_UNIT:
-                    return { ...state, targetOrgUnitId: action.payload }
+            return { ...state, targetOrgUnitId: action.payload };
 
         case MIGRATION_TYPES.MIGRATE_TEIS_START:
-            return { ...state, loading: true, error: null }
+            return { ...state, loading: true, error: null, migrationStatus: null };
 
         case MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS:
             return {
@@ -29,16 +29,16 @@ export function migration(state = migrationInitialState, action) {
                 loading: false,
                 migrationStatus: 'success',
                 teis: [],
-            }
+            };
 
         case MIGRATION_TYPES.MIGRATE_TEIS_ERROR:
-            return { ...state, loading: false, error: action.payload }
+            return { ...state, loading: false, error: action.payload, migrationStatus: null };
 
         case MIGRATION_TYPES.RESET:
-            return migrationInitialState
+            return migrationInitialState;
 
         default:
-            return state
+            return state;
     }
 }
 

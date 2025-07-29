@@ -45,6 +45,28 @@ const History = () => {
     const [showRestoreModal, setShowRestoreModal] = useState(false)
     const [filter, setFilter] = useState('all')
 
+    const [currentUser, setCurrentUser] = useState({});
+    React.useEffect(() => {
+        async function fetchUser() {
+            try {
+                const { me } = await engine.query({ me: { resource: 'me' } });
+                setCurrentUser(me);
+            } catch (e) {
+                setCurrentUser({});
+            }
+        }
+        if (engine) fetchUser();
+    }, [engine]);
+
+    function handleUndoConfirm(batchIds) {
+        dispatch(undoMigrationBatchesThunk(batchIds, engine, currentUser));
+    };
+    function handleRestoreConfirm(batchIds) {
+        dispatch(restoreTeisBatchesThunk(batchIds, engine));
+    };
+
+    // Filter histories by action type
+    const filteredHistories = filter === 'all' ? histories : histories.filter(h => h.action === filter)
     function isBatchUndoable(batch) {
         return batch.action === 'migrated';
     }
@@ -174,7 +196,15 @@ const History = () => {
                         customColumns={['timestamp', 'program', 'sourceOrgUnit', 'targetOrgUnit', 'user', 'action']}
                         selectedBatches={selectedBatches}
                     />
-                    <UndoMigrationModal open={showUndoModal} onClose={() => setShowUndoModal(false)} selectedBatches={selectedBatches} onConfirm={handleUndoConfirm} />
+                    <UndoMigrationModal
+                        open={showUndoModal}
+                        onClose={() => setShowUndoModal(false)}
+                        selectedBatches={selectedBatches}
+                        engine={engine}
+                        currentUser={currentUser}
+                        histories={histories}
+                        onConfirm={handleUndoConfirm}
+                    />
                     <RestoreConfirmationModal open={showRestoreModal} onClose={() => setShowRestoreModal(false)} selectedBatches={selectedBatches} onConfirm={handleRestoreConfirm} />
                 </>
             )}
