@@ -14,6 +14,7 @@ export const DATA_CONTROL_TYPES = {
     FETCH_TEIS_START: 'DATA_CONTROL_FETCH_TEIS_START',
     FETCH_TEIS_SUCCESS: 'DATA_CONTROL_FETCH_TEIS_SUCCESS',
     FETCH_TEIS_ERROR: 'DATA_CONTROL_FETCH_TEIS_ERROR',
+    SET_FILTERS: 'DATA_CONTROL_SET_FILTERS', 
 }
 
 // Initial States
@@ -61,6 +62,12 @@ export function dataControl(state = controlInitialState, action) {
                         ? action.payload
                         : filter
                 ),
+            }
+
+        case DATA_CONTROL_TYPES.SET_FILTERS:
+            return {
+                ...state,
+                filters: action.payload,
             }
 
         case DATA_CONTROL_TYPES.ADD_DISPLAY_ATTRIBUTE:

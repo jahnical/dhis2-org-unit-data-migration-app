@@ -5,21 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-24T20:33:36.921Z\n"
-"PO-Revision-Date: 2025-07-24T20:33:36.922Z\n"
-
-msgid "Please select at least one TEI to delete."
-msgstr "Please select at least one TEI to delete."
-
-msgid "No TEIs selected for deletion."
-msgstr "No TEIs selected for deletion."
-
-msgid ""
-"The TEIs couldn't be deleted. Please try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be deleted. Please try again or contact your system "
-"administrator."
+"POT-Creation-Date: 2025-07-15T10:03:54.558Z\n"
+"PO-Revision-Date: 2025-07-15T10:03:54.558Z\n"
 
 msgid "Confirm Data Deletion"
 msgstr "Confirm Data Deletion"
@@ -171,8 +158,48 @@ msgstr "Next"
 msgid "Confirm Migration"
 msgstr "Confirm Migration"
 
-msgid "Engine not available. Please try again later."
-msgstr "Engine not available. Please try again later."
+msgid "Could not load TEIs"
+msgstr "Could not load TEIs"
+
+msgid ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+msgstr ""
+"The TEIs couldn't be retrieved. Try again or contact your system "
+"administrator."
+
+msgid "Sort by Instance ID"
+msgstr "Sort by Instance ID"
+
+msgid "Instance ID"
+msgstr "Instance ID"
+
+msgid "Sort by Created At"
+msgstr "Sort by Created At"
+
+msgid "Created At"
+msgstr "Created At"
+
+msgid "Sort by Last Updated At"
+msgstr "Sort by Last Updated At"
+
+msgid "Last Updated At"
+msgstr "Last Updated At"
+
+msgid "Sort by Stored By"
+msgstr "Sort by Stored By"
+
+msgid "Stored By"
+msgstr "Stored By"
+
+msgid "Sort by Last Updated By"
+msgstr "Sort by Last Updated By"
+
+msgid "Last Updated By"
+msgstr "Last Updated By"
+
+msgid "Filter by \"{{name}}\""
+msgstr "Filter by \"{{name}}\""
 
 msgid "Failed to restore TEIs. Please try again."
 msgstr "Failed to restore TEIs. Please try again."
@@ -192,92 +219,14 @@ msgstr ""
 "History tab. Please filter your org unit or program to reduce the number of "
 "deleted TEIs."
 
-msgid "Successfully restored TEIs."
-msgstr "Successfully restored TEIs."
+msgid "Remove Column"
+msgstr "Remove Column"
 
-msgid "Could not load History TEIs"
-msgstr "Could not load History TEIs"
+msgid "Number Ranges"
+msgstr "Number Ranges"
 
-msgid ""
-"The History TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-msgstr ""
-"The History TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-
-msgid "Instance ID"
-msgstr "Instance ID"
-
-msgid "Created At"
-msgstr "Created At"
-
-msgid "Last Updated At"
-msgstr "Last Updated At"
-
-msgid "Stored By"
-msgstr "Stored By"
-
-msgid "Last Updated By"
-msgstr "Last Updated By"
-
-msgid "No deleted TEIs found for this org unit and program."
-msgstr "No deleted TEIs found for this org unit and program."
-
-msgid "Restore Tracked Entity Instances"
-msgstr "Restore Tracked Entity Instances"
-
-msgid "Confirm Restore"
-msgstr "Confirm Restore"
-
-msgid ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-msgid_plural ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-msgstr[0] ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-msgstr[1] ""
-"Are you sure you want to restore the following {{count}} Tracked Entity "
-"Instance(s)?"
-
-msgid ""
-"This will change their status from deleted to active, making them visible "
-"in the main tab."
-msgstr ""
-"This will change their status from deleted to active, making them visible "
-"in the main tab."
-
-msgid "Restoring..."
-msgstr "Restoring..."
-
-msgid "Restore"
-msgstr "Restore"
-
-msgid "Filter by \"{{name}}\""
-msgstr "Filter by \"{{name}}\""
-
-msgid "Select Stored By"
-msgstr "Select Stored By"
-
-msgid "Select Last Updated By"
-msgstr "Select Last Updated By"
-
-msgid "Start Date"
-msgstr "Start Date"
-
-msgid "End Date"
-msgstr "End Date"
-
-msgid "Enter Household Code"
-msgstr "Enter Household Code"
-
-msgid "Enter Househould Member Number"
-msgstr "Enter Househould Member Number"
-
-msgid "Enter keyword"
-msgstr "Enter keyword"
+msgid "Add Range"
+msgstr "Add Range"
 
 msgid "Min value"
 msgstr "Min value"
@@ -285,58 +234,44 @@ msgstr "Min value"
 msgid "Max value"
 msgstr "Max value"
 
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Date Ranges"
+msgstr "Date Ranges"
+
+msgid "Start date"
+msgstr "Start date"
+
+msgid "End date"
+msgstr "End date"
+
+msgid "Select Users"
+msgstr "Select Users"
+
+msgid "Add User Filter"
+msgstr "Add User Filter"
+
+msgid "Select user"
+msgstr "Select user"
+
+msgid "Keywords"
+msgstr "Keywords"
+
+msgid "Add Keyword"
+msgstr "Add Keyword"
+
+msgid "Keyword"
+msgstr "Keyword"
+
 msgid "Remove Filter"
 msgstr "Remove Filter"
 
 msgid "Apply Filter"
 msgstr "Apply Filter"
 
-msgid "Could not load TEIs"
-msgstr "Could not load TEIs"
-
-msgid ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be retrieved. Try again or contact your system "
-"administrator."
-
-msgid "Sort by Instance ID"
-msgstr "Sort by Instance ID"
-
-msgid "Sort by Created At"
-msgstr "Sort by Created At"
-
-msgid "Sort by Last Updated At"
-msgstr "Sort by Last Updated At"
-
-msgid "Sort by Stored By"
-msgstr "Sort by Stored By"
-
-msgid "Sort by Last Updated By"
-msgstr "Sort by Last Updated By"
-
-msgid "Restore Deleted TEIs"
-msgstr "Restore Deleted TEIs"
-
-msgid "Restore failed"
-msgstr "Restore failed"
-
-msgid "Restore successful"
-msgstr "Restore successful"
-
-msgid ""
-"All selected TEIs have been restored and are now available in the active "
-"list."
-msgstr ""
-"All selected TEIs have been restored and are now available in the active "
-"list."
-
-msgid "Are you sure you want to restore the selected deleted TEI(s)?"
-msgstr "Are you sure you want to restore the selected deleted TEI(s)?"
-
-msgid "Restoring TEIs..."
-msgstr "Restoring TEIs..."
+msgid "Reset Filters"
+msgstr "Reset Filters"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
@@ -364,9 +299,6 @@ msgstr "Choose a condition type"
 
 msgid "Case sensitive"
 msgstr "Case sensitive"
-
-msgid "Remove"
-msgstr "Remove"
 
 msgid "and"
 msgstr "and"

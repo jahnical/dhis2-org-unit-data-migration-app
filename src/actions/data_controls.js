@@ -32,6 +32,11 @@ export const dataActionCreators = {
         payload: filter,
     }),
 
+    setFilters: (filters) => ({
+        type: DATA_CONTROL_TYPES.SET_FILTERS,
+        payload: filters,
+    }),
+
     removeFilter: (filter) => ({
         type: DATA_CONTROL_TYPES.REMOVE_FILTER,
         payload: filter,
