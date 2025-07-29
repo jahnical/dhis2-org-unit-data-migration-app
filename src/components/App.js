@@ -1,3 +1,5 @@
+//src/components/App.js
+// This file contains the main App component which sets up the layout and handles the main application logic.
 import { useCachedDataQuery } from '@dhis2/analytics'
 import { CssVariables } from '@dhis2/ui'
 import cx from 'classnames'
@@ -23,18 +25,21 @@ import LoadingMask from './LoadingMask/LoadingMask.js'
 import MainSidebar from './MainSidebar/MainSidebar.js'
 import { Toolbar } from './Toolbar/Toolbar.js'
 import StartScreen from './Visualization/StartScreen.js'
-import HistoryTei from './DataMigration/HistoryTei'
+import History from './MigrationHistory/History.js'
+import { useDataEngine } from '@dhis2/app-runtime'
+import { loadMigrationHistory, cleanupOldHistory } from '../actions/history'
 
 const App = () => {
     const programId = useSelector(sGetUiProgramId)
     const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
     const [initialLoadIsComplete, setInitialLoadIsComplete] = useState(false)
+    const [tabIndex, setTabIndex] = useState(0)
     const dispatch = useDispatch()
     const isLoading = useSelector(sGetIsVisualizationLoading)
     const error = useSelector(sGetLoadError)
     const { systemSettings, rootOrgUnits } = useCachedDataQuery()
-    const digitGroupSeparator =
-        systemSettings[SYSTEM_SETTINGS_DIGIT_GROUP_SEPARATOR]
+    const digitGroupSeparator = systemSettings?.[SYSTEM_SETTINGS_DIGIT_GROUP_SEPARATOR]
+    const engine = useDataEngine()
 
     const loadVisualization = async (location) => {
         //dispatch(acSetVisualizationLoading(true))
@@ -55,16 +60,37 @@ const App = () => {
         setInitialLoadIsComplete(true)
     }
 
+    const handleTabChange = (index) => setTabIndex(index)
+
     useEffect(() => {
-        dispatch(tSetInitMetadata(rootOrgUnits))
-        loadVisualization(history.location)
-    }, [])
+        if (rootOrgUnits) {
+            dispatch(tSetInitMetadata(rootOrgUnits))
+            if (history?.location) {
+                loadVisualization(history.location)
+            }
+        }
+    }, [rootOrgUnits])
 
-    const [tabIndex, setTabIndex] = useState(0)
+    // Log logged-in user on mount
+    useEffect(() => {
+        async function fetchUser() {
+            try {
+                const { me } = await engine.query({
+                    me: { resource: 'me' },
+                })
+                console.log('Logged-in user:', me)
+            } catch (e) {
+                console.error('Failed to fetch logged-in user', e)
+            }
+        }
+        fetchUser()
+    }, [engine])
 
-    const handleTabChange = (index) => {
-        setTabIndex(index)
-    }
+    useEffect(() => {
+        // On app startup, load and cleanup migration history
+        dispatch(loadMigrationHistory(engine))
+        dispatch(cleanupOldHistory(engine))
+    }, [dispatch, engine])
 
     return (
         <div
@@ -108,13 +134,10 @@ const App = () => {
                                     padding: '12px 0',
                                     border: 'none',
                                     borderBottom:
-                                        tabIndex === 0
-                                            ? '2px solid #1976d2'
-                                            : 'none',
+                                        tabIndex === 0 ? '2px solid #1976d2' : 'none',
                                     background: 'none',
                                     cursor: 'pointer',
-                                    fontWeight:
-                                        tabIndex === 0 ? 'bold' : 'normal',
+                                    fontWeight: tabIndex === 0 ? 'bold' : 'normal',
                                 }}
                                 onClick={() => handleTabChange(0)}
                             >
@@ -126,13 +149,10 @@ const App = () => {
                                     padding: '12px 0',
                                     border: 'none',
                                     borderBottom:
-                                        tabIndex === 1
-                                            ? '2px solid #1976d2'
-                                            : 'none',
+                                        tabIndex === 1 ? '2px solid #1976d2' : 'none',
                                     background: 'none',
                                     cursor: 'pointer',
-                                    fontWeight:
-                                        tabIndex === 1 ? 'bold' : 'normal',
+                                    fontWeight: tabIndex === 1 ? 'bold' : 'normal',
                                 }}
                                 onClick={() => handleTabChange(1)}
                             >
@@ -154,9 +174,7 @@ const App = () => {
                                 ) : (
                                     <>
                                         {isLoading && (
-                                            <div
-                                                className={classes.loadingCover}
-                                            >
+                                            <div className={classes.loadingCover}>
                                                 <LoadingMask />
                                             </div>
                                         )}
@@ -179,7 +197,7 @@ const App = () => {
                                         overflowX: 'visible',
                                     }}
                                 >
-                                    <HistoryTei />
+                                    <History />
                                 </div>
                             )}
                         </div>

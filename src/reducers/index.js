@@ -9,6 +9,8 @@ import ui from './ui.js'
 import visualization from './visualization.js'
 import { downloadTeis } from './download.js'
 import historyTeis from './historyTeis.js'
+import historyReducer from './history.js'
+import undoMigrationReducer from './undoMigration.js'
 
 // Reducers
 
@@ -23,4 +25,6 @@ export default combineReducers({
     dataControl,
     downloadTeis,
     historyTeis,
+    history: historyReducer,
+    undoMigration: undoMigrationReducer,
 })
