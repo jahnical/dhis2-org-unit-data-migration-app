@@ -22,9 +22,6 @@ msgstr "An error occurred during deletion. Please check the alert for details."
 msgid "Close"
 msgstr "Close"
 
-msgid "Retry"
-msgstr "Retry"
-
 msgid "Soft delete successful"
 msgstr "Soft delete successful"
 
@@ -278,6 +275,25 @@ msgstr "Reset Filters"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
+
+msgid "No items selected"
+msgstr "No items selected"
+
+msgid "Available options"
+msgstr "Available options"
+
+msgid "Filter options"
+msgstr "Filter options"
+
+msgid "Selected options"
+msgstr "Selected options"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Nothing found for \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "No options"
+
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
 
@@ -357,23 +373,11 @@ msgstr "Define start - end dates"
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
 
-msgid "No items selected"
-msgstr "No items selected"
+msgid "Start date"
+msgstr "Start date"
 
-msgid "Available options"
-msgstr "Available options"
-
-msgid "Filter options"
-msgstr "Filter options"
-
-msgid "Selected options"
-msgstr "Selected options"
-
-msgid "Nothing found for \"{{- searchTerm}}\""
-msgstr "Nothing found for \"{{- searchTerm}}\""
-
-msgid "No options"
-msgstr "No options"
+msgid "End date"
+msgstr "End date"
 
 msgid "all"
 msgstr "all"

@@ -7,6 +7,7 @@ export const DELETION_TYPES = {
     RESTORE_TEIS_SUCCESS: 'RESTORE_TEIS_SUCCESS',
     RESTORE_TEIS_ERROR: 'RESTORE_TEIS_ERROR',
     RESET: 'DELETE_TEIS_RESET',
+    RESET_DELETION_STATE: 'RESET_DELETION_STATE',
 }
 
 const deletionInitialState = {
@@ -18,6 +19,8 @@ const deletionInitialState = {
 
 export function deleteTeis(state = deletionInitialState, action) {
     switch (action.type) {
+        case DELETION_TYPES.RESET_DELETION_STATE:
+            return deletionInitialState;
         case DELETION_TYPES.DELETE_TEIS_START:
             return { ...state, loading: true, error: null }
 

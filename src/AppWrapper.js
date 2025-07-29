@@ -1,4 +1,5 @@
 import { CachedDataQueryProvider } from '@dhis2/analytics'
+import { Provider } from '@dhis2/app-runtime'
 import { useDataEngine } from '@dhis2/app-runtime'
 import React from 'react'
 import { Provider as ReduxProvider } from 'react-redux'

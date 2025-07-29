@@ -1,3 +1,6 @@
+import React, { useEffect, useCallback, useState, useRef } from 'react'
+import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
 import { useDataEngine, useAlert } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import {
@@ -10,144 +13,116 @@ import {
     CircularLoader,
     NoticeBox,
 } from '@dhis2/ui'
-import PropTypes from 'prop-types' 
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+
 import { dataActionCreators } from '../../actions/data_controls.js'
-import { deletionAsyncActions } from '../../actions/deletion.js'
-import { logHistoryBatchThunk } from '../../actions/history'
+import { deleteTeis } from '../../actions/deletion.js'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import { deletionSelectors } from '../../reducers/deletion.js'
-import { buildSoftDeleteHistoryRecord } from '../../utils/buildSoftDeleteHistoryRecord'
 
 const DataDeletionModal = ({ onClose }) => {
-    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs);
-    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs);
-    const deletionStatus = useSelector(deletionSelectors.getDeletionState);
-    const loading = useSelector(deletionSelectors.getDeletionIsLoading);
-    const error = useSelector(deletionSelectors.getDeletionError);
-    const dispatch = useDispatch();
-    const engine = useDataEngine();
-    const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit);
-    const programId = useSelector(dataControlSelectors.getDataControlProgram);
-    const currentUser = useSelector(state => state.current.user || { id: '', name: '' })
-    const programName = useSelector(state => {
-        const program = state.metadata.programs?.find(p => p.id === programId)
-        return program?.name || ''
-    })
-    const orgUnitName = useSelector(state => {
-        const ou = state.metadata.orgUnits?.find(o => o.id === orgUnitId)
-        return ou?.name || ''
-    })
-
-    // Local state
-    const [showConfirm, setShowConfirm] = React.useState(false);
-    const [deletionComplete, setDeletionComplete] = React.useState(false);
-    const { show: showDeletionError } = useAlert('', { critical: true });
-
-    // Reset all state and close modal
-    const resetAndClose = React.useCallback(() => {
-        dispatch(dataActionCreators.reset());
-        setDeletionComplete(false);
-        setShowConfirm(false);
-        onClose();
-    }, [dispatch, onClose]);
-
-    // Show confirmation screen before actual delete
-    const handleSoftDeleteClick = React.useCallback(() => {
-        // Do NOT reset here! Only show confirmation
-        setShowConfirm(true);
-    }, []);
-
-    // Confirm delete
-    const handleConfirmDelete = React.useCallback(() => {
-        setShowConfirm(false);
-        // Only reset after delete completes or on close
-        dispatch(
-            deletionAsyncActions.softDeleteTEIsWithRetry({
-                teis: selectedTeis,
-                engine,
-                maxRetries: 3,
-            })
-        );
-    }, [dispatch, selectedTeis, engine]);
-
-    // Success detection and fetch updated TEIs
+    const dispatch = useDispatch()
+    // Reset deletion state when modal opens
     useEffect(() => {
-        if (deletionStatus === 'soft_deleted') {
-            setDeletionComplete(true);
-            dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine));
-            // Log to migration history
-            const historyRecord = buildSoftDeleteHistoryRecord({
-                programId,
-                programName,
-                orgUnitId,
-                orgUnitName,
-                user: currentUser,
-                teis: selectedTeiObjects,
-            })
-            dispatch(logHistoryBatchThunk(historyRecord, engine))
+        dispatch({ type: 'RESET_DELETION_STATE' })
+    }, [dispatch])
+    const engine = useDataEngine()
+    const alert = useAlert()
+
+    const allTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
+    const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs) // array of UIDs
+    const deletionStatus = useSelector(deletionSelectors.getDeletionState)
+    const loading = useSelector(deletionSelectors.getDeletionIsLoading)
+    const error = useSelector(deletionSelectors.getDeletionError)
+
+    const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
+    const programId = useSelector(dataControlSelectors.getDataControlProgram)
+
+    const [showConfirm, setShowConfirm] = useState(false)
+    const [deletionComplete, setDeletionComplete] = useState(false)
+
+    const isMountedRef = useRef(true)
+    useEffect(() => {
+        isMountedRef.current = true
+        return () => { isMountedRef.current = false }
+    }, [])
+
+    // Reset modal and redux state on close (only for cancel/close)
+    const resetAndClose = useCallback(() => {
+        setDeletionComplete(false)
+        setShowConfirm(false)
+        onClose()
+    }, [dispatch, onClose])
+
+    // Show confirmation modal
+    const handleSoftDeleteClick = useCallback(() => {
+        if (!selectedTeis.length) {
+            alert.show({ message: i18n.t('Please select at least one TEI to delete.'), critical: true })
+            return
         }
-    }, [deletionStatus, orgUnitId, programId, engine, dispatch, programName, orgUnitName, currentUser, selectedTeiObjects]);
+        setShowConfirm(true)
+    }, [selectedTeis, alert])
 
-    // Reset local state on open/unmount
+    // Confirm deletion: dispatch native deleteTeis action
+    const handleConfirmDelete = useCallback(() => {
+        if (!selectedTeis.length) {
+            alert.show({ message: i18n.t('No TEIs selected for deletion.'), critical: true })
+            return
+        }
+        setShowConfirm(false)
+        dispatch(deleteTeis({ teiUids: selectedTeis, engine, allTeis }))
+    }, [dispatch, selectedTeis, engine, allTeis])
+
+    // When deletionStatus changes, react accordingly
     useEffect(() => {
-        setDeletionComplete(false);
-        setShowConfirm(false);
-        return () => {
-            setDeletionComplete(false);
-            setShowConfirm(false);
-        };
-    }, []);
+        // Full success - mark complete and refresh
+        if (deletionStatus === 'soft_deleted' && isMountedRef.current) {
+            console.log('[DataDeletionModal] Deletion complete, setting deletionComplete and fetching TEIs');
+            setDeletionComplete(true)
+            dispatch(dataActionCreators.reset()) // Only reset selection after success
+            if (orgUnitId && programId) {
+                dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine))
+            }
+        }
+    }, [deletionStatus, orgUnitId, programId, engine, dispatch])
 
-    // Error feedback
+    // Reset local modal state on open/unmount
+    useEffect(() => {
+        setDeletionComplete(false)
+        setShowConfirm(false)
+        return () => {
+            setDeletionComplete(false)
+            setShowConfirm(false)
+        }
+    }, [])
+
+    // Show error alert and reset state if error occurs
     useEffect(() => {
         if (error) {
-            let errorMessage = i18n.t("The TEIs couldn't be deleted. Please try again or contact your system administrator.");
+            let errorMessage = i18n.t("The TEIs couldn't be deleted. Please try again or contact your system administrator.")
             if (typeof error === 'string') {
-                errorMessage = error;
+                errorMessage = error
             } else if (error instanceof Error && error.message) {
-                errorMessage = error.message;
+                errorMessage = error.message
             }
-            console.error("Deletion Error:", error);
-            showDeletionError({ message: errorMessage });
-            dispatch(dataActionCreators.reset());
-        }
-    }, [error, showDeletionError, dispatch]);
+            console.error('Deletion Error:', error)
+            alert.show({ message: errorMessage, critical: true })
+            dispatch(dataActionCreators.reset())
+        } 
 
-    // Utility to fetch latest deleted TEIs for the current org unit and program
-    const fetchHistoryTeis = React.useCallback(async () => {
-        await dispatch(dataActionCreators.fetchTEIs(orgUnitId, programId, engine));
-        const allTeis = dataControlSelectors.getDataControlRawTEIs(
-            dispatch((_, getState) => getState())
-        );
-        return allTeis.filter(
-            tei => tei.deleted === true && (tei.orgUnit === orgUnitId || tei.ou === orgUnitId)
-        );
-    }, [dispatch, orgUnitId, programId, engine]);
+    }, [error, alert, dispatch])
 
-    // Get the actual TEI objects for display
-    const selectedTeiObjects = allTeis.filter(tei => selectedTeis.includes(tei.trackedEntityInstance));
-
-    // Debug: Log selectedTeis and allTeis on every render
-    React.useEffect(() => {
-        console.log('[DataDeletionModal] selectedTeis:', selectedTeis);
-        console.log('[DataDeletionModal] allTeis:', allTeis);
-        const selectedTeiObjects = allTeis.filter(tei => selectedTeis.includes(tei.id));
-        console.log('[DataDeletionModal] selectedTeiObjects:', selectedTeiObjects);
-    }, [selectedTeis, allTeis]);
-
-    // Render logic
+    // Get TEI objects for display in confirm modal
+    const selectedTeiObjects = allTeis.filter(tei =>
+        selectedTeis.includes(tei.trackedEntityInstance || tei.id)
+    )
     return (
         <Modal onClose={resetAndClose} position="middle">
             <ModalTitle>{i18n.t('Confirm Data Deletion')}</ModalTitle>
             {loading ? (
                 <ModalContent>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
                         <CircularLoader />
-                        <span>
-                            {i18n.t('Deleting {{count}} TEIs...', { count: selectedTeis.length })}
-                        </span>
+                        <span>{i18n.t('Deleting {{count}} TEIs...', { count: selectedTeis.length })}</span>
                     </div>
                 </ModalContent>
             ) : error ? (
@@ -156,9 +131,6 @@ const DataDeletionModal = ({ onClose }) => {
                     <ButtonStrip>
                         <Button secondary onClick={resetAndClose} dataTest="data-deletion-modal-error-close">
                             {i18n.t('Close')}
-                        </Button>
-                        <Button primary onClick={handleSoftDeleteClick} disabled={loading} dataTest="data-deletion-modal-error-retry">
-                            {i18n.t('Retry')}
                         </Button>
                     </ButtonStrip>
                 </ModalContent>
@@ -194,7 +166,7 @@ const DataDeletionModal = ({ onClose }) => {
                             <strong>{i18n.t('TEIs to be deleted:')}</strong>
                             <ul style={{ maxHeight: 120, overflowY: 'auto', margin: 0, paddingLeft: 18 }}>
                                 {selectedTeiObjects.map(tei => (
-                                    <li key={tei.trackedEntityInstance}>{tei.trackedEntityInstance}</li>
+                                    <li key={tei.trackedEntityInstance || tei.id}>{tei.trackedEntityInstance || tei.id}</li>
                                 ))}
                             </ul>
                         </div>
@@ -221,7 +193,7 @@ const DataDeletionModal = ({ onClose }) => {
                                 <>
                                     <strong>{i18n.t('You are about to mark {{count}} TEIs as deleted.', { count: selectedTeis.length })}</strong>
                                     <br />
-                                    {selectedTeis.length > 20 ? i18n.t('This is a large number of TEIs. Are you sure you want to proceed?') : ''}
+                                    {i18n.t('This is a large number of TEIs. Are you sure you want to proceed?')}
                                     <br />
                                     {i18n.t('This action can be undone from the History tab.')}
                                 </>
@@ -243,11 +215,11 @@ const DataDeletionModal = ({ onClose }) => {
                 </>
             )}
         </Modal>
-    );
-};
+    )
+}
 
 DataDeletionModal.propTypes = {
     onClose: PropTypes.func.isRequired,
-};
+}
 
-export default DataDeletionModal;
+export default DataDeletionModal

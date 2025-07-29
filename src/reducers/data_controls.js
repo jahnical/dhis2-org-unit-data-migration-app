@@ -105,7 +105,7 @@ export function dataControl(state = controlInitialState, action) {
             return { ...state, loading: true, error: null }
 
         case DATA_CONTROL_TYPES.FETCH_TEIS_SUCCESS:
-                    return { ...state, loading: false, teis: action.payload }
+            return { ...state, loading: false, teis: action.payload }
 
         case DATA_CONTROL_TYPES.FETCH_TEIS_ERROR:
             return { ...state, loading: false, error: action.payload }
@@ -113,6 +113,38 @@ export function dataControl(state = controlInitialState, action) {
         case DATA_CONTROL_TYPES.RESET:
             return controlInitialState
 
+        case 'TEIS_MARK_RESTORED':
+            // Move the original deleted TEIs to restored (update only their action)
+            // Also ensure deleted/restored flags are set correctly
+            return {
+                ...state,
+                teis: state.teis.map(tei =>
+                    action.payload.includes(tei.id)
+                        ? { ...tei, action: 'restored', deleted: false, restored: true }
+                        : tei
+                ),
+            };
+
+        // TEIS_RESTORE_CLONE case removed; handled by TEIS_MARK_RESTORED now
+
+        case 'SOFT_DELETE_TEIS':
+            // Mark the deleted TEIs in state.teis, but preserve orgUnit, program, and user info
+            return {
+                ...state,
+                teis: state.teis.map(tei =>
+                    action.payload.includes(tei.id)
+                        ? {
+                            ...tei,
+                            deleted: true,
+                            restored: false,
+                            // Ensure orgUnit, program, and user info are preserved
+                            orgUnit: tei.orgUnit,
+                            program: tei.program,
+                            user: tei.user
+                        }
+                        : tei
+                ),
+            }
         default:
             return state
     }
@@ -139,5 +171,10 @@ export const dataControlSelectors = {
             state.dataControl.filters
         )
     },
+    getActiveTEIs: (state) => state.dataControl.teis.filter(tei => !tei.deleted),
+    // Selector for restored TEIs (persist in restore filter)
+    getRestoredTEIs: (state) => state.dataControl.teis.filter(tei => tei.action === 'restored'),
+    // Selector for deleted TEIs (show orgUnit, program, user info)
+    getDeletedTEIs: (state) => state.dataControl.teis.filter(tei => tei.deleted),
 }
 

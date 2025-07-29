@@ -6,9 +6,8 @@ import { SingleSelect, SingleSelectOption } from '@dhis2/ui'
 const ACTION_OPTIONS = [
     { label: 'All', value: 'all' },
     { label: 'Migrated', value: 'migrated' },
-    { label: 'Deleted', value: 'soft-deleted' },
+    { label: 'Deleted', value: 'deleted' },
     { label: 'Undone', value: 'undone' },
-    { label: 'Restored', value: 'restored' },
 ]
 
 const HistoryFilter = ({ value = 'all', onFilterChange }) => {

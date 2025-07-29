@@ -12,7 +12,7 @@ import {
     NoticeBox,
     Checkbox,
 } from '@dhis2/ui'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { dataActionCreators } from '../../actions/data_controls.js'
 import { filterTeis } from '../../modules/data_control.js'
@@ -21,6 +21,7 @@ import { sGetUiProgramId } from '../../reducers/ui.js'
 import classes from './styles/Common.module.css'
 
 const TEIs = () => {
+    // ...existing code...
     const loading = useSelector(dataControlSelectors.getDataControlIsLoading)
     const error = useSelector(dataControlSelectors.getDataControlError)
     const dispatch = useDispatch()
@@ -29,12 +30,14 @@ const TEIs = () => {
     const orgUnitId = useSelector(dataControlSelectors.getDataControlOrgUnit)
     const selectedTeis = useSelector(dataControlSelectors.getSelectedTEIs)
     const rawTeis = useSelector(dataControlSelectors.getDataControlRawTEIs)
+    const activeTeis = useMemo(() => rawTeis.filter(tei => tei.deleted !== true), [rawTeis])
     const filters = useSelector(dataControlSelectors.getDataControlFilters)
     const attributesToDisplay = useSelector(dataControlSelectors.getDataControlAttributesToDisplay)
     const engine = useDataEngine()
 
     const [displayTeis, setDisplayTeis] = useState([])
     const [initialFilteredTeis, setInitialFilteredTeis] = useState([])
+    const filteredTeis = useMemo(() => filterTeis(activeTeis, filters), [activeTeis, filters])
     const [sortKey, setSortKey] = useState('')
     const [sortDirection, setSortDirection] = useState('default')
 
@@ -57,13 +60,12 @@ const TEIs = () => {
     }, [programId, orgUnitId, dispatch, engine])
 
     useEffect(() => {
-        const newlyFilteredTeis = filterTeis(rawTeis, filters)
-        setInitialFilteredTeis(newlyFilteredTeis)
-        setDisplayTeis(newlyFilteredTeis)
+        setInitialFilteredTeis(filteredTeis)
+        setDisplayTeis(filteredTeis)
         setSortKey('')
         setSortDirection('default')
         dispatch(dataActionCreators.setSelectedTEIs([]))
-    }, [filters, rawTeis, dispatch])
+    }, [filteredTeis, dispatch])
 
     const getColumnValue = (tei, columnName) => {
         switch (columnName) {
@@ -164,6 +166,7 @@ const TEIs = () => {
     if (loading) {
         return <CircularLoader />
     }
+
 
     return (
         <div style={{ height: '100%' }}>
