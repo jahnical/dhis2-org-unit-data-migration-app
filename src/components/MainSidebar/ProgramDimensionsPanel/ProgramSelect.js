@@ -79,6 +79,12 @@ const ProgramSelect = ({ prefix }) => {
     const setSelectedProgramId = (programId) => {
         if (programId !== selectedProgramId) {
             const program = programs?.find(({ id }) => id === programId)
+            if (program) {
+                console.log('[History][Program Selected]', {
+                    id: program.id,
+                    name: program.name,
+                })
+            }
             const stage =
                 // auto-select first stage if input type is Event
                 inputType === OUTPUT_TYPE_EVENT && program?.programStages.length
