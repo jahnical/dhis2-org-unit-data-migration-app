@@ -16,49 +16,113 @@ msgid_plural "Deleting {{count}} TEIs..."
 msgstr[0] "Deleting {{count}} TEIs..."
 msgstr[1] "Deleting {{count}} TEIs..."
 
-msgid "Could not delete TEIs"
-msgstr "Could not delete TEIs"
-
-msgid ""
-"The TEIs couldn't be deleted. Try again or contact your system "
-"administrator."
-msgstr ""
-"The TEIs couldn't be deleted. Try again or contact your system "
-"administrator."
-
-msgid "Deletion successful"
-msgstr "Deletion successful"
-
-msgid "All selected TEIs have been successfully deleted."
-msgstr "All selected TEIs have been successfully deleted."
-
-msgid "Warning"
-msgstr "Warning"
-
-msgid "You are about to delete {{count}} TEIs. This action cannot be undone."
-msgid_plural "You are about to delete {{count}} TEIs. This action cannot be undone."
-msgstr[0] "You are about to delete {{count}} TEIs. This action cannot be undone."
-msgstr[1] "You are about to delete {{count}} TEIs. This action cannot be undone."
-
-msgid "... and {{count}} more"
-msgstr "... and {{count}} more"
+msgid "An error occurred during deletion. Please check the alert for details."
+msgstr "An error occurred during deletion. Please check the alert for details."
 
 msgid "Close"
 msgstr "Close"
 
+msgid "Retry"
+msgstr "Retry"
+
+msgid "Soft delete successful"
+msgstr "Soft delete successful"
+
+msgid ""
+"All selected TEIs have been marked as deleted. You can restore them from "
+"the History tab."
+msgstr ""
+"All selected TEIs have been marked as deleted. You can restore them from "
+"the History tab."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "You are about to mark {{count}} TEIs as deleted."
+msgid_plural "You are about to mark {{count}} TEIs as deleted."
+msgstr[0] "You are about to mark {{count}} TEIs as deleted."
+msgstr[1] "You are about to mark {{count}} TEIs as deleted."
+
+msgid ""
+"This is a large number of TEIs. This action will mark them as deleted and "
+"remove them from the active list. This can be undone from the History tab."
+msgstr ""
+"This is a large number of TEIs. This action will mark them as deleted and "
+"remove them from the active list. This can be undone from the History tab."
+
+msgid ""
+"This action will mark the selected TEIs as deleted and remove them from the "
+"active list. This can be undone from the History tab."
+msgstr ""
+"This action will mark the selected TEIs as deleted and remove them from the "
+"active list. This can be undone from the History tab."
+
+msgid "Are you absolutely sure you want to proceed?"
+msgstr "Are you absolutely sure you want to proceed?"
+
 msgid "Cancel"
 msgstr "Cancel"
+
+msgid "Yes, Delete"
+msgstr "Yes, Delete"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "This is a large number of TEIs. Are you sure you want to proceed?"
+msgstr "This is a large number of TEIs. Are you sure you want to proceed?"
+
+msgid "This action can be undone from the History tab."
+msgstr "This action can be undone from the History tab."
+
+msgid ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
+msgid_plural ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
+msgstr[0] ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
+msgstr[1] ""
+"You are about to mark {{count}} TEIs as deleted. This action can be undone "
+"from the History tab."
 
 msgid "Delete"
 msgstr "Delete"
 
-msgid "Migration Preview"
-msgstr "Migration Preview"
+msgid "Download Preview"
+msgstr "Download Preview"
 
 msgid "{{count}} TEIs"
 msgid_plural "{{count}} TEIs"
 msgstr[0] "{{count}} TEIs"
 msgstr[1] "{{count}} TEIs"
+
+msgid "The data will be downloaded in CSV format."
+msgstr "The data will be downloaded in CSV format."
+
+msgid "Preparing download... {{completed}} of {{total}} TEIs processed"
+msgstr "Preparing download... {{completed}} of {{total}} TEIs processed"
+
+msgid "Download TEI Data"
+msgstr "Download TEI Data"
+
+msgid "Could not prepare download"
+msgstr "Could not prepare download"
+
+msgid ""
+"The download couldn't be prepared. Try again or contact your system "
+"administrator."
+msgstr ""
+"The download couldn't be prepared. Try again or contact your system "
+"administrator."
+
+msgid "Download CSV"
+msgstr "Download CSV"
+
+msgid "Migration Preview"
+msgstr "Migration Preview"
 
 msgid "To {{orgUnit}}"
 msgstr "To {{orgUnit}}"
@@ -87,6 +151,9 @@ msgstr "Migration successful"
 
 msgid "All TEIs have been successfully migrated to the selected org unit."
 msgstr "All TEIs have been successfully migrated to the selected org unit."
+
+msgid "Back"
+msgstr "Back"
 
 msgid "Next"
 msgstr "Next"
@@ -137,8 +204,23 @@ msgstr "Last Updated By"
 msgid "Filter by \"{{name}}\""
 msgstr "Filter by \"{{name}}\""
 
-msgid "Add Column"
-msgstr "Add Column"
+msgid "Failed to restore TEIs. Please try again."
+msgstr "Failed to restore TEIs. Please try again."
+
+msgid "Loading TEI history..."
+msgstr "Loading TEI history..."
+
+msgid "Too many deleted TEIs to display!"
+msgstr "Too many deleted TEIs to display!"
+
+msgid ""
+"There are too many deleted Tracked Entity Instances to display in the "
+"History tab. Please filter your org unit or program to reduce the number of "
+"deleted TEIs."
+msgstr ""
+"There are too many deleted Tracked Entity Instances to display in the "
+"History tab. Please filter your org unit or program to reduce the number of "
+"deleted TEIs."
 
 msgid "Remove Column"
 msgstr "Remove Column"
@@ -196,7 +278,6 @@ msgstr "Reset Filters"
 
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
-
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
 

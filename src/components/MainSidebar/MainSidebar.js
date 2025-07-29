@@ -11,8 +11,9 @@ import {
     sGetUiAccessoryPanelActiveTab,
 } from '../../reducers/ui.js'
 import DataDeletionModal from '../DataDeletion/DataDeletionModal.js'
+import DataDownloadModal from '../DataDownload/DataDownloadModal.js'
 import DataMigrationModal from '../DataMigration/DataMigrationModal.js'
-import OrgUnitSelection from '../DataMigration/OrgUnitSelection.js'
+import OrgUnitSelection from '../SearchableOrgUnitTree/OrgUnitSelection.js'
 import { InputPanel } from './InputPanel/index.js'
 import styles from './MainSidebar.module.css'
 import { useSelectedDimensions } from './SelectedDimensionsContext.js'
@@ -27,6 +28,7 @@ const MainSidebar = () => {
     const open = useSelector(sGetUiShowAccessoryPanel) && Boolean(selectedTabId)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false)
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
     const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false)
 
     const {
@@ -58,6 +60,11 @@ const MainSidebar = () => {
         setIsMigrationModalOpen(true)
     }
 
+    const onDownloadDataClocked = () => {
+        console.log('Download Data clicked')
+        setIsDownloadModalOpen(true)
+    }
+
     const onDeleteDataCliked = () => {
         console.log('Delete Data clicked')
         setIsDeletionModalOpen(true)
@@ -66,6 +73,7 @@ const MainSidebar = () => {
     const handleDMmodalClose = () => {
         setIsMigrationModalOpen(false)
         setIsDeletionModalOpen(false)
+        setIsDownloadModalOpen(false)
     }
 
     return (
@@ -96,17 +104,22 @@ const MainSidebar = () => {
 
                     <Divider />
 
-                    <div
-                        style={{
-                            overflow: 'auto',
-                            maxHeight: '512px',
-                        }}
-                    >
-                        <h4>Select Source Organisation Unit</h4>
-                        <OrgUnitSelection isSourceOrgUnit={true} />
+                    {/* Updated OrgUnitSelection with compact mode and custom styling */}
+                    <div className={styles.orgUnitSelectionWrapper}>
+                        <OrgUnitSelection
+                            isSourceOrgUnit={true}
+                            title="Select Source Organisation Unit"
+                            description="" // No description for compact mode
+                            compact={true}
+                            maxHeight="400px" // Custom max height for sidebar
+                        />
                     </div>
 
                     <Divider />
+
+                    {isDownloadModalOpen && (
+                        <DataDownloadModal onClose={handleDMmodalClose} />
+                    )}
 
                     {isMigrationModalOpen && (
                         <DataMigrationModal onClose={handleDMmodalClose} />
@@ -115,6 +128,20 @@ const MainSidebar = () => {
                     {isDeletionModalOpen && (
                         <DataDeletionModal onClose={handleDMmodalClose} />
                     )}
+
+                    <Button
+                        success={true}
+                        onClick={onDownloadDataClocked}
+                        style={{
+                            width: '100%',
+                            maxWidth: '512px',
+                            height: '48px',
+                            marginTop: '16px',
+                        }}
+                        disabled={!programId || !orgUnitId || selectedTeis.length === 0}
+                    >
+                        Download Data
+                    </Button>
 
                     <Button
                         primary

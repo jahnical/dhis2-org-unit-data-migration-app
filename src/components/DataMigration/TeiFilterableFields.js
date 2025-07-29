@@ -31,6 +31,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { dataActionCreators } from '../../actions/data_controls.js'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
 import classes from './styles/TeiAttributes.module.css'
+import { FIELD_METADATA } from '../../constants/FilterFieldmetadata.js'
 
 const TeiFilterableFields = () => {
     const teis = useSelector(dataControlSelectors.getDataControlTEIs)
@@ -80,8 +81,8 @@ const TeiFilterableFields = () => {
         )
     }, [allTEIs])
 
-    const availableUsers = selectedField?.name === 'Stored By' 
-        ? storedByOptions 
+    const availableUsers = selectedField?.name === 'Stored By'
+        ? storedByOptions
         : lastUpdatedByOptions
 
     const isUserAlreadySelected = (user, currentIndex) => {
@@ -91,9 +92,9 @@ const TeiFilterableFields = () => {
 
     const handleFieldClick = (field) => {
         setSelectedField(field)
-        
+
         const fieldFilters = filters.filter(f => f.field === field.name)
-        
+
         if (fieldFilters.length > 0) {
             const newConditions = fieldFilters.map(filter => {
                 if ([
@@ -103,27 +104,27 @@ const TeiFilterableFields = () => {
                     VALUE_TYPE_INTEGER_POSITIVE,
                     VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE,
                 ].includes(field.valueType)) {
-                    return { 
-                        type: field.valueType, 
-                        min: filter.min?.toString() || '', 
-                        max: filter.max?.toString() || '' 
+                    return {
+                        type: field.valueType,
+                        min: filter.min?.toString() || '',
+                        max: filter.max?.toString() || ''
                     }
                 } else if ([VALUE_TYPE_DATE, VALUE_TYPE_DATETIME].includes(field.valueType)) {
-                    return { 
-                        type: field.valueType, 
-                        start: filter.startDate || '', 
-                        end: filter.endDate || '' 
+                    return {
+                        type: field.valueType,
+                        start: filter.startDate || '',
+                        end: filter.endDate || ''
                     }
                 } else if (field.valueType === VALUE_TYPE_TEXT) {
-                    return { 
-                        type: field.valueType, 
+                    return {
+                        type: field.valueType,
                         keyword: filter.keyword || '',
-                        username: filter.username || '' 
+                        username: filter.username || ''
                     }
-                } 
+                }
                 return createEmptyCondition(field)
             })
-            
+
             setConditions(prev => ({
                 ...prev,
                 [field.name]: newConditions
@@ -134,7 +135,7 @@ const TeiFilterableFields = () => {
                 [field.name]: [createEmptyCondition(field)]
             }))
         }
-        
+
         setIsModalOpen(true)
     }
 
@@ -180,7 +181,7 @@ const TeiFilterableFields = () => {
     const updateCondition = (index, key, value) => {
         setConditions(prev => ({
             ...prev,
-            [selectedField.name]: prev[selectedField.name].map((cond, i) => 
+            [selectedField.name]: prev[selectedField.name].map((cond, i) =>
                 i === index ? { ...cond, [key]: value } : cond
             )
         }))
@@ -211,16 +212,16 @@ const TeiFilterableFields = () => {
 
     const applyFilters = () => {
         const newFilters = []
-        
+
         Object.entries(conditions).forEach(([fieldName, fieldConditions]) => {
             fieldConditions.forEach(condition => {
                 if (!condition.type) return
-                
+
                 const baseFilter = {
                     field: fieldName,
                     type: condition.type
                 }
-                
+
                 if ([
                     VALUE_TYPE_NUMBER,
                     VALUE_TYPE_INTEGER,
@@ -235,7 +236,7 @@ const TeiFilterableFields = () => {
                             max: Number(condition.max)
                         })
                     }
-                } 
+                }
                 else if ([VALUE_TYPE_DATE, VALUE_TYPE_DATETIME].includes(condition.type)) {
                     if (condition.start && condition.end) {
                         newFilters.push({
@@ -287,7 +288,7 @@ const TeiFilterableFields = () => {
 
     const hasValidConditions = () => {
         if (!selectedField) return false
-        
+
         const fieldConditions = conditions[selectedField.name] || []
         return fieldConditions.some(condition => {
             switch(condition.type) {
@@ -299,7 +300,7 @@ const TeiFilterableFields = () => {
                 case VALUE_TYPE_INTEGER_POSITIVE:
                 case VALUE_TYPE_INTEGER_NEGATIVE:
                 case VALUE_TYPE_INTEGER_ZERO_OR_POSITIVE:
-                    return condition.min !== '' && condition.max !== '' && 
+                    return condition.min !== '' && condition.max !== '' &&
                         !isNaN(condition.min) && !isNaN(condition.max)
                 case VALUE_TYPE_TEXT:
                     return condition.keyword || condition.username
@@ -363,9 +364,9 @@ const TeiFilterableFields = () => {
                                         value={cond.max}
                                         onChange={({ value }) => updateCondition(index, 'max', value)}
                                     />
-                                    <Button 
-                                        small 
-                                        destructive 
+                                    <Button
+                                        small
+                                        destructive
                                         onClick={() => removeCondition(index)}
                                     >
                                         {i18n.t('Remove')}
@@ -398,9 +399,9 @@ const TeiFilterableFields = () => {
                                         value={cond.end}
                                         onChange={({ value }) => updateCondition(index, 'end', value)}
                                     />
-                                    <Button 
-                                        small 
-                                        destructive 
+                                    <Button
+                                        small
+                                        destructive
                                         onClick={() => removeCondition(index)}
                                     >
                                         {i18n.t('Remove')}
@@ -414,8 +415,8 @@ const TeiFilterableFields = () => {
                     {(selectedField.name === 'Stored By' || selectedField.name === 'Last Updated By') && (
                         <div>
                             <h5>{i18n.t('Select Users')}</h5>
-                            <Button 
-                                onClick={addCondition} 
+                            <Button
+                                onClick={addCondition}
                                 icon={<IconAdd24 />}
                                 disabled={availableUsers.length === 0}
                             >
@@ -439,9 +440,9 @@ const TeiFilterableFields = () => {
                                             />
                                         ))}
                                     </SingleSelectField>
-                                    <Button 
-                                        small 
-                                        destructive 
+                                    <Button
+                                        small
+                                        destructive
                                         onClick={() => removeCondition(index)}
                                         style={{ marginTop: '8px' }}
                                     >
@@ -470,9 +471,9 @@ const TeiFilterableFields = () => {
                                         value={cond.keyword}
                                         onChange={({ value }) => updateCondition(index, 'keyword', value)}
                                     />
-                                    <Button 
-                                        small 
-                                        destructive 
+                                    <Button
+                                        small
+                                        destructive
                                         onClick={() => removeCondition(index)}
                                         style={{ marginTop: '8px' }}
                                     >

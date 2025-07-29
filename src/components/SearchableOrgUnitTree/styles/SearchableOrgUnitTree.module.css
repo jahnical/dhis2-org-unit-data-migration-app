@@ -1,0 +1,130 @@
+/* Base styles */
+.horizontalPadding {
+    padding: 0 var(--spacers-dp8);
+}
+
+.header,
+.searchFilterWrapper {
+    composes: horizontalPadding;
+    padding: var(--spacers-dp8);
+}
+
+.headerText {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+    margin: 0;
+}
+
+.headerDescription {
+    font-size: 14px;
+    color: var(--colors-grey800);
+    margin: 0;
+    margin-top: var(--spacers-dp4);
+}
+
+.searchFilterWrapper {
+    background: var(--colors-grey100);
+}
+
+.flexWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.errorIcon {
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-left: var(--spacers-dp8);
+}
+
+/* Full-size wrapper - for modal/dialog usage */
+.innerWrapper {
+    display: inline-block;
+    border: 1px solid var(--colors-grey400);
+    border-radius: 3px;
+    width: 480px;
+}
+
+.innerWrapper.error {
+    border-color: var(--theme-error);
+}
+
+/* Compact wrapper - for sidebar usage */
+.compactWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+/* Full-size scroll box */
+.scrollBox {
+    max-height: calc(60vh - 154px);
+    min-height: calc(300px - 154px);
+    overflow-y: auto;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* Compact scroll box - for sidebar usage */
+.compactScrollBox {
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    max-height: 400px; /* Default max height for compact mode */
+    min-height: 200px;
+}
+
+/* Button strip for full-size usage */
+.buttonStrip {
+    padding-top: var(--spacers-dp4);
+    padding-bottom: var(--spacers-dp8);
+    composes: horizontalPadding;
+}
+
+/* Compact mode adjustments */
+.compactWrapper .header {
+    padding: var(--spacers-dp4) var(--spacers-dp8);
+}
+
+.compactWrapper .headerText {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.compactWrapper .headerDescription {
+    font-size: 12px;
+    margin-top: var(--spacers-dp2);
+}
+
+.compactWrapper .searchFilterWrapper {
+    padding: var(--spacers-dp4) var(--spacers-dp8);
+}
+
+/* Selected org unit text */
+.selectedOrgUnitWrapper {
+    composes: horizontalPadding;
+    padding: var(--spacers-dp8);
+    font-size: 14px;
+    color: var(--colors-grey800);
+    margin: 0;
+    margin-top: var(--spacers-dp4);
+}
+
+.selectedPrefix {
+    color: var(--colors-grey800);
+}
+
+.selectedName {
+    font-weight: 600;
+    color: var(--colors-grey800);
+}
+
+/* Compact mode adjustments for selected org unit */
+.compactWrapper .selectedOrgUnitWrapper {
+    padding: var(--spacers-dp4) var(--spacers-dp8);
+    font-size: 12px;
+    margin-top: var(--spacers-dp2);
+}

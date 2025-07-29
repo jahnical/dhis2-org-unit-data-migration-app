@@ -79,6 +79,7 @@ export const dataActionCreators = {
                                 fields: '*',
                                 pageSize,
                                 page,
+                                includeDeleted: true, // <-- Ensure deleted TEIs are included
                             },
                         },
                     }
@@ -94,9 +95,15 @@ export const dataActionCreators = {
                     }
                 }
 
+                // Patch: ensure every TEI has both id and trackedEntityInstance set
+                const patchedTEIs = allTEIs.map(tei => ({
+                    ...tei,
+                    id: tei.trackedEntityInstance || tei.id,
+                    trackedEntityInstance: tei.trackedEntityInstance || tei.id,
+                }));
                 dispatch({
                     type: DATA_CONTROL_TYPES.FETCH_TEIS_SUCCESS,
-                    payload: allTEIs,
+                    payload: patchedTEIs,
                 })
 
                 return allTEIs
@@ -109,4 +116,9 @@ export const dataActionCreators = {
             }
         },
 
+    // Fix: setDataControlFilters action creator for filters
+    setDataControlFilters: (filters) => ({
+        type: DATA_CONTROL_TYPES.SET_FILTERS,
+        payload: filters,
+    }),
 }
