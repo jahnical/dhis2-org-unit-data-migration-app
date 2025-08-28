@@ -28,6 +28,7 @@ const DataMigrationModal = _ref => {
     const loading = useSelector(migrationSelectors.getMigrationIsLoading);
     const error = useSelector(migrationSelectors.getMigrationError);
     const migrationStatus = useSelector(migrationSelectors.getMigrationMigrationStatus);
+    const failedTeis = useSelector(migrationSelectors.getMigrationFailedTeis)
     const metadata = useSelector(sGetMetadata);
     const engine = useDataEngine();
 
@@ -77,10 +78,20 @@ const DataMigrationModal = _ref => {
     }, [targetOrgUnit, metadata])
 
     const migrateData = async () => {
-        setStep('migrating');
-        setMigrationProgress({
-            step: 0
-        });
+        // Add validation before starting migration
+        if (!allTeis || !selectedTeis || !targetOrgUnit || !metadata[targetOrgUnit] || !engine) {
+            console.error('Missing required parameters for migration:', {
+                allTeis: !!allTeis,
+                selectedTeis: !!selectedTeis,
+                targetOrgUnit: !!targetOrgUnit,
+                metadata: !!metadata[targetOrgUnit],
+                engine: !!engine
+            })
+            return
+        }
+
+        setStep('migrating')
+        setMigrationProgress({step: 0})
 
         // Simulating progress updates
         const updateProgress = (progress) => {
@@ -92,12 +103,66 @@ const DataMigrationModal = _ref => {
                 teis: allTeis,
                 selectedTeis: selectedTeis,
                 targetOrgUnit: targetOrgUnit,
-                targetOrgUnitName: metadata[targetOrgUnit].name,
+                targetOrgUnitName: metadata[targetOrgUnit]?.name || metadata[targetOrgUnit]?.displayName,
                 engine: engine,
                 onProgress: updateProgress,
                 currentUser: currentUser,
             })
         )
+    }
+
+    const retryFailedMigration = async () => {
+        setStep('migrating')
+        setMigrationProgress({step: 0})
+
+        const updateProgress = (progress) => {
+            setMigrationProgress(progress)
+        }
+
+        // TODO(Check the failedTeis, it always has no data)
+        const isFullErrorRetry = true //error !== null && migrationStatus === 'failed'
+
+        if (isFullErrorRetry) {
+            // For full error retry, use all originally selected TEIs
+            dispatch(
+                migrationActions.migrateTEIs({
+                    teis: allTeis,
+                    selectedTeis: selectedTeis,
+                    targetOrgUnit: targetOrgUnit,
+                    targetOrgUnitName: metadata[targetOrgUnit]?.name || metadata[targetOrgUnit]?.displayName,
+                    engine: engine,
+                    onProgress: updateProgress,
+                })
+            )
+        } else {
+            // For partial failure retry, only retry the failed TEIs
+            // Add validation to ensure all required parameters are present
+            if (!allTeis || !failedTeis || !targetOrgUnit || !metadata[targetOrgUnit] || !engine) {
+                console.error(`Missing required parameters for retry: allTeis: ${allTeis}
+                    failedTeis: ${!!failedTeis},
+                    targetOrgUnit: ${!!targetOrgUnit},
+                    metadata: ${!!metadata[targetOrgUnit]},
+                    engine: ${!!engine}`, {
+                    allTeis: !!allTeis,
+                    failedTeis: !!failedTeis,
+                    targetOrgUnit: !!targetOrgUnit,
+                    metadata: !!metadata[targetOrgUnit],
+                    engine: !!engine
+                })
+                return
+            }
+
+            dispatch(
+                migrationActions.retryFailedTEIs({
+                    teis: allTeis,
+                    failedTeis: failedTeis,
+                    targetOrgUnit: targetOrgUnit,
+                    targetOrgUnitName: metadata[targetOrgUnit]?.name || metadata[targetOrgUnit]?.displayName,
+                    engine: engine,
+                    onProgress: updateProgress,
+                })
+            )
+        }
     }
 
     const onCloseClicked = () => {
@@ -145,7 +210,7 @@ const DataMigrationModal = _ref => {
             }}>
                 <CircularLoader />
                 {
-                    migrationProgress.step == 0? <div>
+                    migrationProgress.step === 0? <div>
                         <p>{i18n.t("Updating Organisation Units")}</p>
                     </div> : <>
                         <div>
@@ -164,6 +229,83 @@ const DataMigrationModal = _ref => {
         )
     }
 
+    const renderMigrationResults = () => {
+        const hasFailedTeis = failedTeis && failedTeis.length > 0
+        const hasError = error !== null
+
+        if (migrationStatus === 'success' && !hasFailedTeis) {
+            return (
+                <NoticeBox success title={i18n.t('Migration successful')}>
+                    {i18n.t('All TEIs have been successfully migrated to the selected org unit.')}
+                </NoticeBox>
+            )
+        }
+
+        if (migrationStatus === 'partial_success' || hasFailedTeis) {
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <NoticeBox warning title={i18n.t('Migration completed with some failures')}>
+                        {i18n.t('Some TEIs could not be migrated. {{count}} TEI(s) failed to migrate.', {
+                            count: failedTeis.length
+                        })}
+                    </NoticeBox>
+                    {hasError && (
+                        <NoticeBox error title={i18n.t('Error details')}>
+                            {error?.message || error || i18n.t('An error occurred during migration')}
+                        </NoticeBox>
+                    )}
+                </div>
+            )
+        }
+
+        if (hasError) {
+            return (
+                <NoticeBox error title={i18n.t('Migration failed')}>
+                    <p>{error?.message || error || i18n.t('The migration could not be completed')}</p>
+                    <p style={{ marginTop: '8px', fontStyle: 'italic' }}>
+                        {i18n.t('You can retry the migration for all {{count}} selected TEIs.', {
+                            count: selectedTeis.length
+                        })}
+                    </p>
+                </NoticeBox>
+            )
+        }
+
+        return null
+    }
+
+    const showRetryButton = () => {
+        // Show retry button for:
+        // 1. Partial success with failed TEIs
+        // 2. Complete failure with error
+        // 3. Any scenario with failed TEIs
+        return (
+            (migrationStatus === 'partial_success' ||
+                migrationStatus === 'failed' ||
+                error !== null ||
+                (failedTeis && failedTeis.length > 0)) &&
+            !loading
+        )
+    }
+
+    const showCloseOnlyButton = () => {
+        return migrationStatus === 'success' && (!failedTeis || failedTeis.length === 0) && error === null
+    }
+
+    const getRetryButtonText = () => {
+        const hasError = error !== null
+        const hasFailedTeis = failedTeis && failedTeis.length > 0
+
+        if (hasError && migrationStatus === 'failed') {
+            return i18n.t('Retry All TEIs')
+        } else if (hasFailedTeis) {
+            return i18n.t('Retry Failed TEIs')
+        }
+        else {
+            return i18n.t('Retry Migration')
+        }
+    }
+
     return (
         <Modal onClose={onCloseClicked} position="middle" large>
             <ModalTitle>Data Migration</ModalTitle>
@@ -171,23 +313,11 @@ const DataMigrationModal = _ref => {
                 <ModalContent>
                     {renderProgress()}
                 </ModalContent>
-            ) : error ? (
-                <ModalContent>
-                    <NoticeBox error title={i18n.t('Could not migrate TEIs')}>
-                        {error?.message ||
-                            i18n.t(
-                                "The TEIs couldn't be migrated. {{error}}",
-                                { error: error }
-                            )}
-                    </NoticeBox>
-                </ModalContent>
             ) : (
                 <>
                     <ModalContent>
-                        {migrationStatus === 'success' ? (
-                            <NoticeBox success title={i18n.t('Migration successful')}>
-                                {i18n.t('All TEIs have been successfully migrated to the selected org unit.')}
-                            </NoticeBox>
+                        {migrationStatus === 'success' || migrationStatus === 'partial_success' || migrationStatus === 'failed' || error ? (
+                            renderMigrationResults()
                         ) : step === 'selection' ? (
                             <div style={{ marginBottom: '20px' }}>
                                 <h4>Select Target Organisation Unit</h4>
@@ -198,14 +328,31 @@ const DataMigrationModal = _ref => {
                         ) : null}
                     </ModalContent>
                     <ModalActions>
-                        {migrationStatus === 'success' ? (
+                        {showCloseOnlyButton() ? (
                             <ButtonStrip>
                                 <Button
                                     secondary
                                     onClick={onCloseClicked}
-                                    dataTest="data-migration-modal-confirm"
+                                    dataTest="data-migration-modal-close"
                                 >
                                     {i18n.t('Close')}
+                                </Button>
+                            </ButtonStrip>
+                        ) : showRetryButton() ? (
+                            <ButtonStrip>
+                                <Button
+                                    secondary
+                                    onClick={onCloseClicked}
+                                    dataTest="data-migration-modal-cancel"
+                                >
+                                    {i18n.t('Cancel')}
+                                </Button>
+                                <Button
+                                    primary
+                                    onClick={retryFailedMigration}
+                                    dataTest="data-migration-modal-retry"
+                                >
+                                    {getRetryButtonText()}
                                 </Button>
                             </ButtonStrip>
                         ) : (
