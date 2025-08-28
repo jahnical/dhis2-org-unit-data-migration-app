@@ -1,8 +1,7 @@
 import { VALUE_TYPE_DATE, VALUE_TYPE_DATETIME } from '@dhis2/analytics';
-import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button } from '@dhis2/ui';
 import { useDataEngine } from '@dhis2/app-runtime';
 import i18n from '@dhis2/d2-i18n';
-import {
+import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button ,
     Table,
     TableBody,
     TableCell,
@@ -20,8 +19,18 @@ import {
 } from '@dhis2/ui';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deletionSelectors } from '../../reducers/deletion.js';
+import { dataActionCreators } from '../../actions/data_controls.js';
+import {
+    setHistoryTeisLoading,
+    setHistoryTeisError,
+    setHistoryTeis,
+    setHistorySelectedTeis,
+    setHistoryTeisFilters,
+} from '../../actions/historyTeis.js';
 import { restoreTeis } from '../../actions/restoreTeis.js';
+import { APP_SOFT_DELETED_ATTR_ID } from '../../constants/appSoftDeletedAttrId.js';
+import { dataControlSelectors } from '../../reducers/data_controls.js';
+import { deletionSelectors } from '../../reducers/deletion.js';
 import {
     sGetHistoryTeisIsLoading,
     sGetHistoryTeisError,
@@ -30,18 +39,8 @@ import {
     sGetHistoryTeisAttributesToDisplay,
     sGetHistoryTeisFilters,
 } from '../../reducers/historyTeis.js';
-import {
-    setHistoryTeisLoading,
-    setHistoryTeisError,
-    setHistoryTeis,
-    setHistorySelectedTeis, 
-    setHistoryTeisFilters,
-} from '../../actions/historyTeis.js';
-import { dataControlSelectors } from '../../reducers/data_controls.js';
-import { dataActionCreators } from '../../actions/data_controls.js';
 import { sGetMetadata } from '../../reducers/metadata.js';
 import classes from './styles/Common.module.css';
-import { APP_SOFT_DELETED_ATTR_ID } from '../../constants/appSoftDeletedAttrId.js';
 
 const MAX_SAFE_HISTORY_ROWS = 500;
 const MAX_DISPLAY_ROWS = 100;
@@ -159,9 +158,9 @@ const HistoryTei = () => {
             }
         } catch (error) {
             const errorMessage = error.message || i18n.t('Failed to restore TEIs. Please try again.');
-            if (isMountedRef.current) setRestoreError(errorMessage);
+            if (isMountedRef.current) {setRestoreError(errorMessage);}
         } finally {
-            if (isMountedRef.current) setRestoreInProgress(false);
+            if (isMountedRef.current) {setRestoreInProgress(false);}
         }
     };
 
@@ -227,22 +226,22 @@ const HistoryTei = () => {
                                 <MenuItem label="Migrated" onClick={() => setStatus('migrated')} />
                             </Menu>
                         </DropdownButton>
-                        <Button 
-                            style={{ 
-                                height: 36, 
-                                minWidth: 100, 
-                                fontSize: '1rem', 
-                                padding: '0 22px', 
-                                background: '#1976d2', 
-                                color: '#fff', 
-                                border: 'none', 
-                                boxShadow: 'none', 
+                        <Button
+                            style={{
+                                height: 36,
+                                minWidth: 100,
+                                fontSize: '1rem',
+                                padding: '0 22px',
+                                background: '#1976d2',
+                                color: '#fff',
+                                border: 'none',
+                                boxShadow: 'none',
                                 fontWeight: 400,
                                 transition: 'background 0.15s',
                                 cursor: 'pointer',
                                 outline: 'none',
                                 userSelect: 'none',
-                            }} 
+                            }}
                             onMouseDown={e => e.currentTarget.style.background = '#115293'}
                             onMouseUp={e => e.currentTarget.style.background = '#1976d2'}
                             onMouseLeave={e => e.currentTarget.style.background = '#1976d2'}
@@ -348,8 +347,8 @@ const HistoryTei = () => {
                     <ModalContent>
                         <NoticeBox title={i18n.t('Confirm Restore')} info>
                             <p style={{ marginBottom: '16px' }}>
-                                {i18n.t('Are you sure you want to restore the following {{count}} Tracked Entity Instance(s)?', { 
-                                    count: selectedTeis.length 
+                                {i18n.t('Are you sure you want to restore the following {{count}} Tracked Entity Instance(s)?', {
+                                    count: selectedTeis.length
                                 })}
                             </p>
                             <p style={{ fontSize: '0.9em', color: '#666' }}>
@@ -370,15 +369,15 @@ const HistoryTei = () => {
                     </ModalContent>
                     <ModalActions>
                         <ButtonStrip end>
-                            <Button 
-                                secondary 
+                            <Button
+                                secondary
                                 onClick={handleCloseRestoreModal}
                                 disabled={restoreInProgress}
                             >
                                 {i18n.t('Cancel')}
                             </Button>
-                            <Button 
-                                primary 
+                            <Button
+                                primary
                                 onClick={handleRestore}
                                 disabled={restoreInProgress}
                             >

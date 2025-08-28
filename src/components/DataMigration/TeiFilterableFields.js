@@ -54,8 +54,10 @@ const TeiFilterableFields = () => {
     useEffect(() => {
         setFields([])
         if (teis && teis.length > 0) {
-            const firstTei = teis[0]
-            const fields = firstTei.filterableFields
+            const mostFieldsTei = teis.reduce((prev, curr) => {
+                return curr.filterableFields.length > prev.filterableFields.length ? curr : prev
+            })
+            const fields = mostFieldsTei.filterableFields
             setFields(fields)
         }
     }, [teis, programId, orgUnitId])
