@@ -1,18 +1,18 @@
+/* eslint-disable import/extensions */
+import { useAlert , useDataEngine } from '@dhis2/app-runtime'
 import React, { useState } from 'react'
-import { useAlert } from '@dhis2/app-runtime'
 import { useDispatch, useSelector } from 'react-redux'
-import { useDataEngine } from '@dhis2/app-runtime'
-import MigrationHistoryTable from './MigrationHistoryTable';
+import { fetchAndStoreMetadataThunk } from '../../actions/fetchAndStoreMetadataThunk';
+import { restoreTeisBatchesThunk } from '../../actions/restoreTeis';
+import { undoMigrationBatchesThunk } from '../../actions/undoMigration';
 import { useDeletionHistoryLogic } from '../DeletionHistory/DeletionHistory';
 import RestoreDeletedButton from '../DeletionHistory/RestoreDeletedButton';
 import RestoreDeletedModal from '../DeletionHistory/RestoreDeletedModal';
+import HistoryFilter from './HistoryFilter';
+import MigrationHistoryTable from './MigrationHistoryTable';
+import RestoreConfirmationModal from './RestoreConfirmationModal';
 import UndoMigrationButton from './UndoMigrationButton';
 import UndoMigrationModal from './UndoMigrationModal';
-import HistoryFilter from './HistoryFilter';
-import RestoreConfirmationModal from './RestoreConfirmationModal';
-import { undoMigrationBatchesThunk } from '../../actions/undoMigration';
-import { restoreTeisBatchesThunk } from '../../actions/restoreTeis';
-import { fetchAndStoreMetadataThunk } from '../../actions/fetchAndStoreMetadataThunk';
 
 const History = () => {
     const { show: showAlert } = useAlert();
@@ -45,12 +45,24 @@ const History = () => {
     const [showRestoreModal, setShowRestoreModal] = useState(false)
     const [filter, setFilter] = useState('all')
 
+    const [currentUser, setCurrentUser] = useState({});
+    React.useEffect(() => {
+        async function fetchUser() {
+            try {
+                const { me } = await engine.query({ me: { resource: 'me' } });
+                setCurrentUser(me);
+            } catch (e) {
+                setCurrentUser({});
+            }
+        }
+        if (engine) {fetchUser();}
+    }, [engine]);
+
+    // Filter histories by action type
     function isBatchUndoable(batch) {
         return batch.action === 'migrated';
     }
-    function isBatchRestorable(batch) {
-        return batch.action === 'soft-deleted';
-    }
+    
     const selectedBatchObjs = histories
         .filter(h => filter === 'all' || h.action === filter)
         .filter(b => selectedBatches.includes(b.id));
@@ -63,13 +75,13 @@ const History = () => {
             const orgUnitIds = [];
             if (tei.enrollments && tei.enrollments.length > 0) {
                 tei.enrollments.forEach(enr => {
-                    if (enr.program) programIds.push(enr.program);
-                    if (enr.orgUnit) orgUnitIds.push(enr.orgUnit);
+                    if (enr.program) {programIds.push(enr.program);}
+                    if (enr.orgUnit) {orgUnitIds.push(enr.orgUnit);}
                 });
             }
-            if (tei.program) programIds.push(tei.program);
-            if (tei.orgUnit) orgUnitIds.push(tei.orgUnit);
-            if (tei.orgUnitId) orgUnitIds.push(tei.orgUnitId);
+            if (tei.program) {programIds.push(tei.program);}
+            if (tei.orgUnit) {orgUnitIds.push(tei.orgUnit);}
+            if (tei.orgUnitId) {orgUnitIds.push(tei.orgUnitId);}
 
             // Remove duplicates
             const uniqueProgramIds = Array.from(new Set(programIds));
@@ -174,7 +186,15 @@ const History = () => {
                         customColumns={['timestamp', 'program', 'sourceOrgUnit', 'targetOrgUnit', 'user', 'action']}
                         selectedBatches={selectedBatches}
                     />
-                    <UndoMigrationModal open={showUndoModal} onClose={() => setShowUndoModal(false)} selectedBatches={selectedBatches} onConfirm={handleUndoConfirm} />
+                    <UndoMigrationModal
+                        open={showUndoModal}
+                        onClose={() => setShowUndoModal(false)}
+                        selectedBatches={selectedBatches}
+                        engine={engine}
+                        currentUser={currentUser}
+                        histories={histories}
+                        onConfirm={handleUndoConfirm}
+                    />
                     <RestoreConfirmationModal open={showRestoreModal} onClose={() => setShowRestoreModal(false)} selectedBatches={selectedBatches} onConfirm={handleRestoreConfirm} />
                 </>
             )}

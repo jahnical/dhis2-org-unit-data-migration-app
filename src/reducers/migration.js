@@ -23,7 +23,7 @@ export function migration(state = migrationInitialState, action) {
             return { ...state, targetOrgUnitId: action.payload }
 
         case MIGRATION_TYPES.MIGRATE_TEIS_START:
-            return { ...state, loading: true, error: null }
+            return { ...state, loading: true, error: null, migrationStatus: null };
 
         case MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS:
             return {
@@ -36,13 +36,13 @@ export function migration(state = migrationInitialState, action) {
             }
 
         case MIGRATION_TYPES.MIGRATE_TEIS_ERROR:
-            return { ...state, loading: false, error: action.payload }
+            return { ...state, loading: false, error: action.payload, migrationStatus: null };
 
         case MIGRATION_TYPES.RESET:
-            return migrationInitialState
+            return migrationInitialState;
 
         default:
-            return state
+            return state;
     }
 }
 

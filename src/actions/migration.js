@@ -1,5 +1,5 @@
 import { MIGRATION_TYPES } from '../reducers/migration.js'
-import { logHistoryBatchThunk } from './history'
+import { logHistoryBatchThunk } from './history.js'
 
 export const migrationActions = {
     setTargetOrgUnit: (orgUnitId) => ({
@@ -19,7 +19,8 @@ export const migrationActions = {
              targetOrgUnitName,
              engine,
              onProgress,
-         }) =>
+             currentUser,
+        }) =>
             async (dispatch) => {
                 if (
                     !teis?.length ||
@@ -36,17 +37,26 @@ export const migrationActions = {
 
                     const customEngine = engine
 
+                console.log("Selected TEIs for migration:", selectedTeis)
+
                     teis = teis.filter((tei) =>
                         selectedTeis.includes(tei.trackedEntityInstance)
                     )
 
-                    const updatedTeis = teis.map((tei) => {
+                    // Use currentUser for storedBy/lastUpdatedBy
+                const migrationUser = currentUser || { uid: '', username: '', displayName: '' }
+                const updatedTeis = teis.map((tei) => {
                         // Update all orgUnit references in the TEI
                         const updatedTei = {
                             ...tei,
                             orgUnit: targetOrgUnit,
                             lastUpdated: new Date().toISOString(),
-                        }
+                            lastUpdatedBy: {
+                            username: migrationUser.username || '',
+                            displayName: migrationUser.displayName || migrationUser.username || '',
+                        },
+                        storedBy: migrationUser.username || migrationUser.displayName || '',
+                    }
 
                         // Update orgUnit in all enrollments
                         if (updatedTei.enrollments) {
@@ -150,49 +160,40 @@ export const migrationActions = {
                     // Wait for all ownership transfers to complete
                     await Promise.all(ownershipPromises)
 
-                    // Determine migration status based on results
-                    const migrationStatus = failedTeis.length === 0 ? 'success' :
-                        successfulTeis.length > 0 ? 'partial_success' : 'failed'
+                dispatch({
+                    type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
+                    payload: response,
+                })
 
-                    dispatch({
-                        type: MIGRATION_TYPES.MIGRATE_TEIS_SUCCESS,
-                        payload: {
-                            response,
-                            successfulTeis,
-                            failedTeis,
-                            migrationStatus
-                        },
-                    })
-
-                    //Log the migration history batch
-                    const state = dispatch((_, getState) => getState()) || {};
-                    const programId = state.ui?.program?.id;
-                    const programName = state.metadata?.[programId]?.name || '';
-                    const user = state.current?.user || { id: '', name: '' };
-                    const sourceOrgUnitId = teis[0]?.orgUnit; // Before migration, this is the source
-                    const sourceOrgUnitName = state.metadata?.[sourceOrgUnitId]?.name || '';
-                    const targetOrgUnitId = targetOrgUnit;
-                    const targetOrgUnitNameFinal = state.metadata?.[targetOrgUnitId]?.name || targetOrgUnitName || '';
-                    const historyBatch = {
-                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        timestamp: new Date().toISOString(),
-                        date: new Date().toISOString().slice(0, 10),
-                        time: new Date().toLocaleTimeString(),
-                        action: 'migrated',
-                        program: { id: programId, name: programName },
-                        sourceOrgUnit: { id: sourceOrgUnitId, name: sourceOrgUnitName },
-                        targetOrgUnit: { id: targetOrgUnitId, name: targetOrgUnitNameFinal },
-                        user,
-                        teis: updatedTeis.map(tei => ({
-                            id: tei.trackedEntityInstance || tei.id,
-                            created: tei.created,
-                            lastUpdated: tei.lastUpdated,
-                            storedBy: tei.storedBy,
-                            lastUpdatedBy: tei.lastUpdatedBy,
-                            attributes: tei.attributes || [],
-                        })),
-                    };
-                    await dispatch(logHistoryBatchThunk(historyBatch, engine));
+                //Log the migration history batch
+                const state = dispatch((_, getState) => getState()) || {};
+                const programId = state.ui?.program?.id;
+                const programName = state.metadata?.[programId]?.name || '';
+                const user = state.current?.user || { id: '', name: '' };
+                const sourceOrgUnitId = teis[0]?.orgUnit; // Before migration, this is the source
+                const sourceOrgUnitName = state.metadata?.[sourceOrgUnitId]?.name || '';
+                const targetOrgUnitId = targetOrgUnit;
+                const targetOrgUnitNameFinal = state.metadata?.[targetOrgUnitId]?.name || targetOrgUnitName || '';
+                const historyBatch = {
+                    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toISOString().slice(0, 10),
+                    time: new Date().toLocaleTimeString(),
+                    action: 'migrated',
+                    program: { id: programId, name: programName },
+                    sourceOrgUnit: { id: sourceOrgUnitId, name: sourceOrgUnitName },
+                    targetOrgUnit: { id: targetOrgUnitId, name: targetOrgUnitNameFinal },
+                    user,
+                    teis: updatedTeis.map(tei => ({
+                        id: tei.trackedEntityInstance || tei.id,
+                        created: tei.created,
+                        lastUpdated: tei.lastUpdated,
+                        storedBy: tei.storedBy,
+                        lastUpdatedBy: tei.lastUpdatedBy,
+                        attributes: tei.attributes || [],
+                    })),
+                };
+                await dispatch(logHistoryBatchThunk(historyBatch, engine));
 
                     return response
                 } catch (error) {

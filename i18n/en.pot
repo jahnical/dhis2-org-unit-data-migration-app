@@ -280,42 +280,6 @@ msgstr "Restoring..."
 msgid "Restore"
 msgstr "Restore"
 
-msgid "Filter by \"{{name}}\""
-msgstr "Filter by \"{{name}}\""
-
-msgid "Select Stored By"
-msgstr "Select Stored By"
-
-msgid "Select Last Updated By"
-msgstr "Select Last Updated By"
-
-msgid "Start Date"
-msgstr "Start Date"
-
-msgid "End Date"
-msgstr "End Date"
-
-msgid "Enter Household Code"
-msgstr "Enter Household Code"
-
-msgid "Enter Househould Member Number"
-msgstr "Enter Househould Member Number"
-
-msgid "Enter keyword"
-msgstr "Enter keyword"
-
-msgid "Min value"
-msgstr "Min value"
-
-msgid "Max value"
-msgstr "Max value"
-
-msgid "Remove Filter"
-msgstr "Remove Filter"
-
-msgid "Apply Filter"
-msgstr "Apply Filter"
-
 msgid "Could not load TEIs"
 msgstr "Could not load TEIs"
 
@@ -340,6 +304,66 @@ msgstr "Sort by Stored By"
 
 msgid "Sort by Last Updated By"
 msgstr "Sort by Last Updated By"
+
+msgid "Filter by \"{{name}}\""
+msgstr "Filter by \"{{name}}\""
+
+msgid "Add Column"
+msgstr "Add Column"
+
+msgid "Remove Column"
+msgstr "Remove Column"
+
+msgid "Number Ranges"
+msgstr "Number Ranges"
+
+msgid "Add Range"
+msgstr "Add Range"
+
+msgid "Min value"
+msgstr "Min value"
+
+msgid "Max value"
+msgstr "Max value"
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Date Ranges"
+msgstr "Date Ranges"
+
+msgid "Start date"
+msgstr "Start date"
+
+msgid "End date"
+msgstr "End date"
+
+msgid "Select Users"
+msgstr "Select Users"
+
+msgid "Add User Filter"
+msgstr "Add User Filter"
+
+msgid "Select user"
+msgstr "Select user"
+
+msgid "Keywords"
+msgstr "Keywords"
+
+msgid "Add Keyword"
+msgstr "Add Keyword"
+
+msgid "Keyword"
+msgstr "Keyword"
+
+msgid "Remove Filter"
+msgstr "Remove Filter"
+
+msgid "Apply Filter"
+msgstr "Apply Filter"
+
+msgid "Reset Filters"
+msgstr "Reset Filters"
 
 msgid "Restore Deleted TEIs"
 msgstr "Restore Deleted TEIs"
@@ -366,32 +390,11 @@ msgstr "Restoring TEIs..."
 msgid "Add to {{axisName}}"
 msgstr "Add to {{axisName}}"
 
-msgid "No items selected"
-msgstr "No items selected"
-
-msgid "Available options"
-msgstr "Available options"
-
-msgid "Filter options"
-msgstr "Filter options"
-
-msgid "Selected options"
-msgstr "Selected options"
-
-msgid "Nothing found for \"{{- searchTerm}}\""
-msgstr "Nothing found for \"{{- searchTerm}}\""
-
-msgid "No options"
-msgstr "No options"
-
 msgid "Choose a condition type"
 msgstr "Choose a condition type"
 
 msgid "Case sensitive"
 msgstr "Case sensitive"
-
-msgid "Remove"
-msgstr "Remove"
 
 msgid "and"
 msgstr "and"
@@ -466,11 +469,23 @@ msgstr "Define start - end dates"
 msgid "Start and end dates are inclusive and will be included in the outputs."
 msgstr "Start and end dates are inclusive and will be included in the outputs."
 
-msgid "Start date"
-msgstr "Start date"
+msgid "No items selected"
+msgstr "No items selected"
 
-msgid "End date"
-msgstr "End date"
+msgid "Available options"
+msgstr "Available options"
+
+msgid "Filter options"
+msgstr "Filter options"
+
+msgid "Selected options"
+msgstr "Selected options"
+
+msgid "Nothing found for \"{{- searchTerm}}\""
+msgstr "Nothing found for \"{{- searchTerm}}\""
+
+msgid "No options"
+msgstr "No options"
 
 msgid "all"
 msgstr "all"
