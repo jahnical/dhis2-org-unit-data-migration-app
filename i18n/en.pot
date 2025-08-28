@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-07-30T07:24:01.820Z\n"
-"PO-Revision-Date: 2025-07-30T07:24:01.821Z\n"
+"POT-Creation-Date: 2025-07-29T17:12:54.722Z\n"
+"PO-Revision-Date: 2025-07-29T17:12:54.724Z\n"
 
 msgid "Please select at least one TEI to delete."
 msgstr "Please select at least one TEI to delete."
@@ -150,17 +150,45 @@ msgstr ""
 "Transferring Ownerships {{success}} successes and {{failure}} failures of "
 "{{total}} TEIs..."
 
-msgid "Could not migrate TEIs"
-msgstr "Could not migrate TEIs"
-
-msgid "The TEIs couldn't be migrated. {{error}}"
-msgstr "The TEIs couldn't be migrated. {{error}}"
-
 msgid "Migration successful"
 msgstr "Migration successful"
 
 msgid "All TEIs have been successfully migrated to the selected org unit."
 msgstr "All TEIs have been successfully migrated to the selected org unit."
+
+msgid "Migration completed with some failures"
+msgstr "Migration completed with some failures"
+
+msgid "Some TEIs could not be migrated. {{count}} TEI(s) failed to migrate."
+msgid_plural "Some TEIs could not be migrated. {{count}} TEI(s) failed to migrate."
+msgstr[0] "Some TEIs could not be migrated. {{count}} TEI(s) failed to migrate."
+msgstr[1] "Some TEIs could not be migrated. {{count}} TEI(s) failed to migrate."
+
+msgid "Error details"
+msgstr "Error details"
+
+msgid "An error occurred during migration"
+msgstr "An error occurred during migration"
+
+msgid "Migration failed"
+msgstr "Migration failed"
+
+msgid "The migration could not be completed"
+msgstr "The migration could not be completed"
+
+msgid "You can retry the migration for all {{count}} selected TEIs."
+msgid_plural "You can retry the migration for all {{count}} selected TEIs."
+msgstr[0] "You can retry the migration for all {{count}} selected TEIs."
+msgstr[1] "You can retry the migration for all {{count}} selected TEIs."
+
+msgid "Retry All TEIs"
+msgstr "Retry All TEIs"
+
+msgid "Retry Failed TEIs"
+msgstr "Retry Failed TEIs"
+
+msgid "Retry Migration"
+msgstr "Retry Migration"
 
 msgid "Next"
 msgstr "Next"
