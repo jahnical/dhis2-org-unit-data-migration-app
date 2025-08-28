@@ -119,8 +119,8 @@ const DataMigrationModal = _ref => {
             setMigrationProgress(progress)
         }
 
-        // Check if this is a full error retry or partial failure retry
-        const isFullErrorRetry = error !== null && migrationStatus === 'failed'
+        // TODO(Check the failedTeis, it always has no data)
+        const isFullErrorRetry = true //error !== null && migrationStatus === 'failed'
 
         if (isFullErrorRetry) {
             // For full error retry, use all originally selected TEIs
