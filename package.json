@@ -1,6 +1,6 @@
 {
     "name": "data-migration-app",
-    "version": "1.2",
+    "version": "1.3",
     "description": "DHIS2 Data Migration",
     "license": "BSD-3-Clause",
     "private": true,

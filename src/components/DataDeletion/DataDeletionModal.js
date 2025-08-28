@@ -13,7 +13,6 @@ import {
     CircularLoader,
     NoticeBox,
 } from '@dhis2/ui'
-
 import { dataActionCreators } from '../../actions/data_controls.js'
 import { deleteTeis } from '../../actions/deletion.js'
 import { dataControlSelectors } from '../../reducers/data_controls.js'
@@ -107,7 +106,7 @@ const DataDeletionModal = ({ onClose }) => {
             console.error('Deletion Error:', error)
             alert.show({ message: errorMessage, critical: true })
             dispatch(dataActionCreators.reset())
-        } 
+        }
 
     }, [error, alert, dispatch])
 
@@ -138,7 +137,7 @@ const DataDeletionModal = ({ onClose }) => {
                 <>
                     <ModalContent>
                         <NoticeBox success title={i18n.t('Soft delete successful')} aria-live="polite">
-                            {i18n.t('All selected TEIs have been marked as deleted. You can restore them from the History tab.')}
+                            {i18n.t('All selected TEIs have been deleted.')}
                         </NoticeBox>
                     </ModalContent>
                     <ModalActions>
@@ -159,8 +158,8 @@ const DataDeletionModal = ({ onClose }) => {
                         </div>
                         <div style={{ marginBottom: 8 }}>
                             {selectedTeis.length > 20
-                                ? i18n.t('This is a large number of TEIs. This action will mark them as deleted and remove them from the active list. This can be undone from the History tab.')
-                                : i18n.t('This action will mark the selected TEIs as deleted and remove them from the active list. This can be undone from the History tab.')}
+                                ? i18n.t('This is a large number of TEIs. This action will delete all the selected TEIs and it cannot be undone.')
+                                : i18n.t('This action will delete the selected TEIs and it cannot be undone.')}
                         </div>
                         <div style={{ marginBottom: 8 }}>
                             <strong>{i18n.t('TEIs to be deleted:')}</strong>
@@ -198,7 +197,7 @@ const DataDeletionModal = ({ onClose }) => {
                                     {i18n.t('This action can be undone from the History tab.')}
                                 </>
                             ) : (
-                                i18n.t('You are about to mark {{count}} TEIs as deleted. This action can be undone from the History tab.', { count: selectedTeis.length })
+                                i18n.t('You are about to delete {{count}} TEIs. This action cannot be undone.', { count: selectedTeis.length })
                             )}
                         </NoticeBox>
                     </ModalContent>
