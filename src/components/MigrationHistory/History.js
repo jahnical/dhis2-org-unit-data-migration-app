@@ -62,7 +62,7 @@ const History = () => {
     function isBatchUndoable(batch) {
         return batch.action === 'migrated';
     }
-    
+
     const selectedBatchObjs = histories
         .filter(h => filter === 'all' || h.action === filter)
         .filter(b => selectedBatches.includes(b.id));
@@ -133,16 +133,16 @@ const History = () => {
             <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center' }}>
                 {filter === 'deleted' ? (
                     <>
-                        <RestoreDeletedButton
+                        {/* <RestoreDeletedButton
                             selectedTeis={deletion.selectedDeletedTeis}
                             onClick={deletion.handleRestoreDeletedTeis}
                             disabled={!deletion.canRestoreDeletedTeis || deletion.restoring}
-                        />
+                        /> */}
                         <HistoryFilter value={filter} onFilterChange={setFilter} />
                     </>
                 ) : (
                     <>
-                        <UndoMigrationButton selectedBatches={selectedBatches} onClick={() => setShowUndoModal(true)} disabled={!canUndo} />
+                        {/* TODO(Need to manage the workflow properly, should not do multiple redos) <UndoMigrationButton selectedBatches={selectedBatches} onClick={() => setShowUndoModal(true)} disabled={!canUndo} /> */}
                         <HistoryFilter value={filter} onFilterChange={setFilter} />
                     </>
                 )}
