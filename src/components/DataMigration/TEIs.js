@@ -11,6 +11,7 @@ import {
     CircularLoader,
     NoticeBox,
     Checkbox,
+    Pagination,
 } from '@dhis2/ui'
 import React, { useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -40,6 +41,8 @@ const TEIs = () => {
     const filteredTeis = useMemo(() => filterTeis(activeTeis, filters), [activeTeis, filters])
     const [sortKey, setSortKey] = useState('')
     const [sortDirection, setSortDirection] = useState('default')
+    const [pageSize, setPageSize] = useState(5)
+    const [page, setPage] = useState(1)
 
     useEffect(() => {
         dispatch(dataActionCreators.setProgram(uiProgramId))
@@ -64,6 +67,7 @@ const TEIs = () => {
         setDisplayTeis(filteredTeis)
         setSortKey('')
         setSortDirection('default')
+        setPage(1)
         dispatch(dataActionCreators.setSelectedTEIs([]))
     }, [filteredTeis, dispatch])
 
@@ -141,8 +145,9 @@ const TEIs = () => {
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            const selectedIds = displayTeis.map(tei => tei.id)
-            const selectedTeiObjs = displayTeis.map(tei => ({ id: tei.id, ...tei }))
+            // Select only items on current page
+            const selectedIds = paginatedTeis.map(tei => tei.id)
+            const selectedTeiObjs = paginatedTeis.map(tei => ({ id: tei.id, ...tei }))
             console.log('[History][TEIs Selected][All]', selectedTeiObjs)
             dispatch(dataActionCreators.setSelectedTEIs(selectedIds))
         } else {
@@ -153,7 +158,7 @@ const TEIs = () => {
 
     const handleSelectTei = (teiId) => {
         const isSelected = selectedTeis.includes(teiId)
-        const teiObj = displayTeis.find(tei => tei.id === teiId)
+        const teiObj = initialFilteredTeis.find(tei => tei.id === teiId)
         if (isSelected) {
             console.log('[History][TEI Deselected]', teiObj)
             dispatch(dataActionCreators.setSelectedTEIs(selectedTeis.filter(id => id !== teiId)))
@@ -161,6 +166,24 @@ const TEIs = () => {
             console.log('[History][TEI Selected]', teiObj)
             dispatch(dataActionCreators.setSelectedTEIs([...selectedTeis, teiId]))
         }
+    }
+
+    // Calculate paginated data
+    const paginatedTeis = useMemo(() => {
+        const startIndex = (page - 1) * pageSize
+        const endIndex = startIndex + pageSize
+        return displayTeis.slice(startIndex, endIndex)
+    }, [displayTeis, page, pageSize])
+
+    const pageCount = Math.ceil(displayTeis.length / pageSize)
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage)
+    }
+
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize)
+        setPage(1)
     }
 
     if (loading) {
@@ -187,6 +210,27 @@ const TEIs = () => {
                         </h4>
                     </div>
 
+                    <div style={{ marginBottom: '16px' }}>
+                        <Pagination
+                            page={page}
+                            pageCount={pageCount}
+                            pageSize={pageSize}
+                            total={displayTeis.length}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                            className="pagination-white-buttons"
+                        />
+                        <style>{`
+                            .pagination-white-buttons button {
+                                background-color: white !important;
+                                color: #333 !important;
+                            }
+                            .pagination-white-buttons button:hover {
+                                background-color: #f5f5f5 !important;
+                            }
+                        `}</style>
+                    </div>
+
                     <DataTable>
                         <TableHead>
                             <DataTableRow>
@@ -196,8 +240,8 @@ const TEIs = () => {
                                     key="checkbox-header"
                                 >
                                     <Checkbox
-                                        checked={selectedTeis.length === displayTeis.length && displayTeis.length > 0}
-                                        indeterminate={selectedTeis.length > 0 && selectedTeis.length < displayTeis.length}
+                                        checked={selectedTeis.length === paginatedTeis.length && paginatedTeis.length > 0}
+                                        indeterminate={selectedTeis.length > 0 && selectedTeis.length < paginatedTeis.length}
                                         onChange={({ checked }) => handleSelectAll(checked)}
                                     />
                                 </DataTableColumnHeader>
@@ -261,7 +305,7 @@ const TEIs = () => {
                             </DataTableRow>
                         </TableHead>
                         <TableBody>
-                            {displayTeis.map((instance) => (
+                            {paginatedTeis.map((instance) => (
                                 <DataTableRow key={instance.id}>
                                     <DataTableCell className={classes.checkbox}>
                                         <Checkbox
