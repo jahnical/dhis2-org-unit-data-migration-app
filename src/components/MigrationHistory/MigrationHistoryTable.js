@@ -10,7 +10,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useSelector } from 'react-redux'
 import { useDeletedTeisHistory } from '../../hooks/useDeletedTeisHistory'
-import { DataTable, DataTableHead, DataTableRow, DataTableCell, DataTableColumnHeader, DataTableBody, Checkbox } from '@dhis2/ui'
+import { DataTable, DataTableHead, DataTableRow, DataTableCell, DataTableColumnHeader, DataTableBody, Checkbox, Pagination } from '@dhis2/ui'
 
 const ALL_COLUMN_DEFS = [
     { key: 'timestamp', label: 'Timestamp', width: '200px' },
@@ -136,6 +136,8 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
         : ALL_COLUMN_DEFS
     const [expandedBatchId, setExpandedBatchId] = useState(null)
     const [selected, setSelected] = useState(selectedBatches)
+    const [pageSize, setPageSize] = useState(5)
+    const [page, setPage] = useState(1)
     // Only update local selected state if prop changes and is different
     useEffect(() => {
         if (selectedBatches.length !== selected.length || !selectedBatches.every((id, i) => id === selected[i])) {
@@ -168,17 +170,6 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
         })
     }
 
-    const handleSelectAll = () => {
-        if (selected.length === histories.length) {
-            setSelected([])
-        } else {
-            setSelected(histories.map(batch => batch.id))
-        }
-    }
-
-    const areAllBatchesSelected = selected.length === histories.length && histories.length > 0
-    const isPartiallySelected = selected.length > 0 && selected.length < histories.length
-
     // Sorting logic
     function getSortValue(batch, col) {
         if (col === 'timestamp') return batch.timestamp
@@ -196,6 +187,33 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
         if (sortDir === 'asc') return aVal > bVal ? 1 : -1
         return aVal < bVal ? 1 : -1
     })
+
+    // Pagination logic - must come after sortedHistories is defined
+    const paginatedHistories = sortedHistories.slice(
+        (page - 1) * pageSize,
+        (page - 1) * pageSize + pageSize
+    )
+    const pageCount = Math.ceil(sortedHistories.length / pageSize)
+
+    const handleSelectAll = () => {
+        if (selected.length === paginatedHistories.length) {
+            setSelected([])
+        } else {
+            setSelected(paginatedHistories.map(batch => batch.id))
+        }
+    }
+
+    const areAllBatchesSelected = selected.length === paginatedHistories.length && paginatedHistories.length > 0
+    const isPartiallySelected = selected.length > 0 && selected.length < paginatedHistories.length
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage)
+    }
+
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize)
+        setPage(1)
+    }
 
     // Batch selection safety helpers
     function isBatchUndoable(batch) {
@@ -215,7 +233,28 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
             {histories.length === 0 ? (
                 <p>No migration history found.</p>
             ) : (
-                <DataTable>
+                <>
+                    <div style={{ marginBottom: '16px' }}>
+                        <Pagination
+                            page={page}
+                            pageCount={pageCount}
+                            pageSize={pageSize}
+                            total={sortedHistories.length}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                            className="pagination-white-buttons"
+                        />
+                        <style>{`
+                            .pagination-white-buttons button {
+                                background-color: white !important;
+                                color: #333 !important;
+                            }
+                            .pagination-white-buttons button:hover {
+                                background-color: #f5f5f5 !important;
+                            }
+                        `}</style>
+                    </div>
+                    <DataTable>
                     <DataTableHead>
                         <DataTableRow>
                             <DataTableColumnHeader width="48px">
@@ -248,7 +287,7 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
                         </DataTableRow>
                     </DataTableHead>
                     <DataTableBody>
-                        {sortedHistories.map((batch, idx) => (
+                        {paginatedHistories.map((batch, idx) => (
                             <MemoRow
                                 batch={batch}
                                 idx={idx}
@@ -263,6 +302,7 @@ const MigrationHistoryTable = ({ onSelectionChange, histories: historiesProp, cu
                         ))}
                     </DataTableBody>
                 </DataTable>
+                </>
             )}
         </div>
     )

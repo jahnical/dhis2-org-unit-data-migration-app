@@ -16,6 +16,7 @@ import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button ,
     Menu,
     MenuItem,
     AlertBar,
+    Pagination,
 } from '@dhis2/ui';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -59,6 +60,8 @@ const HistoryTei = () => {
     const [restoreSuccess, setRestoreSuccess] = useState(false);
     const [restoreError, setRestoreError] = useState(null);
     const [selectedTeiDetails, setSelectedTeiDetails] = useState([]);
+    const [pageSize, setPageSize] = useState(5);
+    const [page, setPage] = useState(1);
     const engine = useDataEngine();
     // Track mount status to avoid state update on unmounted
     const isMountedRef = React.useRef(true);
@@ -105,7 +108,8 @@ const HistoryTei = () => {
     // Handle select all checkbox
     const handleSelectAll = (checked) => {
         if (checked) {
-            const allTeiIds = teis.map(tei => tei.id);
+            // Select only items on current page
+            const allTeiIds = paginatedTeis.map(tei => tei.id);
             dispatch(setHistorySelectedTeis(allTeiIds));
         } else {
             dispatch(setHistorySelectedTeis([]));
@@ -171,6 +175,24 @@ const HistoryTei = () => {
     // Only show up to MAX_DISPLAY_ROWS, and if more than MAX_SAFE_HISTORY_ROWS, show warning and do not render table
     const teis = status === 'deleted' ? deletedTeis.slice(0, MAX_DISPLAY_ROWS) : [];
 
+    // Calculate paginated data
+    const paginatedTeis = React.useMemo(() => {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        return teis.slice(startIndex, endIndex);
+    }, [teis, page, pageSize]);
+
+    const pageCount = Math.ceil(teis.length / pageSize);
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setPage(1);
+    };
+
     // Always fetch TEIs (with includeDeleted) when orgUnit or program changes, even in History tab
     React.useEffect(() => {
         if (orgUnitId && programId) {
@@ -212,6 +234,27 @@ const HistoryTei = () => {
                     {/* Table label at the top */}
                     <div style={{ color: 'grey', display: 'flex', alignItems: 'center', marginBottom: 0 }}>
                         <h4 style={{ marginLeft: '16px', marginBottom: 0 }}>{i18n.t(labelText)}</h4>
+                    </div>
+                    {/* Pagination above table */}
+                    <div style={{ marginBottom: '16px' }}>
+                        <Pagination
+                            page={page}
+                            pageCount={pageCount}
+                            pageSize={pageSize}
+                            total={teis.length}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                            className="pagination-white-buttons"
+                        />
+                        <style>{`
+                            .pagination-white-buttons button {
+                                background-color: white !important;
+                                color: #333 !important;
+                            }
+                            .pagination-white-buttons button:hover {
+                                background-color: #f5f5f5 !important;
+                            }
+                        `}</style>
                     </div>
                     {/* Controls below the label */}
                     <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 4, marginBottom: 8 }}>
@@ -257,8 +300,8 @@ const HistoryTei = () => {
                             <TableRowHead>
                                 <TableCellHead className={classes.checkbox}>
                                     <Checkbox
-                                        checked={selectedTeis.length === teis.length && teis.length > 0}
-                                        indeterminate={selectedTeis.length > 0 && selectedTeis.length < teis.length}
+                                        checked={selectedTeis.length === paginatedTeis.length && paginatedTeis.length > 0}
+                                        indeterminate={selectedTeis.length > 0 && selectedTeis.length < paginatedTeis.length}
                                         onChange={({ checked }) => handleSelectAll(checked)}
                                     />
                                 </TableCellHead>
@@ -288,14 +331,14 @@ const HistoryTei = () => {
                             </TableRowHead>
                         </TableHead>
                         <TableBody className={classes.bodyTable}>
-                            {teis.length === 0 ? (
+                            {paginatedTeis.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={`${6 + attributesToDisplay.length}`} style={{ textAlign: 'center', color: '#888' }}>
                                         {i18n.t('No deleted TEIs found for this org unit and program.')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                teis.map((instance) => (
+                                paginatedTeis.map((instance) => (
                                     <TableRow key={instance.id}>
                                         <TableCell className={classes.checkbox}>
                                             <Checkbox
