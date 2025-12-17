@@ -21,19 +21,27 @@ export const deleteTeis = ({ teiUids, engine, allTeis }) => async (dispatch) => 
     const errors = [];
     const deletedTeis = [];
     const allTeisList = allTeis || [];
-    for (const teiId of teiUids) {
+    const deletePromises = teiUids.map(async (teiId) => {
         try {
-            // Find full TEI object
             const fullTei = allTeisList.find(t => t.trackedEntityInstance === teiId || t.id === teiId) || { id: teiId };
             await deleteTEI(engine, teiId, fullTei);
-            deletedTeis.push(fullTei);
+            return { success: true, tei: fullTei };
         } catch (error) {
-            // If 404 or already deleted, skip and collect error
             if (error.message && error.message.includes('404')) {
-                errors.push(`${teiId}: Not found or already deleted`);
+                return { success: false, error: `${teiId}: Not found or already deleted` };
             } else {
-                errors.push(`${teiId}: ${error.message}`);
+                return { success: false, error: `${teiId}: ${error.message}` };
             }
+        }
+    });
+
+    const results = await Promise.all(deletePromises);
+
+    for (const result of results) {
+        if (result.success) {
+            deletedTeis.push(result.tei);
+        } else {
+            errors.push(result.error);
         }
     }
 
