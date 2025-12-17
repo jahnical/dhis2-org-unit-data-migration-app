@@ -100,7 +100,7 @@ export const deleteTEI = async (engine, teiUid, fullTei) => {
         type: 'delete',
     })
     // Track deleted TEI in datastore as a batch (store full object)
-    await trackDeletedTeiBatch(engine, [fullTei || { id: teiUid }])
+    // await trackDeletedTeiBatch(engine, [fullTei || { id: teiUid }]) Temporarily disable history tracking
     console.info(`Successfully soft-deleted TEI ${teiUid}`)
   } catch (error) {
     let errorMsg = `Failed to delete TEI ${teiUid}`

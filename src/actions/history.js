@@ -38,8 +38,8 @@ export const logHistoryBatchThunk = (batch, dataEngine) => async (dispatch) => {
     // Add to Redux
     dispatch(logHistoryBatch(batch))
     // Save to localStorage
-    const local = getLocalHistory()
-    setLocalHistory([batch, ...local])
+    // const local = getLocalHistory()
+    // setLocalHistory([batch, ...local])
     // Save to DataStore
     const remote = await getDataStoreHistory(dataEngine)
     await setDataStoreHistory(dataEngine, [batch, ...remote])
